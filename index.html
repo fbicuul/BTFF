@@ -535,7 +535,7 @@
             transition: width 0.3s;
         }
 
-        /* DETAILS MODAL - New improved version */
+        /* DETAILS MODAL */
         .details-modal {
             display: none;
             position: fixed;
@@ -1153,7 +1153,7 @@
 <script>
     (function() {
         // ---------- CONFIGURATION ----------
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwzWIfjfXJCZ8fhX_tQi1DJt9aeVxHcsRhSNFAz236KNI_iZTNtKYpIAzGSxylxyzZx/exec'; // Replace with your actual URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwzWIfjfXJCZ8fhX_tQi1DJt9aeVxHcsRhSNFAz236KNI_iZTNtKYpIAzGSxylxyzZx/exec';
         
         // ---------- STATE ----------
         let movies = [];
@@ -1470,7 +1470,7 @@
                 filtered = filtered.filter(m => m.year === yearFilter.value);
             }
             
-            if (sortFilter && sortFilter.value) {
+            if (sortFilter && sortFilter.value && sortFilter.value !== 'default') {
                 switch(sortFilter.value) {
                     case 'titleAsc':
                         filtered.sort((a, b) => a.title.localeCompare(b.title));
@@ -1497,7 +1497,7 @@
             return filtered;
         }
 
-        // ---------- CARD CREATION ----------
+        // ---------- CARD CREATION - FIXED ----------
         function createMovieCard(movie, forSimilar = false) {
             const card = document.createElement('div');
             card.className = `movie-card ${isInMyList(movie.id) ? 'in-my-list' : ''}`;
@@ -1535,28 +1535,35 @@
                 </div>
             `;
 
-            card.querySelector('.fa-play').addEventListener('click', (e) => {
+            const playIcon = card.querySelector('.fa-play');
+            const listIcon = card.querySelector('.fa-plus, .fa-check');
+            
+            playIcon.addEventListener('click', (e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 openVideoPlayer(movie.id);
             });
 
-            card.querySelector('.fa-plus, .fa-check').addEventListener('click', (e) => {
+            listIcon.addEventListener('click', (e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 toggleMyList(movie.id, e);
             });
 
-            card.addEventListener('click', () => {
-                if (forSimilar) {
-                    openVideoPlayer(movie.id);
-                } else {
-                    openDetailsModal(movie.id);
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('i')) {
+                    if (forSimilar) {
+                        openVideoPlayer(movie.id);
+                    } else {
+                        openDetailsModal(movie.id);
+                    }
                 }
             });
 
             return card;
         }
 
-        // ---------- RENDERING ----------
+        // ---------- RENDERING - FIXED ----------
         function clearRow(row) {
             if (!row) return;
             while (row.firstChild) {
@@ -1572,10 +1579,21 @@
             const filteredMovies = filterAndSortMovies(movies);
 
             filteredMovies.forEach(movie => {
-                const card = createMovieCard(movie);
-                if (movie.category === 'trending') trendingRow.appendChild(card.cloneNode(true));
-                else if (movie.category === 'popular') popularRow.appendChild(card.cloneNode(true));
-                else if (movie.category === 'recent') recentRow.appendChild(card.cloneNode(true));
+                if (movie.category === 'trending') {
+                    trendingRow.appendChild(createMovieCard(movie));
+                }
+            });
+            
+            filteredMovies.forEach(movie => {
+                if (movie.category === 'popular') {
+                    popularRow.appendChild(createMovieCard(movie));
+                }
+            });
+            
+            filteredMovies.forEach(movie => {
+                if (movie.category === 'recent') {
+                    recentRow.appendChild(createMovieCard(movie));
+                }
             });
 
             if (trendingRow.children.length === 0) {
@@ -1636,7 +1654,16 @@
         if (searchIcon) {
             searchIcon.addEventListener('click', () => {
                 if (searchContainer) {
-                    searchContainer.style.display = searchContainer.style.display === 'none' ? 'block' : 'none';
+                    if (searchContainer.style.display === 'none') {
+                        searchContainer.style.display = 'block';
+                        categoryFilter.value = '';
+                        yearFilter.value = '';
+                        sortFilter.value = 'default';
+                        searchInput.value = '';
+                        applyFilters();
+                    } else {
+                        searchContainer.style.display = 'none';
+                    }
                 }
             });
         }
@@ -1661,6 +1688,17 @@
             logoHome.addEventListener('click', () => {
                 closeDetailsModalFunc();
                 closeVideoPlayer();
+                navLinks.forEach(l => l.classList.remove('active'));
+                document.querySelector('[data-category="all"]').classList.add('active');
+                document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex');
+                trendingRow.style.display = 'flex';
+                popularRow.style.display = 'flex';
+                recentRow.style.display = 'flex';
+                if (myList.length === 0) {
+                    myListSection.style.display = 'none';
+                } else {
+                    myListSection.style.display = 'block';
+                }
             });
         }
 
@@ -1668,6 +1706,34 @@
             link.addEventListener('click', () => {
                 navLinks.forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
+                
+                const category = link.dataset.category;
+                
+                if (category === 'myList') {
+                    document.querySelectorAll('.section-header').forEach(header => {
+                        if (header.querySelector('.section-title')?.textContent.includes('MY LIST')) {
+                            header.style.display = 'flex';
+                        } else {
+                            header.style.display = 'none';
+                        }
+                    });
+                    trendingRow.style.display = 'none';
+                    popularRow.style.display = 'none';
+                    recentRow.style.display = 'none';
+                    myListSection.style.display = myList.length ? 'block' : 'none';
+                } else if (category === 'all') {
+                    document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex');
+                    trendingRow.style.display = 'flex';
+                    popularRow.style.display = 'flex';
+                    recentRow.style.display = 'flex';
+                    myListSection.style.display = myList.length ? 'block' : 'none';
+                } else {
+                    document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex');
+                    trendingRow.style.display = category === 'trending' ? 'flex' : 'none';
+                    popularRow.style.display = category === 'popular' ? 'flex' : 'none';
+                    recentRow.style.display = category === 'recent' ? 'flex' : 'none';
+                    myListSection.style.display = 'none';
+                }
             });
         });
 
@@ -1720,6 +1786,9 @@
                 myList = [];
                 saveMyList();
                 showNotification('🗑️ My List cleared');
+                if (document.querySelector('[data-category="myList"]').classList.contains('active')) {
+                    myListSection.style.display = 'none';
+                }
             });
         }
 
@@ -1736,7 +1805,6 @@
             retryBtn.addEventListener('click', fetchMovies);
         }
 
-        // Details modal buttons
         if (detailsPlayBtn) {
             detailsPlayBtn.addEventListener('click', () => {
                 if (currentMovie) {
@@ -1757,7 +1825,6 @@
             });
         }
 
-        // Rating modal
         if (rateMovieBtn) {
             rateMovieBtn.addEventListener('click', () => {
                 ratingModal.classList.add('active');
@@ -1769,10 +1836,11 @@
         }
 
         if (ratingStars) {
-            ratingStars.querySelectorAll('i').forEach(star => {
+            const stars = ratingStars.querySelectorAll('i');
+            stars.forEach(star => {
                 star.addEventListener('mouseover', () => {
                     const rating = star.dataset.rating;
-                    ratingStars.querySelectorAll('i').forEach((s, index) => {
+                    stars.forEach((s, index) => {
                         if (index < rating) {
                             s.className = 'fas fa-star';
                         } else {
@@ -1782,7 +1850,7 @@
                 });
                 
                 star.addEventListener('mouseout', () => {
-                    ratingStars.querySelectorAll('i').forEach((s, index) => {
+                    stars.forEach((s, index) => {
                         if (index < currentRating) {
                             s.className = 'fas fa-star';
                         } else {
@@ -1816,6 +1884,20 @@
         window.addEventListener('click', (e) => {
             if (e.target === ratingModal) {
                 ratingModal.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (detailsModal.classList.contains('active')) {
+                    closeDetailsModalFunc();
+                }
+                if (videoModal.classList.contains('active')) {
+                    closeVideoPlayer();
+                }
+                if (ratingModal.classList.contains('active')) {
+                    ratingModal.classList.remove('active');
+                }
             }
         });
 

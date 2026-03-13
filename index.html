@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>BTFF · Streaming Platform</title>
     <!-- Font Awesome 6 (free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -170,7 +170,7 @@
             color: white;
         }
 
-        /* Mobile navigation drawer */
+        /* Mobile navigation drawer - FIXED VISIBILITY */
         .mobile-nav-drawer {
             display: none;
             position: absolute;
@@ -178,42 +178,49 @@
             left: 0;
             width: 100%;
             background: #0c1727;
-            border: 1px solid #3d6190;
+            border: 2px solid #3d6190;
             border-top: none;
             border-radius: 0 0 20px 20px;
-            padding: 20px 40px;
-            z-index: 25;
-            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+            padding: 25px 40px;
+            z-index: 1000;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
         }
         
         .mobile-nav-drawer.active {
-            display: block;
+            display: block !important;
         }
         
         .mobile-nav-links {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
         }
         
         .mobile-nav-links span {
             cursor: pointer;
-            transition: color 0.2s;
-            font-size: 1.2rem;
+            transition: all 0.2s;
+            font-size: 1.4rem;
             color: #b0c7e9;
-            padding: 5px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(61, 97, 144, 0.3);
+        }
+        
+        .mobile-nav-links span:last-child {
+            border-bottom: none;
         }
         
         .mobile-nav-links span:hover {
             color: white;
+            padding-left: 10px;
         }
         
         .mobile-nav-links span.active {
             color: white;
             font-weight: 600;
             border-left: 4px solid #2f6bc6;
-            padding-left: 12px;
+            padding-left: 16px;
+            background: rgba(47, 107, 198, 0.1);
         }
 
         .nav-right {
@@ -984,7 +991,7 @@
             transform: translateX(0);
         }
 
-        /* Mobile responsive styles */
+        /* Mobile responsive styles - FIXED */
         @media (max-width: 800px) {
             .hero-title { 
                 font-size: 3.2rem; 
@@ -1012,6 +1019,25 @@
             /* Adjust navbar for mobile */
             .navbar {
                 flex-wrap: wrap;
+                position: relative;
+            }
+            
+            /* Make mobile drawer full width and visible when active */
+            .mobile-nav-drawer {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                width: 100%;
+                display: none;
+                background: #0c1727;
+                border: 2px solid #3d6190;
+                border-top: none;
+                z-index: 1000;
+            }
+            
+            .mobile-nav-drawer.active {
+                display: block !important;
             }
             
             /* Make search container full width on mobile */
@@ -1033,6 +1059,17 @@
             
             .details-buttons {
                 justify-content: center;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 480px) {
+            .mobile-nav-drawer {
+                padding: 20px;
+            }
+            
+            .mobile-nav-links span {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -1348,7 +1385,8 @@
         function toggleMobileMenu() {
             if (mobileNavDrawer) {
                 mobileNavDrawer.classList.toggle('active');
-                console.log('Mobile menu toggled:', mobileNavDrawer.classList.contains('active'));
+                console.log('Mobile menu toggled. Active:', mobileNavDrawer.classList.contains('active'));
+                console.log('Drawer HTML:', mobileNavDrawer.outerHTML);
             }
         }
 
@@ -1806,24 +1844,27 @@
         if (mobileMenuToggle) {
             console.log('Mobile menu toggle found, attaching event');
             
-            // Remove any existing event listeners by cloning and replacing
-            const newToggle = mobileMenuToggle.cloneNode(true);
-            mobileMenuToggle.parentNode.replaceChild(newToggle, mobileMenuToggle);
-            
-            // Add new event listener
-            newToggle.addEventListener('click', function(event) {
+            mobileMenuToggle.addEventListener('click', function(event) {
                 event.preventDefault();
                 event.stopPropagation();
+                event.stopImmediatePropagation();
                 console.log('Hamburger clicked!');
                 
                 if (mobileNavDrawer) {
-                    mobileNavDrawer.classList.toggle('active');
-                    console.log('Drawer active:', mobileNavDrawer.classList.contains('active'));
+                    // Force toggle the class
+                    if (mobileNavDrawer.classList.contains('active')) {
+                        mobileNavDrawer.classList.remove('active');
+                        console.log('Drawer closed');
+                    } else {
+                        mobileNavDrawer.classList.add('active');
+                        console.log('Drawer opened');
+                        console.log('Drawer classes:', mobileNavDrawer.className);
+                        console.log('Drawer display style:', window.getComputedStyle(mobileNavDrawer).display);
+                    }
+                } else {
+                    console.log('Mobile nav drawer not found!');
                 }
             });
-            
-            // Update reference
-            window.mobileMenuToggle = newToggle;
         } else {
             console.log('Mobile menu toggle NOT found - check if element exists in DOM');
         }

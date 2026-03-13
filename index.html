@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTFF · complete streaming experience</title>
+    <title>BTFF SERIES</title>
     <!-- Font Awesome 6 (free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Same styles as previous version - keeping it beautiful */
         * {
             margin: 0;
             padding: 0;
@@ -461,9 +462,21 @@
             background: #2f6bc6;
         }
 
-        /* my list row (initially hidden if empty) */
-        #myListRow {
+        /* my list row */
+        #myListSection {
             transition: opacity 0.3s;
+        }
+
+        /* loading indicator */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #84b2ff;
+            font-size: 1.2rem;
+        }
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 10px;
         }
 
         /* footer */
@@ -632,7 +645,7 @@
                 </div>
             </nav>
 
-            <!-- SEARCH (hidden by default) -->
+            <!-- SEARCH -->
             <div class="search-container" id="searchContainer" style="display: none;">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
@@ -660,7 +673,13 @@
     </div>
 
     <div class="container">
-        <!-- MY LIST ROW (dynamic) -->
+        <!-- LOADING INDICATOR -->
+        <div id="loadingIndicator" class="loading" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading movies...</p>
+        </div>
+
+        <!-- MY LIST ROW -->
         <div id="myListSection" style="display: none;">
             <div class="section-header">
                 <h2 class="section-title">📋 MY LIST</h2>
@@ -727,26 +746,16 @@
 
 <script>
     (function() {
-        // ---------- MOVIE DATABASE ----------
-        const movies = [
-            { id: "1", title: "The Silent Escape", youtubeId: "vgWyjYBvsUk", category: "trending", year: "2024", duration: "1h 58m", desc: "A suspenseful cinematic journey filled with mystery and tension." },
-            { id: "2", title: "Shadow Mission", youtubeId: "60q_y5IDD6U", category: "trending", year: "2025", duration: "2h 11m", desc: "An intense action story about survival, secrets, and power." },
-            { id: "3", title: "First Flight: Origins", youtubeId: "dKrVeg6LopI", category: "popular", year: "2023", duration: "2h 04m", desc: "The early days of aviation pioneers." },
-            { id: "4", title: "Night Sky", youtubeId: "YoHD9XEInc0", category: "popular", year: "2022", duration: "1h 47m", desc: "A journey beyond the stars." },
-            { id: "5", title: "Echoes of Tomorrow", youtubeId: "zSWdZVtXT7E", category: "recent", year: "2025", duration: "2h 22m", desc: "Time-bending thriller." },
-            { id: "6", title: "Last Horizon", youtubeId: "HhesaQXLuRY", category: "recent", year: "2024", duration: "1h 50m", desc: "Survival on a distant planet." },
-            { id: "7", title: "Iron Will", youtubeId: "vw61gCe2oqI", category: "trending", year: "2025", duration: "2h 15m", desc: "Unyielding spirit in space." },
-            { id: "8", title: "Dream Engine", youtubeId: "nIOmotayDMU", category: "popular", year: "2023", duration: "1h 43m", desc: "Building the impossible aircraft." },
-            { id: "9", title: "Gravity Riders", youtubeId: "LoebZZ8K5N0", category: "recent", year: "2026", duration: "1h 55m", desc: "High‑octane aerial adventure." },
-            { id: "10", title: "Silent Thunder", youtubeId: "U7elNhHwgBU", category: "trending", year: "2024", duration: "2h 08m", desc: "Stealth and revenge." },
-            { id: "11", title: "Beyond the Clouds", youtubeId: "xK7S9mrFWL4", category: "popular", year: "2023", duration: "1h 50m", desc: "Mystery above the sky." },
-            { id: "12", title: "Wing and a Prayer", youtubeId: "QfDoL4WcD3s", category: "recent", year: "2025", duration: "1h 42m", desc: "Inspiring true story." }
-        ];
-
-        // ---------- GLOBAL STATE ----------
-        let myList = JSON.parse(localStorage.getItem('btffMyList')) || []; // store movie ids
+        // ---------- CONFIGURATION ----------
+        // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhWMnjTJvbF57VlLGDm7m0tsUCZFS0b6ki-1N3cwRLsoyciD_NtOmz9wVpBYrgmmg-/exec';
+        
+        // ---------- STATE ----------
+        let movies = [];
+        let myList = JSON.parse(localStorage.getItem('btffMyList')) || [];
         let currentFilterCategory = 'all';
-        let currentModalMovie = null; // for modal add button
+        let currentModalMovie = null;
+        let isLoading = false;
 
         // DOM elements
         const trendingRow = document.getElementById('trendingRow');
@@ -770,32 +779,63 @@
         const closeModal = document.getElementById('closeModal');
         const notification = document.getElementById('notification');
         const clearMyList = document.getElementById('clearMyList');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+
+        // ---------- API FUNCTIONS ----------
+        async function fetchMovies(params = {}) {
+            try {
+                showLoading(true);
+                
+                // Build query string
+                const queryParams = new URLSearchParams({
+                    action: 'getMovies',
+                    ...params
+                }).toString();
+                
+                const response = await fetch(`${APPS_SCRIPT_URL}?${queryParams}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    movies = data.movies;
+                    renderAllCards();
+                } else {
+                    showNotification('Error loading movies: ' + data.error);
+                    console.error('API Error:', data.error);
+                }
+            } catch (error) {
+                showNotification('Failed to connect to database');
+                console.error('Fetch error:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
 
         // ---------- HELPER FUNCTIONS ----------
+        function showLoading(show) {
+            isLoading = show;
+            loadingIndicator.style.display = show ? 'block' : 'none';
+        }
+
         function showNotification(msg) {
-            notification.textContent = msg || '✅ Added to My List';
+            notification.textContent = msg;
             notification.classList.add('show');
             setTimeout(() => notification.classList.remove('show'), 2500);
         }
 
-        // get movie by id
         function getMovieById(id) {
             return movies.find(m => m.id === id);
         }
 
-        // check if movie is in myList
         function isInMyList(movieId) {
             return myList.includes(movieId);
         }
 
-        // update localStorage and re-render affected rows
         function saveMyList() {
             localStorage.setItem('btffMyList', JSON.stringify(myList));
-            renderAllCards(); // re-render to update + icons and borders
+            renderAllCards();
             renderMyListRow();
         }
 
-        // add to my list
         function addToMyList(movieId) {
             if (!myList.includes(movieId)) {
                 myList.push(movieId);
@@ -806,14 +846,12 @@
             }
         }
 
-        // remove from my list
         function removeFromMyList(movieId) {
             myList = myList.filter(id => id !== movieId);
             saveMyList();
             showNotification('❌ Removed from My List');
         }
 
-        // toggle (used in cards)
         function toggleMyList(movieId, event) {
             event.stopPropagation();
             if (isInMyList(movieId)) {
@@ -823,7 +861,6 @@
             }
         }
 
-        // open player
         function openPlayer(movieId) {
             const movie = getMovieById(movieId);
             if (!movie) return;
@@ -831,7 +868,7 @@
             modalTitle.textContent = movie.title;
             modalIframe.src = `https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&rel=0&modestbranding=1&controls=1`;
             modal.classList.add('active');
-            // update modal add button text
+            
             if (isInMyList(movieId)) {
                 modalAddBtn.innerHTML = '<i class="fas fa-check"></i> In My List';
             } else {
@@ -839,14 +876,12 @@
             }
         }
 
-        // close modal
         function closePlayer() {
             modal.classList.remove('active');
             modalIframe.src = '';
             currentModalMovie = null;
         }
 
-        // render a single card (reusable)
         function createMovieCard(movie) {
             const card = document.createElement('div');
             card.className = `movie-card ${isInMyList(movie.id) ? 'in-my-list' : ''}`;
@@ -860,8 +895,8 @@
                 <img class="card-poster" src="${thumb}" alt="${movie.title}" loading="lazy">
                 <div class="card-info">
                     <div class="card-title">${movie.title}</div>
-                    <div class="card-meta"><span>${movie.year}</span> <span>${movie.duration}</span> <span class="card-badge">HD</span></div>
-                    <div class="card-description">${movie.desc.substring(0,60)}...</div>
+                    <div class="card-meta"><span>${movie.year || '2024'}</span> <span>${movie.duration || '1h 30m'}</span> <span class="card-badge">HD</span></div>
+                    <div class="card-description">${(movie.description || '').substring(0,60)}...</div>
                     <div class="card-footer">
                         <i class="fas fa-play" title="play"></i>
                         <i class="fas ${plusIcon}" title="my list"></i>
@@ -869,7 +904,6 @@
                 </div>
             `;
 
-            // attach play and list events
             const playIcon = card.querySelector('.fa-play');
             playIcon.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -882,7 +916,6 @@
                 toggleMyList(movie.id, e);
             });
 
-            // card click anywhere also opens player (except buttons)
             card.addEventListener('click', (e) => {
                 if (!e.target.closest('i')) {
                     openPlayer(movie.id);
@@ -892,9 +925,7 @@
             return card;
         }
 
-        // render all rows based on filter and search
         function renderAllCards() {
-            // Clear rows
             trendingRow.innerHTML = '';
             popularRow.innerHTML = '';
             recentRow.innerHTML = '';
@@ -902,10 +933,9 @@
             const searchTerm = searchInput.value.toLowerCase().trim();
 
             movies.forEach(movie => {
-                // filter by search
+                if (!movie.active && movie.active !== undefined) return;
+                
                 if (searchTerm && !movie.title.toLowerCase().includes(searchTerm)) return;
-
-                // filter by category if not 'all'
                 if (currentFilterCategory !== 'all' && movie.category !== currentFilterCategory) return;
 
                 const card = createMovieCard(movie);
@@ -913,14 +943,13 @@
                 if (movie.category === 'trending') trendingRow.appendChild(card);
                 else if (movie.category === 'popular') popularRow.appendChild(card);
                 else if (movie.category === 'recent') recentRow.appendChild(card);
+                else trendingRow.appendChild(card); // fallback
             });
 
-            // update search count
             const visibleCount = trendingRow.children.length + popularRow.children.length + recentRow.children.length;
             searchCount.textContent = searchTerm ? `${visibleCount} movies found` : '';
         }
 
-        // render My List row
         function renderMyListRow() {
             myListRow.innerHTML = '';
             if (myList.length === 0) {
@@ -929,35 +958,28 @@
             }
             myListSection.style.display = 'block';
 
-            const myListMovies = movies.filter(m => myList.includes(m.id));
+            const myListMovies = movies.filter(m => myList.includes(m.id) && m.active !== false);
             myListMovies.forEach(movie => {
                 const card = createMovieCard(movie);
                 myListRow.appendChild(card);
             });
         }
 
-        // filter by category (nav)
         function setCategoryFilter(category) {
             currentFilterCategory = category;
-            // update active nav
+            
             navLinks.forEach(link => {
                 const cat = link.dataset.category;
                 if (cat === category) link.classList.add('active');
                 else link.classList.remove('active');
             });
-            // hide search for now (optional)
+            
             searchContainer.style.display = 'none';
-            searchInput.value = ''; // reset search
+            searchInput.value = '';
             renderAllCards();
         }
 
-        // ---------- INITIAL RENDER ----------
-        renderAllCards();
-        renderMyListRow();
-
         // ---------- EVENT LISTENERS ----------
-
-        // nav links
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
                 const category = link.dataset.category;
@@ -965,15 +987,13 @@
             });
         });
 
-        // logo home
         logoHome.addEventListener('click', () => setCategoryFilter('all'));
 
-        // search toggle
         searchIcon.addEventListener('click', () => {
             if (searchContainer.style.display === 'none') {
                 searchContainer.style.display = 'block';
                 searchInput.focus();
-                setCategoryFilter('all'); // show all when searching
+                setCategoryFilter('all');
             } else {
                 searchContainer.style.display = 'none';
                 searchInput.value = '';
@@ -981,12 +1001,10 @@
             }
         });
 
-        // search input
         searchInput.addEventListener('input', () => {
             renderAllCards();
         });
 
-        // view all links
         document.querySelectorAll('.section-link[data-category]').forEach(link => {
             link.addEventListener('click', () => {
                 const category = link.dataset.category;
@@ -994,17 +1012,22 @@
             });
         });
 
-        // hero play (silent escape as trailer)
-        heroPlayBtn.addEventListener('click', () => openPlayer('1'));
-        heroImage.addEventListener('click', () => openPlayer('1'));
-
-        // hero add to list (The Silent Escape)
-        heroAddBtn.addEventListener('click', () => {
-            addToMyList('1');
-            renderAllCards(); // update icons
+        // Hero section - use first movie as default
+        heroPlayBtn.addEventListener('click', () => {
+            if (movies.length > 0) openPlayer(movies[0].id);
+        });
+        
+        heroImage.addEventListener('click', () => {
+            if (movies.length > 0) openPlayer(movies[0].id);
         });
 
-        // modal add button
+        heroAddBtn.addEventListener('click', () => {
+            if (movies.length > 0) {
+                addToMyList(movies[0].id);
+                renderAllCards();
+            }
+        });
+
         modalAddBtn.addEventListener('click', () => {
             if (currentModalMovie) {
                 if (isInMyList(currentModalMovie.id)) {
@@ -1018,13 +1041,18 @@
             }
         });
 
-        // close modal
         closeModal.addEventListener('click', closePlayer);
+        
         window.addEventListener('click', (e) => {
             if (e.target === modal) closePlayer();
         });
 
-        // clear my list
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closePlayer();
+            }
+        });
+
         clearMyList.addEventListener('click', () => {
             myList = [];
             saveMyList();
@@ -1033,12 +1061,26 @@
             showNotification('🗑️ My List cleared');
         });
 
-        // escape key closes modal
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modal.classList.contains('active')) {
-                closePlayer();
-            }
-        });
+        // ---------- INITIAL LOAD ----------
+        // Load movies from Google Sheets
+        if (APPS_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbwhWMnjTJvbF57VlLGDm7m0tsUCZFS0b6ki-1N3cwRLsoyciD_NtOmz9wVpBYrgmmg-/exec') {
+            fetchMovies();
+        } else {
+            // Fallback to hardcoded movies if no URL configured
+            console.warn('Using fallback movies. Please configure APPS_SCRIPT_URL');
+            movies = [
+                { id: "1", title: "The Silent Escape", youtubeId: "vgWyjYBvsUk", category: "trending", year: "2024", duration: "1h 58m", description: "A suspenseful cinematic journey filled with mystery and tension." },
+                { id: "2", title: "Shadow Mission", youtubeId: "60q_y5IDD6U", category: "trending", year: "2025", duration: "2h 11m", description: "An intense action story about survival, secrets, and power." },
+                { id: "3", title: "First Flight: Origins", youtubeId: "dKrVeg6LopI", category: "popular", year: "2023", duration: "2h 04m", description: "The early days of aviation pioneers." },
+                { id: "4", title: "Night Sky", youtubeId: "YoHD9XEInc0", category: "popular", year: "2022", duration: "1h 47m", description: "A journey beyond the stars." },
+                { id: "5", title: "Echoes of Tomorrow", youtubeId: "zSWdZVtXT7E", category: "recent", year: "2025", duration: "2h 22m", description: "Time-bending thriller." },
+                { id: "6", title: "Last Horizon", youtubeId: "HhesaQXLuRY", category: "recent", year: "2024", duration: "1h 50m", description: "Survival on a distant planet." },
+                { id: "7", title: "Iron Will", youtubeId: "vw61gCe2oqI", category: "trending", year: "2025", duration: "2h 15m", description: "Unyielding spirit in space." },
+                { id: "8", title: "Dream Engine", youtubeId: "nIOmotayDMU", category: "popular", year: "2023", duration: "1h 43m", description: "Building the impossible aircraft." }
+            ];
+            renderAllCards();
+            renderMyListRow();
+        }
     })();
 </script>
 </body>

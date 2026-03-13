@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTFF · Complete Streaming Platform</title>
+    <title>BTFF · Streaming Platform</title>
     <!-- Font Awesome 6 (free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -110,7 +110,6 @@
             justify-content: space-between;
             padding: 24px 0 16px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            flex-wrap: wrap;
             position: relative;
             z-index: 20;
         }
@@ -126,12 +125,14 @@
             cursor: pointer;
         }
 
+        /* Desktop navigation */
         .nav-links {
             display: flex;
             gap: 2.8rem;
             font-weight: 500;
             color: #b0c7e9;
         }
+        
         .nav-links span {
             cursor: pointer;
             transition: color 0.2s;
@@ -155,6 +156,64 @@
             border-radius: 2px;
         }
 
+        /* Mobile menu toggle button */
+        .mobile-menu-toggle {
+            display: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #d0e0ff;
+            transition: color 0.2s;
+        }
+        .mobile-menu-toggle:hover {
+            color: white;
+        }
+
+        /* Mobile navigation drawer */
+        .mobile-nav-drawer {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: #0c1727;
+            border: 1px solid #3d6190;
+            border-top: none;
+            border-radius: 0 0 20px 20px;
+            padding: 20px 40px;
+            z-index: 25;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .mobile-nav-drawer.active {
+            display: block;
+        }
+        
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .mobile-nav-links span {
+            cursor: pointer;
+            transition: color 0.2s;
+            font-size: 1.2rem;
+            color: #b0c7e9;
+            padding: 5px 0;
+        }
+        
+        .mobile-nav-links span:hover {
+            color: white;
+        }
+        
+        .mobile-nav-links span.active {
+            color: white;
+            font-weight: 600;
+            border-left: 4px solid #2f6bc6;
+            padding-left: 12px;
+        }
+
         .nav-right {
             display: flex;
             gap: 24px;
@@ -168,14 +227,6 @@
         }
         .nav-right i:hover {
             color: white;
-        }
-        .avatar {
-            background: #2f4b70;
-            border-radius: 30px;
-            padding: 6px 16px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
         }
 
         /* Advanced Search Bar */
@@ -373,7 +424,7 @@
             margin: 50px 0 20px;
         }
         .section-title {
-            font-size: 2rem;
+            font-size: 1rem;
             font-weight: 600;
             letter-spacing: -0.5px;
             background: linear-gradient(135deg, #ffffff, #b2d5ff);
@@ -621,7 +672,7 @@
         }
 
         .details-poster {
-            width: 250px;
+            width: 500px;
             border-radius: 20px;
             border: 3px solid #3d6190;
             box-shadow: 0 20px 30px rgba(0,0,0,0.5);
@@ -927,11 +978,56 @@
             transform: translateX(0);
         }
 
+        /* Mobile responsive styles */
         @media (max-width: 800px) {
-            .hero-title { font-size: 3.2rem; }
-            .navbar { flex-direction: column; gap: 20px; }
-            .container { padding: 0 24px; }
-            .nav-links { gap: 1.5rem; }
+            .hero-title { 
+                font-size: 3.2rem; 
+            }
+            
+            .container { 
+                padding: 0 24px; 
+            }
+            
+            .hero-buttons { 
+                flex-direction: column; 
+                gap: 10px; 
+            }
+            
+            /* Hide desktop nav links on mobile */
+            .nav-links {
+                display: none;
+            }
+            
+            /* Show mobile menu toggle */
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            /* Adjust navbar for mobile */
+            .navbar {
+                flex-wrap: wrap;
+            }
+            
+            /* Make search container full width on mobile */
+            .search-container {
+                width: 100%;
+            }
+            
+            /* Adjust modal poster size for mobile */
+            .details-poster {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            
+            .details-flex {
+                justify-content: center;
+                text-align: center;
+            }
+            
+            .details-buttons {
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -948,6 +1044,8 @@
             <!-- NAVBAR -->
             <nav class="navbar">
                 <div class="logo" id="logoHome">BTFF</div>
+                
+                <!-- Desktop Navigation Links -->
                 <div class="nav-links" id="navLinks">
                     <span class="active" data-category="all">Home</span>
                     <span data-category="trending">Trending</span>
@@ -955,12 +1053,25 @@
                     <span data-category="recent">Recent</span>
                     <span data-category="myList">My List</span>
                 </div>
+                
                 <div class="nav-right">
                     <i class="fas fa-search" id="searchIcon"></i>
                     <i class="fas fa-bell"></i>
-                    <span class="avatar">KRO</span>
+                    <!-- Mobile Menu Toggle (Hamburger) -->
+                    <i class="fas fa-bars mobile-menu-toggle" id="mobileMenuToggle"></i>
                 </div>
             </nav>
+
+            <!-- Mobile Navigation Drawer -->
+            <div class="mobile-nav-drawer" id="mobileNavDrawer">
+                <div class="mobile-nav-links">
+                    <span class="active" data-category="all">Home</span>
+                    <span data-category="trending">Trending</span>
+                    <span data-category="popular">Popular</span>
+                    <span data-category="recent">Recent</span>
+                    <span data-category="myList">My List</span>
+                </div>
+            </div>
 
             <!-- ADVANCED SEARCH -->
             <div class="search-container" id="searchContainer" style="display: none;">
@@ -1179,7 +1290,7 @@
         const yearFilter = document.getElementById('yearFilter');
         const sortFilter = document.getElementById('sortFilter');
         const activeFilters = document.getElementById('activeFilters');
-        const navLinks = document.querySelectorAll('.nav-links span');
+        const navLinks = document.querySelectorAll('.nav-links span, .mobile-nav-links span');
         const logoHome = document.getElementById('logoHome');
         const heroPlayBtn = document.getElementById('heroPlayBtn');
         const heroAddBtn = document.getElementById('heroAddBtn');
@@ -1191,6 +1302,11 @@
         const errorMessage = document.getElementById('errorMessage');
         const errorText = document.getElementById('errorText');
         const retryBtn = document.getElementById('retryBtn');
+        
+        // Mobile menu elements
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-links span');
         
         // Details modal elements
         const detailsModal = document.getElementById('detailsModal');
@@ -1218,6 +1334,15 @@
         const ratingStars = document.getElementById('ratingStars');
         const submitRating = document.getElementById('submitRating');
         const closeRatingModal = document.getElementById('closeRatingModal');
+
+        // ---------- MOBILE MENU FUNCTIONS ----------
+        function toggleMobileMenu() {
+            mobileNavDrawer.classList.toggle('active');
+        }
+
+        function closeMobileMenu() {
+            mobileNavDrawer.classList.remove('active');
+        }
 
         // ---------- API FUNCTIONS ----------
         async function fetchMovies() {
@@ -1497,7 +1622,7 @@
             return filtered;
         }
 
-        // ---------- CARD CREATION - FIXED ----------
+        // ---------- CARD CREATION ----------
         function createMovieCard(movie, forSimilar = false) {
             const card = document.createElement('div');
             card.className = `movie-card ${isInMyList(movie.id) ? 'in-my-list' : ''}`;
@@ -1563,7 +1688,7 @@
             return card;
         }
 
-        // ---------- RENDERING - FIXED ----------
+        // ---------- RENDERING ----------
         function clearRow(row) {
             if (!row) return;
             while (row.firstChild) {
@@ -1650,7 +1775,38 @@
             });
         }
 
+        // Function to update active state on both desktop and mobile nav
+        function setActiveCategory(category) {
+            navLinks.forEach(link => {
+                if (link.dataset.category === category) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
         // ---------- EVENT LISTENERS ----------
+        
+        // Mobile menu toggle
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileNavDrawer.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                closeMobileMenu();
+            }
+        });
+
+        // Close mobile menu when window resizes above mobile breakpoint
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 800) {
+                closeMobileMenu();
+            }
+        });
+
         if (searchIcon) {
             searchIcon.addEventListener('click', () => {
                 if (searchContainer) {
@@ -1665,6 +1821,7 @@
                         searchContainer.style.display = 'none';
                     }
                 }
+                closeMobileMenu();
             });
         }
 
@@ -1688,8 +1845,7 @@
             logoHome.addEventListener('click', () => {
                 closeDetailsModalFunc();
                 closeVideoPlayer();
-                navLinks.forEach(l => l.classList.remove('active'));
-                document.querySelector('[data-category="all"]').classList.add('active');
+                setActiveCategory('all');
                 document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex');
                 trendingRow.style.display = 'flex';
                 popularRow.style.display = 'flex';
@@ -1699,15 +1855,15 @@
                 } else {
                     myListSection.style.display = 'block';
                 }
+                closeMobileMenu();
             });
         }
 
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
-                navLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                
                 const category = link.dataset.category;
+                setActiveCategory(category);
+                closeMobileMenu();
                 
                 if (category === 'myList') {
                     document.querySelectorAll('.section-header').forEach(header => {
@@ -1898,6 +2054,7 @@
                 if (ratingModal.classList.contains('active')) {
                     ratingModal.classList.remove('active');
                 }
+                closeMobileMenu();
             }
         });
 

@@ -163,6 +163,8 @@
             cursor: pointer;
             color: #d0e0ff;
             transition: color 0.2s;
+            position: relative;
+            z-index: 30;
         }
         .mobile-menu-toggle:hover {
             color: white;
@@ -219,11 +221,15 @@
             gap: 24px;
             align-items: center;
             color: #d0e0ff;
+            position: relative;
+            z-index: 30;
         }
         .nav-right i {
             font-size: 1.4rem;
             cursor: pointer;
             transition: color 0.2s;
+            position: relative;
+            z-index: 30;
         }
         .nav-right i:hover {
             color: white;
@@ -1796,30 +1802,45 @@
 
         // ---------- EVENT LISTENERS ----------
         
-        // Mobile menu toggle - FIXED EVENT LISTENER
+        // Mobile menu toggle - SIMPLE AND RELIABLE
         if (mobileMenuToggle) {
-            console.log('Mobile menu toggle found');
-            mobileMenuToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                toggleMobileMenu();
+            console.log('Mobile menu toggle found, attaching event');
+            
+            // Remove any existing event listeners by cloning and replacing
+            const newToggle = mobileMenuToggle.cloneNode(true);
+            mobileMenuToggle.parentNode.replaceChild(newToggle, mobileMenuToggle);
+            
+            // Add new event listener
+            newToggle.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log('Hamburger clicked!');
+                
+                if (mobileNavDrawer) {
+                    mobileNavDrawer.classList.toggle('active');
+                    console.log('Drawer active:', mobileNavDrawer.classList.contains('active'));
+                }
             });
+            
+            // Update reference
+            window.mobileMenuToggle = newToggle;
         } else {
-            console.log('Mobile menu toggle NOT found');
+            console.log('Mobile menu toggle NOT found - check if element exists in DOM');
         }
 
         // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
             if (mobileNavDrawer && mobileMenuToggle) {
                 if (!mobileNavDrawer.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
-                    closeMobileMenu();
+                    mobileNavDrawer.classList.remove('active');
                 }
             }
         });
 
         // Close mobile menu when window resizes above mobile breakpoint
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 800) {
-                closeMobileMenu();
+            if (window.innerWidth > 800 && mobileNavDrawer) {
+                mobileNavDrawer.classList.remove('active');
             }
         });
 
@@ -1837,7 +1858,7 @@
                         searchContainer.style.display = 'none';
                     }
                 }
-                closeMobileMenu();
+                if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
             });
         }
 
@@ -1871,7 +1892,7 @@
                 } else {
                     myListSection.style.display = 'block';
                 }
-                closeMobileMenu();
+                if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
             });
         }
 
@@ -1879,7 +1900,7 @@
             link.addEventListener('click', () => {
                 const category = link.dataset.category;
                 setActiveCategory(category);
-                closeMobileMenu();
+                if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
                 
                 if (category === 'myList') {
                     document.querySelectorAll('.section-header').forEach(header => {
@@ -2070,7 +2091,7 @@
                 if (ratingModal.classList.contains('active')) {
                     ratingModal.classList.remove('active');
                 }
-                closeMobileMenu();
+                if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
             }
         });
 

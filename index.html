@@ -112,6 +112,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.06);
             position: relative;
             z-index: 20;
+            flex-wrap: wrap;
         }
 
         .logo {
@@ -163,14 +164,12 @@
             cursor: pointer;
             color: #d0e0ff;
             transition: color 0.2s;
-            position: relative;
-            z-index: 30;
         }
         .mobile-menu-toggle:hover {
             color: white;
         }
 
-        /* Mobile navigation drawer - FIXED VISIBILITY */
+        /* Mobile navigation drawer - FIXED */
         .mobile-nav-drawer {
             display: none;
             position: absolute;
@@ -204,6 +203,7 @@
             color: #b0c7e9;
             padding: 8px 0;
             border-bottom: 1px solid rgba(61, 97, 144, 0.3);
+            display: block;
         }
         
         .mobile-nav-links span:last-child {
@@ -228,15 +228,11 @@
             gap: 24px;
             align-items: center;
             color: #d0e0ff;
-            position: relative;
-            z-index: 30;
         }
         .nav-right i {
             font-size: 1.4rem;
             cursor: pointer;
             transition: color 0.2s;
-            position: relative;
-            z-index: 30;
         }
         .nav-right i:hover {
             color: white;
@@ -1016,23 +1012,18 @@
                 display: block;
             }
             
-            /* Adjust navbar for mobile */
-            .navbar {
-                flex-wrap: wrap;
-                position: relative;
-            }
-            
-            /* Make mobile drawer full width and visible when active */
+            /* Make mobile drawer visible when active */
             .mobile-nav-drawer {
+                display: none;
                 position: absolute;
                 top: 100%;
                 left: 0;
-                right: 0;
                 width: 100%;
-                display: none;
                 background: #0c1727;
                 border: 2px solid #3d6190;
                 border-top: none;
+                border-radius: 0 0 20px 20px;
+                padding: 20px;
                 z-index: 1000;
             }
             
@@ -1040,36 +1031,20 @@
                 display: block !important;
             }
             
-            /* Make search container full width on mobile */
-            .search-container {
-                width: 100%;
-            }
-            
-            /* Adjust modal poster size for mobile */
-            .details-poster {
-                width: 100%;
-                max-width: 300px;
-                margin: 0 auto;
-            }
-            
-            .details-flex {
-                justify-content: center;
-                text-align: center;
-            }
-            
-            .details-buttons {
-                justify-content: center;
+            .mobile-nav-links span {
+                font-size: 1.2rem;
+                padding: 12px 0;
             }
         }
 
         /* Extra small devices */
         @media (max-width: 480px) {
             .mobile-nav-drawer {
-                padding: 20px;
+                padding: 15px;
             }
             
             .mobile-nav-links span {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -1100,12 +1075,12 @@
                 <div class="nav-right">
                     <i class="fas fa-search" id="searchIcon"></i>
                     <i class="fas fa-bell"></i>
-                    <!-- Mobile Menu Toggle (Hamburger) -->
+                    <!-- Mobile Menu Toggle (Hamburger) - THIS IS CORRECT -->
                     <i class="fas fa-bars mobile-menu-toggle" id="mobileMenuToggle"></i>
                 </div>
             </nav>
 
-            <!-- Mobile Navigation Drawer -->
+            <!-- Mobile Navigation Drawer - THIS IS CORRECT (NOT inside an anchor tag) -->
             <div class="mobile-nav-drawer" id="mobileNavDrawer">
                 <div class="mobile-nav-links" id="mobileNavLinks">
                     <span class="active" data-category="all">Home</span>
@@ -1386,7 +1361,6 @@
             if (mobileNavDrawer) {
                 mobileNavDrawer.classList.toggle('active');
                 console.log('Mobile menu toggled. Active:', mobileNavDrawer.classList.contains('active'));
-                console.log('Drawer HTML:', mobileNavDrawer.outerHTML);
             }
         }
 
@@ -1847,33 +1821,18 @@
             mobileMenuToggle.addEventListener('click', function(event) {
                 event.preventDefault();
                 event.stopPropagation();
-                event.stopImmediatePropagation();
                 console.log('Hamburger clicked!');
-                
-                if (mobileNavDrawer) {
-                    // Force toggle the class
-                    if (mobileNavDrawer.classList.contains('active')) {
-                        mobileNavDrawer.classList.remove('active');
-                        console.log('Drawer closed');
-                    } else {
-                        mobileNavDrawer.classList.add('active');
-                        console.log('Drawer opened');
-                        console.log('Drawer classes:', mobileNavDrawer.className);
-                        console.log('Drawer display style:', window.getComputedStyle(mobileNavDrawer).display);
-                    }
-                } else {
-                    console.log('Mobile nav drawer not found!');
-                }
+                toggleMobileMenu();
             });
         } else {
-            console.log('Mobile menu toggle NOT found - check if element exists in DOM');
+            console.log('Mobile menu toggle NOT found!');
         }
 
         // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
-            if (mobileNavDrawer && mobileMenuToggle) {
+            if (mobileNavDrawer && mobileNavDrawer.classList.contains('active')) {
                 if (!mobileNavDrawer.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
-                    mobileNavDrawer.classList.remove('active');
+                    closeMobileMenu();
                 }
             }
         });
@@ -1881,7 +1840,7 @@
         // Close mobile menu when window resizes above mobile breakpoint
         window.addEventListener('resize', () => {
             if (window.innerWidth > 800 && mobileNavDrawer) {
-                mobileNavDrawer.classList.remove('active');
+                closeMobileMenu();
             }
         });
 
@@ -1899,7 +1858,7 @@
                         searchContainer.style.display = 'none';
                     }
                 }
-                if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
+                closeMobileMenu();
             });
         }
 
@@ -1933,7 +1892,7 @@
                 } else {
                     myListSection.style.display = 'block';
                 }
-                if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
+                closeMobileMenu();
             });
         }
 
@@ -1941,7 +1900,7 @@
             link.addEventListener('click', () => {
                 const category = link.dataset.category;
                 setActiveCategory(category);
-                if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
+                closeMobileMenu();
                 
                 if (category === 'myList') {
                     document.querySelectorAll('.section-header').forEach(header => {
@@ -2132,7 +2091,7 @@
                 if (ratingModal.classList.contains('active')) {
                     ratingModal.classList.remove('active');
                 }
-                if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
+                closeMobileMenu();
             }
         });
 

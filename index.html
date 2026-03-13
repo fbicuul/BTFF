@@ -1064,7 +1064,7 @@
 
             <!-- Mobile Navigation Drawer -->
             <div class="mobile-nav-drawer" id="mobileNavDrawer">
-                <div class="mobile-nav-links">
+                <div class="mobile-nav-links" id="mobileNavLinks">
                     <span class="active" data-category="all">Home</span>
                     <span data-category="trending">Trending</span>
                     <span data-category="popular">Popular</span>
@@ -1290,7 +1290,8 @@
         const yearFilter = document.getElementById('yearFilter');
         const sortFilter = document.getElementById('sortFilter');
         const activeFilters = document.getElementById('activeFilters');
-        const navLinks = document.querySelectorAll('.nav-links span, .mobile-nav-links span');
+        const desktopNavLinks = document.querySelectorAll('.nav-links span');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-links span');
         const logoHome = document.getElementById('logoHome');
         const heroPlayBtn = document.getElementById('heroPlayBtn');
         const heroAddBtn = document.getElementById('heroAddBtn');
@@ -1306,7 +1307,9 @@
         // Mobile menu elements
         const mobileMenuToggle = document.getElementById('mobileMenuToggle');
         const mobileNavDrawer = document.getElementById('mobileNavDrawer');
-        const mobileNavLinks = document.querySelectorAll('.mobile-nav-links span');
+        
+        // Combine all nav links for active state management
+        const allNavLinks = [...desktopNavLinks, ...mobileNavLinks];
         
         // Details modal elements
         const detailsModal = document.getElementById('detailsModal');
@@ -1337,11 +1340,16 @@
 
         // ---------- MOBILE MENU FUNCTIONS ----------
         function toggleMobileMenu() {
-            mobileNavDrawer.classList.toggle('active');
+            if (mobileNavDrawer) {
+                mobileNavDrawer.classList.toggle('active');
+                console.log('Mobile menu toggled:', mobileNavDrawer.classList.contains('active'));
+            }
         }
 
         function closeMobileMenu() {
-            mobileNavDrawer.classList.remove('active');
+            if (mobileNavDrawer) {
+                mobileNavDrawer.classList.remove('active');
+            }
         }
 
         // ---------- API FUNCTIONS ----------
@@ -1775,9 +1783,9 @@
             });
         }
 
-        // Function to update active state on both desktop and mobile nav
+        // Function to update active state on all nav links
         function setActiveCategory(category) {
-            navLinks.forEach(link => {
+            allNavLinks.forEach(link => {
                 if (link.dataset.category === category) {
                     link.classList.add('active');
                 } else {
@@ -1788,15 +1796,23 @@
 
         // ---------- EVENT LISTENERS ----------
         
-        // Mobile menu toggle
+        // Mobile menu toggle - FIXED EVENT LISTENER
         if (mobileMenuToggle) {
-            mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+            console.log('Mobile menu toggle found');
+            mobileMenuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleMobileMenu();
+            });
+        } else {
+            console.log('Mobile menu toggle NOT found');
         }
 
         // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
-            if (!mobileNavDrawer.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
-                closeMobileMenu();
+            if (mobileNavDrawer && mobileMenuToggle) {
+                if (!mobileNavDrawer.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
             }
         });
 
@@ -1859,7 +1875,7 @@
             });
         }
 
-        navLinks.forEach(link => {
+        allNavLinks.forEach(link => {
             link.addEventListener('click', () => {
                 const category = link.dataset.category;
                 setActiveCategory(category);

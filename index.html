@@ -1453,7 +1453,7 @@
             <!-- Overlay when menu is open -->
             <div class="menu-overlay" id="menuOverlay"></div>
 
-            <!-- Genre Filter Pills -->
+            <!-- Genre Filter Pills (populated from database) -->
             <div class="genre-filters" id="genreFilters"></div>
 
             <!-- ADVANCED SEARCH -->
@@ -1471,11 +1471,6 @@
                     </select>
                     <select class="filter-select" id="yearFilter">
                         <option value="">All Years</option>
-                        <option value="2026">2026</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
                     </select>
                     <select class="filter-select" id="sortFilter">
                         <option value="default">Sort by</option>
@@ -1522,7 +1517,7 @@
             <button class="retry-btn" id="retryBtn"><i class="fas fa-sync-alt"></i> Retry Connection</button>
         </div>
 
-        <!-- CONTINUE WATCHING ROW -->
+        <!-- CONTINUE WATCHING ROW (fetched from database) -->
         <div id="continueWatchingSection" style="display: none;">
             <div class="section-header">
                 <h2 class="section-title">⏯️ CONTINUE WATCHING</h2>
@@ -1531,7 +1526,7 @@
             <div class="movie-row" id="continueWatchingRow"></div>
         </div>
 
-        <!-- MY LIST ROW -->
+        <!-- MY LIST ROW (from localStorage for now, will be database later) -->
         <div id="myListSection" style="display: none;">
             <div class="section-header">
                 <h2 class="section-title">📋 MY LIST</h2>
@@ -1612,7 +1607,7 @@
                     
                     <div class="details-rating" id="detailsRating"></div>
                     
-                    <!-- Rating Distribution -->
+                    <!-- Rating Distribution (fetched from database) -->
                     <div class="rating-distribution" id="ratingDistribution"></div>
                     
                     <p class="details-description" id="detailsDescription"></p>
@@ -1701,7 +1696,7 @@
 <script>
     (function() {
         // ---------- CONFIGURATION ----------
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyWTeuyKBJQf4DX1jg-sNYjnn7XRFQyio5Y-7lxxLvaanZ8U47LjzuDgU0eOq-GaZvz/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyWTeuyKBJQf4DX1jg-sNYjnn7XRFQyio5Y-7lxxLvaanZ8U47LjzuDgU0eOq-GaZvz/exec'; // Replace with your deployed URL
         
         // ---------- STATE ----------
         let movies = [];
@@ -1714,6 +1709,7 @@
         let cinemaModeActive = false;
         let partyId = null;
         let partyUsers = [];
+        let userId = 'user_' + Math.random().toString(36).substring(2, 15);
 
         // DOM elements
         const trendingRow = document.getElementById('trendingRow');
@@ -1842,7 +1838,9 @@
                 
                 if (data.success && Array.isArray(data.movies)) {
                     movies = data.movies;
+                    await fetchAllRatings();
                     extractGenres();
+                    populateYearFilter();
                     renderAll();
                     hideError();
                 } else {
@@ -1856,24 +1854,108 @@
             }
         }
 
+        async function fetchAllRatings() {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL + '?action=getRatings&t=' + Date.now(), {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                if (data.success && data.ratings) {
+                    // Group ratings by movieId
+                    const ratingsMap = {};
+                    data.ratings.forEach(r => {
+                        if (!ratingsMap[r.movieId]) {
+                            ratingsMap[r.movieId] = [];
+                        }
+                        ratingsMap[r.movieId].push(parseInt(r.rating));
+                    });
+                    ratings = ratingsMap;
+                    localStorage.setItem('btffRatings', JSON.stringify(ratings));
+                }
+            } catch (error) {
+                console.error('Error fetching ratings:', error);
+            }
+        }
+
+        async function fetchMovieRatings(movieId) {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL + '?action=getMovieRatings&movieId=' + movieId + '&t=' + Date.now(), {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    return data;
+                }
+            } catch (error) {
+                console.error('Error fetching movie ratings:', error);
+            }
+            return null;
+        }
+
+        async function fetchContinueWatching() {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL + '?action=getContinueWatching&userId=' + userId + '&t=' + Date.now(), {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                if (data.success && data.continueWatching) {
+                    continueWatching = data.continueWatching.map(item => ({
+                        id: item.movieId,
+                        progress: parseInt(item.progress),
+                        timestamp: new Date(item.lastWatched).getTime()
+                    }));
+                    localStorage.setItem('btffContinueWatching', JSON.stringify(continueWatching));
+                    renderContinueWatchingRow();
+                }
+            } catch (error) {
+                console.error('Error fetching continue watching:', error);
+            }
+        }
+
+        async function fetchGenres() {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL + '?action=getGenres&t=' + Date.now(), {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                if (data.success && data.genres) {
+                    renderGenrePills(data.genres);
+                }
+            } catch (error) {
+                console.error('Error fetching genres:', error);
+            }
+        }
+
         // ---------- EXTRACT GENRES ----------
         function extractGenres() {
             const genres = new Set();
             movies.forEach(movie => {
                 if (movie.genre) {
                     genres.add(movie.genre);
-                } else {
-                    // Use category as fallback genre
-                    genres.add(movie.category);
                 }
             });
             
+            renderGenrePills(Array.from(genres).map(g => ({ name: g })));
+        }
+
+        function renderGenrePills(genresList) {
             genreFilters.innerHTML = '<span class="genre-pill active" data-genre="all">All</span>';
-            Array.from(genres).sort().forEach(genre => {
-                genreFilters.innerHTML += `<span class="genre-pill" data-genre="${genre}">${genre}</span>`;
+            genresList.sort().forEach(genre => {
+                if (typeof genre === 'string') {
+                    genreFilters.innerHTML += `<span class="genre-pill" data-genre="${genre}">${genre}</span>`;
+                } else if (genre.name) {
+                    genreFilters.innerHTML += `<span class="genre-pill" data-genre="${genre.name}">${genre.name} (${genre.count || 0})</span>`;
+                }
             });
             
-            // Add genre click listeners
             document.querySelectorAll('.genre-pill').forEach(pill => {
                 pill.addEventListener('click', () => {
                     document.querySelectorAll('.genre-pill').forEach(p => p.classList.remove('active'));
@@ -1881,6 +1963,18 @@
                     currentGenre = pill.dataset.genre;
                     renderAll();
                 });
+            });
+        }
+
+        function populateYearFilter() {
+            const years = new Set();
+            movies.forEach(movie => {
+                if (movie.year) years.add(movie.year);
+            });
+            
+            yearFilter.innerHTML = '<option value="">All Years</option>';
+            Array.from(years).sort().reverse().forEach(year => {
+                yearFilter.innerHTML += `<option value="${year}">${year}</option>`;
             });
         }
 
@@ -1926,34 +2020,38 @@
             return distribution;
         }
 
-        function addRating(movieId, rating) {
-            if (!ratings[movieId]) {
-                ratings[movieId] = [];
-            }
-            ratings[movieId].push(rating);
-            localStorage.setItem('btffRatings', JSON.stringify(ratings));
-            renderAll();
-            if (currentMovie && currentMovie.id === movieId) {
-                updateDetailsModal(currentMovie);
+        async function addRating(movieId, rating) {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL + '?action=addRating&movieId=' + movieId + '&rating=' + rating + '&userId=' + userId + '&t=' + Date.now(), {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    await fetchAllRatings();
+                    if (currentMovie && currentMovie.id === movieId) {
+                        updateDetailsModal(currentMovie);
+                    }
+                    showNotification(`⭐ Rated ${rating} stars`);
+                }
+            } catch (error) {
+                console.error('Error adding rating:', error);
+                showNotification('Failed to submit rating');
             }
         }
 
         // ---------- CONTINUE WATCHING FUNCTIONS ----------
-        function updateProgress(movieId, progress) {
-            const existing = continueWatching.find(m => m.id === movieId);
-            if (existing) {
-                existing.progress = progress;
-                existing.timestamp = Date.now();
-            } else {
-                continueWatching.push({
-                    id: movieId,
-                    progress: progress,
-                    timestamp: Date.now()
+        async function updateProgress(movieId, progress) {
+            try {
+                await fetch(APPS_SCRIPT_URL + '?action=updateProgress&movieId=' + movieId + '&progress=' + progress + '&userId=' + userId + '&t=' + Date.now(), {
+                    method: 'GET',
+                    mode: 'cors'
                 });
+                await fetchContinueWatching();
+            } catch (error) {
+                console.error('Error updating progress:', error);
             }
-            continueWatching = continueWatching.slice(-20);
-            localStorage.setItem('btffContinueWatching', JSON.stringify(continueWatching));
-            renderContinueWatchingRow();
         }
 
         function getProgress(movieId) {
@@ -2021,11 +2119,19 @@
         }
 
         // ---------- DETAILS MODAL FUNCTIONS ----------
-        function openDetailsModal(movieId) {
+        async function openDetailsModal(movieId) {
             const movie = movies.find(m => m.id === movieId);
             if (!movie) return;
             
             currentMovie = movie;
+            
+            // Fetch fresh ratings for this movie
+            const ratingData = await fetchMovieRatings(movieId);
+            if (ratingData) {
+                ratings[movieId] = ratingData.ratings || [];
+                localStorage.setItem('btffRatings', JSON.stringify(ratings));
+            }
+            
             updateDetailsModal(movie);
             detailsModal.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -2116,7 +2222,6 @@
                 (m.category === movie.category || m.genre === movie.genre || 
                  (m.year && movie.year && Math.abs(parseInt(m.year) - parseInt(movie.year)) <= 2))
             ).sort((a, b) => {
-                // Sort by rating similarity
                 const ratingA = getAverageRating(a.id);
                 const ratingB = getAverageRating(b.id);
                 const targetRating = getAverageRating(movie.id);
@@ -2188,7 +2293,7 @@
             
             // Genre filter
             if (currentGenre !== 'all') {
-                filtered = filtered.filter(m => (m.genre || m.category) === currentGenre);
+                filtered = filtered.filter(m => m.genre === currentGenre);
             }
             
             if (sortFilter && sortFilter.value && sortFilter.value !== 'default') {
@@ -2230,7 +2335,6 @@
             const avgRating = getAverageRating(movie.id);
             const ratingCount = getRatingCount(movie.id);
             
-            // Get rating distribution for bars
             const dist = getRatingDistribution(movie.id);
             const total = dist.reduce((a, b) => a + b, 0);
             
@@ -2405,11 +2509,65 @@
         }
 
         // ---------- WATCH PARTY FUNCTIONS ----------
-        function createWatchParty() {
-            partyId = 'party_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            partyLinkInput.value = window.location.href + '?party=' + partyId;
-            watchPartyModal.classList.add('active');
-            addChatMessage('System', 'Party created! Share the link with friends.');
+        async function createWatchParty() {
+            if (!currentMovie) return;
+            
+            try {
+                const response = await fetch(APPS_SCRIPT_URL + '?action=createParty&movieId=' + currentMovie.id + '&userId=' + userId + '&t=' + Date.now(), {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    partyId = data.partyId;
+                    partyLinkInput.value = window.location.href + '?party=' + partyId;
+                    watchPartyModal.classList.add('active');
+                    addChatMessage('System', 'Party created! Share the link with friends.');
+                    startPartyPolling(partyId);
+                }
+            } catch (error) {
+                console.error('Error creating party:', error);
+            }
+        }
+
+        function startPartyPolling(partyId) {
+            setInterval(() => {
+                fetchMessages(partyId);
+            }, 3000);
+        }
+
+        async function fetchMessages(partyId) {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL + '?action=getMessages&partyId=' + partyId + '&t=' + Date.now(), {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                if (data.success && data.messages) {
+                    chatBox.innerHTML = '';
+                    data.messages.forEach(msg => {
+                        addChatMessage(msg.userId === userId ? 'You' : 'Friend', msg.message);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
+        }
+
+        async function sendChatMessage(message) {
+            if (!partyId || !message.trim()) return;
+            
+            try {
+                await fetch(APPS_SCRIPT_URL + '?action=sendMessage&partyId=' + partyId + '&userId=' + userId + '&message=' + encodeURIComponent(message) + '&t=' + Date.now(), {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                chatInput.value = '';
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
         }
 
         function addChatMessage(user, message) {
@@ -2424,15 +2582,12 @@
         function handleKeyboardShortcuts(e) {
             const key = e.key.toLowerCase();
             
-            // Don't trigger if typing in input
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             
             switch(key) {
                 case ' ':
                     e.preventDefault();
-                    // Toggle play/pause in video player
                     if (videoModal.classList.contains('active')) {
-                        // Send play/pause message to iframe
                         videoIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
                     }
                     break;
@@ -2449,21 +2604,18 @@
                 case 'arrowright':
                     e.preventDefault();
                     if (videoModal.classList.contains('active')) {
-                        // Seek forward 10s
                         videoIframe.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[' + (Date.now() + 10) + ']}', '*');
                     }
                     break;
                 case 'arrowleft':
                     e.preventDefault();
                     if (videoModal.classList.contains('active')) {
-                        // Seek backward 10s
                         videoIframe.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[' + (Date.now() - 10) + ']}', '*');
                     }
                     break;
                 case 'm':
                     e.preventDefault();
                     if (videoModal.classList.contains('active')) {
-                        // Toggle mute
                         videoIframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
                     }
                     break;
@@ -2502,7 +2654,6 @@
 
         // ---------- EVENT LISTENERS ----------
         
-        // Mobile menu
         if (mobileMenuBtn) {
             mobileMenuBtn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -2527,7 +2678,6 @@
             });
         }
 
-        // Search
         if (searchIcon) {
             searchIcon.addEventListener('click', () => {
                 if (searchContainer) {
@@ -2562,7 +2712,6 @@
             sortFilter.addEventListener('change', applyFilters);
         }
 
-        // Logo home
         if (logoHome) {
             logoHome.addEventListener('click', () => {
                 closeDetailsModalFunc();
@@ -2581,7 +2730,6 @@
             });
         }
 
-        // Navigation links
         allNavLinks.forEach(link => {
             link.addEventListener('click', () => {
                 const category = link.dataset.category;
@@ -2616,7 +2764,6 @@
             });
         });
 
-        // Hero buttons
         if (heroPlayBtn) {
             heroPlayBtn.addEventListener('click', () => {
                 if (movies.length > 0) openVideoPlayer(movies[0].id);
@@ -2637,7 +2784,6 @@
             });
         }
 
-        // Modal close buttons
         if (closeDetailsModal) {
             closeDetailsModal.addEventListener('click', closeDetailsModalFunc);
         }
@@ -2646,12 +2792,10 @@
             closeVideoModal.addEventListener('click', closeVideoPlayer);
         }
 
-        // Cinema mode
         if (cinemaModeBtn) {
             cinemaModeBtn.addEventListener('click', toggleCinemaMode);
         }
 
-        // Video modal add button
         if (videoModalAddBtn) {
             videoModalAddBtn.addEventListener('click', () => {
                 if (currentMovie) {
@@ -2663,7 +2807,6 @@
             });
         }
 
-        // Click outside modals
         window.addEventListener('click', (e) => {
             if (e.target === detailsModal) closeDetailsModalFunc();
             if (e.target === videoModal) closeVideoPlayer();
@@ -2672,7 +2815,6 @@
             if (e.target === shortcutsModal) shortcutsModal.classList.remove('active');
         });
 
-        // Clear lists
         if (clearMyList) {
             clearMyList.addEventListener('click', () => {
                 myList = [];
@@ -2685,11 +2827,19 @@
         }
 
         if (clearProgress) {
-            clearProgress.addEventListener('click', () => {
-                continueWatching = [];
-                localStorage.setItem('btffContinueWatching', JSON.stringify(continueWatching));
-                renderContinueWatchingRow();
-                showNotification('🗑️ Continue watching cleared');
+            clearProgress.addEventListener('click', async () => {
+                try {
+                    await fetch(APPS_SCRIPT_URL + '?action=clearProgress&userId=' + userId + '&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    continueWatching = [];
+                    localStorage.setItem('btffContinueWatching', JSON.stringify(continueWatching));
+                    renderContinueWatchingRow();
+                    showNotification('🗑️ Continue watching cleared');
+                } catch (error) {
+                    console.error('Error clearing progress:', error);
+                }
             });
         }
 
@@ -2697,7 +2847,6 @@
             retryBtn.addEventListener('click', fetchMovies);
         }
 
-        // Details modal buttons
         if (detailsPlayBtn) {
             detailsPlayBtn.addEventListener('click', () => {
                 if (currentMovie) {
@@ -2718,7 +2867,6 @@
             });
         }
 
-        // Watch party
         if (watchPartyBtn) {
             watchPartyBtn.addEventListener('click', createWatchParty);
         }
@@ -2733,18 +2881,14 @@
 
         if (sendChat) {
             sendChat.addEventListener('click', () => {
-                if (chatInput.value.trim()) {
-                    addChatMessage('You', chatInput.value);
-                    chatInput.value = '';
-                }
+                sendChatMessage(chatInput.value);
             });
         }
 
         if (chatInput) {
             chatInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && chatInput.value.trim()) {
-                    addChatMessage('You', chatInput.value);
-                    chatInput.value = '';
+                    sendChatMessage(chatInput.value);
                 }
             });
         }
@@ -2755,7 +2899,6 @@
             });
         }
 
-        // Shortcuts
         if (shortcutsIcon) {
             shortcutsIcon.addEventListener('click', () => {
                 shortcutsModal.classList.add('active');
@@ -2768,7 +2911,6 @@
             });
         }
 
-        // Rating modal
         if (rateMovieBtn) {
             rateMovieBtn.addEventListener('click', () => {
                 ratingModal.classList.add('active');
@@ -2814,7 +2956,6 @@
                 if (currentRating > 0 && currentMovie) {
                     addRating(currentMovie.id, currentRating);
                     ratingModal.classList.remove('active');
-                    showNotification(`⭐ Rated ${currentRating} stars`);
                 }
             });
         }
@@ -2825,10 +2966,8 @@
             });
         }
 
-        // Keyboard shortcuts
         window.addEventListener('keydown', handleKeyboardShortcuts);
 
-        // Escape key
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (detailsModal.classList.contains('active')) {
@@ -2850,18 +2989,20 @@
             }
         });
 
-        // Check for party invite in URL
         const urlParams = new URLSearchParams(window.location.search);
         const partyParam = urlParams.get('party');
         if (partyParam) {
+            partyId = partyParam;
             setTimeout(() => {
                 watchPartyModal.classList.add('active');
                 addChatMessage('System', 'You joined the watch party!');
+                startPartyPolling(partyId);
             }, 1000);
         }
 
         // Start
         fetchMovies();
+        fetchContinueWatching();
     })();
 </script>
 </body>

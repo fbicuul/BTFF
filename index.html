@@ -103,16 +103,15 @@
             z-index: 5;
         }
 
-        /* navbar */
+        /* ===== NAVBAR - COMPLETELY REBUILT ===== */
         .navbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 24px 0 16px;
+            padding: 20px 0;
             border-bottom: 1px solid rgba(255,255,255,0.06);
             position: relative;
-            z-index: 20;
-            flex-wrap: wrap;
+            z-index: 100;
         }
 
         .logo {
@@ -126,30 +125,33 @@
             cursor: pointer;
         }
 
-        /* Desktop navigation */
-        .nav-links {
+        /* Desktop Navigation */
+        .nav-links-desktop {
             display: flex;
-            gap: 2.8rem;
+            gap: 2.5rem;
             font-weight: 500;
-            color: #b0c7e9;
         }
         
-        .nav-links span {
+        .nav-links-desktop span {
+            color: #b0c7e9;
             cursor: pointer;
             transition: color 0.2s;
             position: relative;
         }
-        .nav-links span:hover {
+        
+        .nav-links-desktop span:hover {
             color: white;
         }
-        .nav-links span.active {
+        
+        .nav-links-desktop span.active {
             color: white;
             font-weight: 600;
         }
-        .nav-links span.active::after {
+        
+        .nav-links-desktop span.active::after {
             content: '';
             position: absolute;
-            bottom: -6px;
+            bottom: -8px;
             left: 0;
             width: 100%;
             height: 2px;
@@ -157,85 +159,86 @@
             border-radius: 2px;
         }
 
-        /* Mobile menu toggle button */
-        .mobile-menu-toggle {
-            display: none;
-            font-size: 1.8rem;
-            cursor: pointer;
+        /* Right side icons */
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-icons i {
+            font-size: 1.4rem;
             color: #d0e0ff;
+            cursor: pointer;
             transition: color 0.2s;
         }
-        .mobile-menu-toggle:hover {
+        
+        .nav-icons i:hover {
             color: white;
         }
 
-        /* Mobile navigation drawer - FIXED */
-        .mobile-nav-drawer {
+        /* Mobile Menu Toggle - SEPARATE FROM ICONS */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #d0e0ff;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 5px;
+            margin-left: 5px;
+        }
+        
+        .mobile-menu-btn:hover {
+            color: white;
+        }
+
+        /* Mobile Navigation Drawer - COMPLETELY REDESIGNED */
+        .mobile-drawer {
             display: none;
             position: absolute;
             top: 100%;
             left: 0;
             width: 100%;
             background: #0c1727;
-            border: 2px solid #3d6190;
-            border-top: none;
-            border-radius: 0 0 20px 20px;
-            padding: 25px 40px;
+            border-top: 2px solid #2f6bc6;
+            border-bottom: 2px solid #2f6bc6;
+            padding: 20px;
             z-index: 1000;
-            box-shadow: 0 20px 30px rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
         
-        .mobile-nav-drawer.active {
+        .mobile-drawer.active {
             display: block !important;
         }
         
-        .mobile-nav-links {
+        .mobile-drawer-links {
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 15px;
         }
         
-        .mobile-nav-links span {
+        .mobile-drawer-links span {
+            color: #b0c7e9;
+            font-size: 1.2rem;
+            padding: 12px 15px;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 1.4rem;
-            color: #b0c7e9;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(61, 97, 144, 0.3);
-            display: block;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
         }
         
-        .mobile-nav-links span:last-child {
-            border-bottom: none;
-        }
-        
-        .mobile-nav-links span:hover {
+        .mobile-drawer-links span:hover {
+            background: #2f6bc6;
             color: white;
-            padding-left: 10px;
+            padding-left: 25px;
         }
         
-        .mobile-nav-links span.active {
+        .mobile-drawer-links span.active {
+            background: #2f6bc6;
             color: white;
             font-weight: 600;
-            border-left: 4px solid #2f6bc6;
-            padding-left: 16px;
-            background: rgba(47, 107, 198, 0.1);
-        }
-
-        .nav-right {
-            display: flex;
-            gap: 24px;
-            align-items: center;
-            color: #d0e0ff;
-        }
-        .nav-right i {
-            font-size: 1.4rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .nav-right i:hover {
-            color: white;
+            border-left: 4px solid white;
         }
 
         /* Advanced Search Bar */
@@ -987,14 +990,14 @@
             transform: translateX(0);
         }
 
-        /* Mobile responsive styles - FIXED */
+        /* ===== MOBILE RESPONSIVE STYLES ===== */
         @media (max-width: 800px) {
-            .hero-title { 
-                font-size: 3.2rem; 
+            .container { 
+                padding: 0 20px; 
             }
             
-            .container { 
-                padding: 0 24px; 
+            .hero-title { 
+                font-size: 3rem; 
             }
             
             .hero-buttons { 
@@ -1002,49 +1005,70 @@
                 gap: 10px; 
             }
             
-            /* Hide desktop nav links on mobile */
-            .nav-links {
+            .hero-buttons button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* Hide desktop navigation */
+            .nav-links-desktop {
                 display: none;
             }
             
-            /* Show mobile menu toggle */
-            .mobile-menu-toggle {
-                display: block;
+            /* Show mobile menu button */
+            .mobile-menu-btn {
+                display: inline-block;
             }
             
-            /* Make mobile drawer visible when active */
-            .mobile-nav-drawer {
-                display: none;
-                position: absolute;
-                top: 100%;
+            /* Adjust navbar for mobile */
+            .navbar {
+                padding: 15px 0;
+            }
+            
+            .logo {
+                font-size: 2.2rem;
+            }
+            
+            .nav-icons {
+                gap: 12px;
+            }
+            
+            /* Make mobile drawer full width */
+            .mobile-drawer {
                 left: 0;
                 width: 100%;
-                background: #0c1727;
-                border: 2px solid #3d6190;
-                border-top: none;
-                border-radius: 0 0 20px 20px;
-                padding: 20px;
-                z-index: 1000;
+                border-radius: 0;
             }
             
-            .mobile-nav-drawer.active {
-                display: block !important;
+            /* Adjust modal for mobile */
+            .details-poster {
+                width: 100%;
+                max-width: 250px;
+                margin: 0 auto;
             }
             
-            .mobile-nav-links span {
-                font-size: 1.2rem;
-                padding: 12px 0;
+            .details-flex {
+                justify-content: center;
+                text-align: center;
+            }
+            
+            .details-buttons {
+                justify-content: center;
             }
         }
 
-        /* Extra small devices */
         @media (max-width: 480px) {
-            .mobile-nav-drawer {
-                padding: 15px;
+            .hero-title {
+                font-size: 2.5rem;
             }
             
-            .mobile-nav-links span {
+            .hero-desc {
                 font-size: 1.1rem;
+            }
+            
+            .mobile-drawer-links span {
+                font-size: 1.1rem;
+                padding: 10px 12px;
             }
         }
     </style>
@@ -1059,12 +1083,12 @@
         </div>
 
         <div class="container">
-            <!-- NAVBAR -->
+            <!-- NAVBAR - COMPLETELY REBUILT -->
             <nav class="navbar">
                 <div class="logo" id="logoHome">BTFF</div>
                 
-                <!-- Desktop Navigation Links -->
-                <div class="nav-links" id="navLinks">
+                <!-- Desktop Navigation -->
+                <div class="nav-links-desktop">
                     <span class="active" data-category="all">Home</span>
                     <span data-category="trending">Trending</span>
                     <span data-category="popular">Popular</span>
@@ -1072,17 +1096,20 @@
                     <span data-category="myList">My List</span>
                 </div>
                 
-                <div class="nav-right">
+                <!-- Right Side Icons -->
+                <div class="nav-icons">
                     <i class="fas fa-search" id="searchIcon"></i>
                     <i class="fas fa-bell"></i>
-                    <!-- Mobile Menu Toggle (Hamburger) - THIS IS CORRECT -->
-                    <i class="fas fa-bars mobile-menu-toggle" id="mobileMenuToggle"></i>
+                    <!-- Mobile Menu Button - SEPARATE from other icons -->
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
             </nav>
 
-            <!-- Mobile Navigation Drawer - THIS IS CORRECT (NOT inside an anchor tag) -->
-            <div class="mobile-nav-drawer" id="mobileNavDrawer">
-                <div class="mobile-nav-links" id="mobileNavLinks">
+            <!-- Mobile Navigation Drawer - SEPARATE container -->
+            <div class="mobile-drawer" id="mobileDrawer">
+                <div class="mobile-drawer-links">
                     <span class="active" data-category="all">Home</span>
                     <span data-category="trending">Trending</span>
                     <span data-category="popular">Popular</span>
@@ -1308,8 +1335,8 @@
         const yearFilter = document.getElementById('yearFilter');
         const sortFilter = document.getElementById('sortFilter');
         const activeFilters = document.getElementById('activeFilters');
-        const desktopNavLinks = document.querySelectorAll('.nav-links span');
-        const mobileNavLinks = document.querySelectorAll('.mobile-nav-links span');
+        const desktopNavLinks = document.querySelectorAll('.nav-links-desktop span');
+        const mobileNavLinks = document.querySelectorAll('.mobile-drawer-links span');
         const logoHome = document.getElementById('logoHome');
         const heroPlayBtn = document.getElementById('heroPlayBtn');
         const heroAddBtn = document.getElementById('heroAddBtn');
@@ -1322,11 +1349,11 @@
         const errorText = document.getElementById('errorText');
         const retryBtn = document.getElementById('retryBtn');
         
-        // Mobile menu elements
-        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-        const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+        // Mobile menu elements - NEW
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileDrawer = document.getElementById('mobileDrawer');
         
-        // Combine all nav links for active state management
+        // Combine all nav links for active state
         const allNavLinks = [...desktopNavLinks, ...mobileNavLinks];
         
         // Details modal elements
@@ -1358,15 +1385,15 @@
 
         // ---------- MOBILE MENU FUNCTIONS ----------
         function toggleMobileMenu() {
-            if (mobileNavDrawer) {
-                mobileNavDrawer.classList.toggle('active');
-                console.log('Mobile menu toggled. Active:', mobileNavDrawer.classList.contains('active'));
+            if (mobileDrawer) {
+                mobileDrawer.classList.toggle('active');
+                console.log('Mobile menu toggled. Active:', mobileDrawer.classList.contains('active'));
             }
         }
 
         function closeMobileMenu() {
-            if (mobileNavDrawer) {
-                mobileNavDrawer.classList.remove('active');
+            if (mobileDrawer) {
+                mobileDrawer.classList.remove('active');
             }
         }
 
@@ -1814,32 +1841,29 @@
 
         // ---------- EVENT LISTENERS ----------
         
-        // Mobile menu toggle - SIMPLE AND RELIABLE
-        if (mobileMenuToggle) {
-            console.log('Mobile menu toggle found, attaching event');
-            
-            mobileMenuToggle.addEventListener('click', function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                console.log('Hamburger clicked!');
+        // Mobile menu button - SIMPLE AND DIRECT
+        if (mobileMenuBtn) {
+            console.log('Mobile menu button found');
+            mobileMenuBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Mobile menu button clicked');
                 toggleMobileMenu();
             });
-        } else {
-            console.log('Mobile menu toggle NOT found!');
         }
 
         // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
-            if (mobileNavDrawer && mobileNavDrawer.classList.contains('active')) {
-                if (!mobileNavDrawer.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+            if (mobileDrawer && mobileDrawer.classList.contains('active')) {
+                if (!mobileDrawer.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
                     closeMobileMenu();
                 }
             }
         });
 
-        // Close mobile menu when window resizes above mobile breakpoint
+        // Close mobile menu on window resize
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 800 && mobileNavDrawer) {
+            if (window.innerWidth > 800 && mobileDrawer) {
                 closeMobileMenu();
             }
         });

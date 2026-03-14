@@ -103,7 +103,7 @@
             z-index: 5;
         }
 
-        /* ===== NAVBAR - COMPLETELY REBUILT ===== */
+        /* ===== NAVBAR ===== */
         .navbar {
             display: flex;
             align-items: center;
@@ -177,7 +177,7 @@
             color: white;
         }
 
-        /* Mobile Menu Toggle - SEPARATE FROM ICONS */
+        /* Mobile Menu Toggle Button */
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -193,52 +193,93 @@
             color: white;
         }
 
-        /* Mobile Navigation Drawer - COMPLETELY REDESIGNED */
-        .mobile-drawer {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
+        /* ===== RIGHT SLIDE MENU ===== */
+        .mobile-slide-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100vh;
             background: #0c1727;
-            border-top: 2px solid #2f6bc6;
-            border-bottom: 2px solid #2f6bc6;
-            padding: 20px;
-            z-index: 1000;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border-left: 2px solid #2f6bc6;
+            z-index: 2000;
+            transition: right 0.3s ease;
+            padding: 80px 20px 30px;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.7);
+            overflow-y: auto;
         }
         
-        .mobile-drawer.active {
-            display: block !important;
+        .mobile-slide-menu.active {
+            right: 0;
         }
         
-        .mobile-drawer-links {
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 2rem;
+            color: #fff;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            transition: 0.2s;
+        }
+        
+        .mobile-menu-close:hover {
+            background: #e50914;
+        }
+        
+        .mobile-slide-links {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            margin-top: 40px;
         }
         
-        .mobile-drawer-links span {
+        .mobile-slide-links span {
             color: #b0c7e9;
-            font-size: 1.2rem;
-            padding: 12px 15px;
+            font-size: 1.3rem;
+            padding: 15px 20px;
             cursor: pointer;
             transition: all 0.2s;
             border-radius: 8px;
             background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(61, 97, 144, 0.3);
         }
         
-        .mobile-drawer-links span:hover {
+        .mobile-slide-links span:hover {
             background: #2f6bc6;
             color: white;
-            padding-left: 25px;
+            transform: translateX(-5px);
         }
         
-        .mobile-drawer-links span.active {
+        .mobile-slide-links span.active {
             background: #2f6bc6;
             color: white;
             font-weight: 600;
             border-left: 4px solid white;
+        }
+        
+        /* Overlay when menu is open */
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1500;
+            backdrop-filter: blur(3px);
+        }
+        
+        .menu-overlay.active {
+            display: block;
         }
 
         /* Advanced Search Bar */
@@ -1017,12 +1058,7 @@
             
             /* Show mobile menu button */
             .mobile-menu-btn {
-                display: inline-block;
-            }
-            
-            /* Adjust navbar for mobile */
-            .navbar {
-                padding: 15px 0;
+                display: block;
             }
             
             .logo {
@@ -1030,14 +1066,7 @@
             }
             
             .nav-icons {
-                gap: 12px;
-            }
-            
-            /* Make mobile drawer full width */
-            .mobile-drawer {
-                left: 0;
-                width: 100%;
-                border-radius: 0;
+                gap: 15px;
             }
             
             /* Adjust modal for mobile */
@@ -1066,9 +1095,8 @@
                 font-size: 1.1rem;
             }
             
-            .mobile-drawer-links span {
-                font-size: 1.1rem;
-                padding: 10px 12px;
+            .mobile-slide-menu {
+                width: 250px;
             }
         }
     </style>
@@ -1083,7 +1111,7 @@
         </div>
 
         <div class="container">
-            <!-- NAVBAR - COMPLETELY REBUILT -->
+            <!-- NAVBAR -->
             <nav class="navbar">
                 <div class="logo" id="logoHome">BTFF</div>
                 
@@ -1100,16 +1128,19 @@
                 <div class="nav-icons">
                     <i class="fas fa-search" id="searchIcon"></i>
                     <i class="fas fa-bell"></i>
-                    <!-- Mobile Menu Button - SEPARATE from other icons -->
+                    <!-- Mobile Menu Button - Opens right slide menu -->
                     <button class="mobile-menu-btn" id="mobileMenuBtn">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
             </nav>
 
-            <!-- Mobile Navigation Drawer - SEPARATE container -->
-            <div class="mobile-drawer" id="mobileDrawer">
-                <div class="mobile-drawer-links">
+            <!-- Mobile Slide Menu (Right Side) -->
+            <div class="mobile-slide-menu" id="mobileSlideMenu">
+                <div class="mobile-menu-close" id="closeMobileMenu">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="mobile-slide-links">
                     <span class="active" data-category="all">Home</span>
                     <span data-category="trending">Trending</span>
                     <span data-category="popular">Popular</span>
@@ -1117,6 +1148,9 @@
                     <span data-category="myList">My List</span>
                 </div>
             </div>
+            
+            <!-- Overlay when menu is open -->
+            <div class="menu-overlay" id="menuOverlay"></div>
 
             <!-- ADVANCED SEARCH -->
             <div class="search-container" id="searchContainer" style="display: none;">
@@ -1336,7 +1370,7 @@
         const sortFilter = document.getElementById('sortFilter');
         const activeFilters = document.getElementById('activeFilters');
         const desktopNavLinks = document.querySelectorAll('.nav-links-desktop span');
-        const mobileNavLinks = document.querySelectorAll('.mobile-drawer-links span');
+        const mobileNavLinks = document.querySelectorAll('.mobile-slide-links span');
         const logoHome = document.getElementById('logoHome');
         const heroPlayBtn = document.getElementById('heroPlayBtn');
         const heroAddBtn = document.getElementById('heroAddBtn');
@@ -1349,9 +1383,11 @@
         const errorText = document.getElementById('errorText');
         const retryBtn = document.getElementById('retryBtn');
         
-        // Mobile menu elements - NEW
+        // Mobile menu elements
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileDrawer = document.getElementById('mobileDrawer');
+        const mobileSlideMenu = document.getElementById('mobileSlideMenu');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
         
         // Combine all nav links for active state
         const allNavLinks = [...desktopNavLinks, ...mobileNavLinks];
@@ -1384,16 +1420,21 @@
         const closeRatingModal = document.getElementById('closeRatingModal');
 
         // ---------- MOBILE MENU FUNCTIONS ----------
-        function toggleMobileMenu() {
-            if (mobileDrawer) {
-                mobileDrawer.classList.toggle('active');
-                console.log('Mobile menu toggled. Active:', mobileDrawer.classList.contains('active'));
+        function openMobileMenu() {
+            if (mobileSlideMenu) {
+                mobileSlideMenu.classList.add('active');
+                menuOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                console.log('Mobile menu opened');
             }
         }
 
-        function closeMobileMenu() {
-            if (mobileDrawer) {
-                mobileDrawer.classList.remove('active');
+        function closeMobileMenuFunc() {
+            if (mobileSlideMenu) {
+                mobileSlideMenu.classList.remove('active');
+                menuOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                console.log('Mobile menu closed');
             }
         }
 
@@ -1841,30 +1882,39 @@
 
         // ---------- EVENT LISTENERS ----------
         
-        // Mobile menu button - SIMPLE AND DIRECT
+        // Mobile menu button - Open right slide menu
         if (mobileMenuBtn) {
             console.log('Mobile menu button found');
             mobileMenuBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('Mobile menu button clicked');
-                toggleMobileMenu();
+                openMobileMenu();
             });
         }
 
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (mobileDrawer && mobileDrawer.classList.contains('active')) {
-                if (!mobileDrawer.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                    closeMobileMenu();
-                }
-            }
-        });
+        // Close menu with close button
+        if (closeMobileMenu) {
+            closeMobileMenu.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeMobileMenuFunc();
+            });
+        }
 
-        // Close mobile menu on window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 800 && mobileDrawer) {
-                closeMobileMenu();
+        // Close menu when clicking overlay
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeMobileMenuFunc();
+            });
+        }
+
+        // Close menu on escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mobileSlideMenu && mobileSlideMenu.classList.contains('active')) {
+                closeMobileMenuFunc();
             }
         });
 
@@ -1882,7 +1932,7 @@
                         searchContainer.style.display = 'none';
                     }
                 }
-                closeMobileMenu();
+                closeMobileMenuFunc();
             });
         }
 
@@ -1916,7 +1966,7 @@
                 } else {
                     myListSection.style.display = 'block';
                 }
-                closeMobileMenu();
+                closeMobileMenuFunc();
             });
         }
 
@@ -1924,7 +1974,7 @@
             link.addEventListener('click', () => {
                 const category = link.dataset.category;
                 setActiveCategory(category);
-                closeMobileMenu();
+                closeMobileMenuFunc();
                 
                 if (category === 'myList') {
                     document.querySelectorAll('.section-header').forEach(header => {
@@ -2115,7 +2165,7 @@
                 if (ratingModal.classList.contains('active')) {
                     ratingModal.classList.remove('active');
                 }
-                closeMobileMenu();
+                closeMobileMenuFunc();
             }
         });
 

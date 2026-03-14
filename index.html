@@ -26,73 +26,54 @@
             min-height: 100vh;
         }
 
-        /* hero wrapper with pronounced gradient */
+        /* hero wrapper with video background */
         .hero-wrapper {
             position: relative;
-            background: radial-gradient(circle at 20% 30%, #1c3f60, #0a0f1a 80%);
             width: 100%;
+            height: 80vh;
+            min-height: 600px;
             overflow: hidden;
-            box-shadow: inset 0 -30px 40px -10px #0a0f1a;
         }
 
-        /* animated waves */
-        .hero-wave {
+        /* Video Hero Background */
+        .hero-video-container {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0.9;
+            z-index: 0;
         }
-
-        .wave {
+        
+        .hero-video-container iframe {
             position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 30% 50%, rgba(120, 200, 255, 0.3) 0%, transparent 45%),
-                        repeating-linear-gradient(45deg, transparent 0px, transparent 40px, rgba(90, 180, 255, 0.08) 40px, rgba(90, 180, 255, 0.08) 80px);
-            animation: waveDrift 22s infinite linear;
-            border-radius: 40%;
-            transform-origin: center;
-            filter: blur(18px);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.5;
         }
-
-        .wave2 {
-            top: -20%;
-            left: -30%;
-            background: radial-gradient(circle at 70% 80%, rgba(70, 160, 250, 0.35) 0%, transparent 55%),
-                        repeating-linear-gradient(135deg, transparent 0px, transparent 60px, rgba(130, 200, 255, 0.1) 60px, rgba(130, 200, 255, 0.1) 120px);
-            animation: waveDrift2 28s infinite alternate;
-            filter: blur(25px);
+        
+        .hero-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #0a0f1a 0%, rgba(10,15,26,0.7) 50%, transparent 100%);
+            z-index: 1;
         }
-
-        .wave3 {
-            bottom: -10%;
-            right: -20%;
-            background: radial-gradient(circle at 20% 40%, rgba(50, 180, 255, 0.3) 0%, transparent 50%),
-                        repeating-linear-gradient(90deg, transparent 0px, transparent 30px, rgba(110, 190, 255, 0.07) 30px, rgba(110, 190, 255, 0.07) 60px);
-            animation: waveDrift3 19s infinite ease-in-out;
-            filter: blur(30px);
-        }
-
-        @keyframes waveDrift {
-            0% { transform: translateX(0%) translateY(0%) rotate(0deg); }
-            33% { transform: translateX(-8%) translateY(4%) rotate(3deg); }
-            66% { transform: translateX(4%) translateY(-6%) rotate(-2deg); }
-            100% { transform: translateX(0%) translateY(0%) rotate(0deg); }
-        }
-        @keyframes waveDrift2 {
-            0% { transform: translateX(0%) translateY(0%) rotate(0deg) scale(1); }
-            50% { transform: translateX(6%) translateY(-8%) rotate(2deg) scale(1.1); }
-            100% { transform: translateX(-5%) translateY(5%) rotate(-3deg) scale(1.05); }
-        }
-        @keyframes waveDrift3 {
-            0% { transform: translateX(0%) translateY(0%) rotate(0deg) scale(1); }
-            40% { transform: translateX(-9%) translateY(-3%) rotate(5deg) scale(1.15); }
-            80% { transform: translateX(7%) translateY(4%) rotate(-4deg) scale(0.95); }
-            100% { transform: translateX(0%) translateY(0%) rotate(0deg) scale(1); }
+        
+        .hero-video-fade {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(transparent, #0a0f1a);
+            z-index: 2;
         }
 
         .container {
@@ -393,9 +374,10 @@
             display: flex;
             align-items: center;
             gap: 50px;
-            padding: 50px 0 70px;
+            padding: 100px 0 70px;
             flex-wrap: wrap;
             z-index: 10;
+            min-height: 600px;
         }
 
         .hero-left {
@@ -423,15 +405,15 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 24px;
-            text-shadow: 0 2px 20px rgba(0,80,255,0.4);
+            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
         }
 
         .hero-desc {
             font-size: 1.3rem;
-            color: #b2c9ec;
+            color: #e0e0e0;
             max-width: 550px;
             margin-bottom: 32px;
-            text-shadow: 0 2px 6px black;
+            text-shadow: 0 2px 4px black;
         }
 
         .hero-buttons {
@@ -464,24 +446,18 @@
             transform: scale(1.04);
         }
         .btn-secondary {
-            background: transparent;
+            background: rgba(0,0,0,0.5);
             border: 2px solid rgba(255,255,255,0.25);
             color: white;
             backdrop-filter: blur(4px);
         }
         .btn-secondary:hover {
             border-color: #2f6bc6;
-            background: rgba(47, 107, 198, 0.1);
+            background: rgba(47, 107, 198, 0.3);
         }
 
         .hero-right {
             flex: 1 1 300px;
-            background: rgba(15, 30, 45, 0.45);
-            border-radius: 40px;
-            padding: 30px;
-            backdrop-filter: blur(8px);
-            border: 1px solid #2e4b70;
-            box-shadow: 0 30px 40px -15px black;
             position: relative;
             z-index: 15;
         }
@@ -490,7 +466,7 @@
             width: 100%;
             border-radius: 24px;
             border: 2px solid #3d6190;
-            box-shadow: 0 10px 20px -5px #00000080;
+            box-shadow: 0 30px 40px -15px black;
             cursor: pointer;
             transition: transform 0.2s;
         }
@@ -507,7 +483,7 @@
             margin: 50px 0 20px;
         }
         .section-title {
-            font-size: 1rem;
+            font-size: 1.5rem;
             font-weight: 600;
             letter-spacing: -0.5px;
             background: linear-gradient(135deg, #ffffff, #b2d5ff);
@@ -1335,6 +1311,36 @@
             border-radius: 5px;
         }
 
+        /* Hero Navigation Dots */
+        .hero-nav {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+        
+        .hero-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .hero-dot:hover {
+            background: rgba(255,255,255,0.6);
+        }
+        
+        .hero-dot.active {
+            background: #2f6bc6;
+            transform: scale(1.2);
+            border-color: white;
+        }
+
         /* ===== MOBILE RESPONSIVE STYLES ===== */
         @media (max-width: 800px) {
             .container { 
@@ -1373,7 +1379,6 @@
             
             .details-poster {
                 width: 100%;
-                max-width: 250px;
                 margin: 0 auto;
             }
             
@@ -1384,6 +1389,16 @@
             
             .details-buttons {
                 justify-content: center;
+            }
+            
+            .hero-wrapper {
+                height: 70vh;
+                min-height: 500px;
+            }
+            
+            .hero-nav {
+                right: 20px;
+                bottom: 20px;
             }
         }
 
@@ -1405,11 +1420,10 @@
 <body>
 <div class="page-wrapper">
     <div class="hero-wrapper">
-        <div class="hero-wave">
-            <div class="wave"></div>
-            <div class="wave wave2"></div>
-            <div class="wave wave3"></div>
-        </div>
+        <!-- Dynamic Video Hero Background -->
+        <div class="hero-video-container" id="heroVideoContainer"></div>
+        <div class="hero-video-overlay"></div>
+        <div class="hero-video-fade"></div>
 
         <div class="container">
             <!-- NAVBAR -->
@@ -1485,12 +1499,12 @@
                 <div class="search-results-count" id="searchCount"></div>
             </div>
 
-            <!-- HERO -->
+            <!-- HERO Content -->
             <section class="hero">
                 <div class="hero-left">
-                    <div class="hero-eyebrow"><i class="fas fa-rocket"></i> ORIGINAL SERIES</div>
-                    <h1 class="hero-title">BEFORE THE FIRST FLIGHT SERIES</h1>
-                    <p class="hero-desc">Witness the untold stories of pioneers, dreamers, and the moments that defied gravity. Streaming exclusively on BTFF.</p>
+                    <div class="hero-eyebrow"><i class="fas fa-rocket"></i> FEATURED</div>
+                    <h1 class="hero-title" id="heroTitle">BEFORE THE FIRST FLIGHT SERIES</h1>
+                    <p class="hero-desc" id="heroDescription">Witness the untold stories of pioneers, dreamers, and the moments that defied gravity. Streaming exclusively on BTFF.</p>
                     <div class="hero-buttons">
                         <button class="btn-primary" id="heroPlayBtn"><i class="fas fa-play"></i> WATCH TRAILER</button>
                         <button class="btn-secondary" id="heroAddBtn"><i class="fas fa-plus"></i> MY LIST</button>
@@ -1500,6 +1514,9 @@
                     <img src="https://i.ibb.co/zW81zb3H/Whats-App-Image-2026-02-19-at-5-41-56-PM.jpg" alt="hero still" id="heroImage">
                 </div>
             </section>
+            
+            <!-- Hero Navigation Dots -->
+            <div class="hero-nav" id="heroNav"></div>
         </div>
     </div>
 
@@ -1696,7 +1713,7 @@
 <script>
     (function() {
         // ---------- CONFIGURATION ----------
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyWTeuyKBJQf4DX1jg-sNYjnn7XRFQyio5Y-7lxxLvaanZ8U47LjzuDgU0eOq-GaZvz/exec'; // Replace with your deployed URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyWTeuyKBJQf4DX1jg-sNYjnn7XRFQyio5Y-7lxxLvaanZ8U47LjzuDgU0eOq-GaZvz/exec';
         
         // ---------- STATE ----------
         let movies = [];
@@ -1710,6 +1727,9 @@
         let partyId = null;
         let partyUsers = [];
         let userId = 'user_' + Math.random().toString(36).substring(2, 15);
+        let heroMovies = [];
+        let currentHeroIndex = 0;
+        let heroInterval;
 
         // DOM elements
         const trendingRow = document.getElementById('trendingRow');
@@ -1733,6 +1753,10 @@
         const heroPlayBtn = document.getElementById('heroPlayBtn');
         const heroAddBtn = document.getElementById('heroAddBtn');
         const heroImage = document.getElementById('heroImage');
+        const heroTitle = document.getElementById('heroTitle');
+        const heroDescription = document.getElementById('heroDescription');
+        const heroVideoContainer = document.getElementById('heroVideoContainer');
+        const heroNav = document.getElementById('heroNav');
         const notification = document.getElementById('notification');
         const clearMyList = document.getElementById('clearMyList');
         const clearProgress = document.getElementById('clearProgress');
@@ -1816,6 +1840,43 @@
             }
         }
 
+        // ---------- HERO FUNCTIONS ----------
+        function updateHero(index) {
+            const movie = heroMovies[index];
+            if (!movie) return;
+            
+            currentHeroIndex = index;
+            
+            // Update video background
+            heroVideoContainer.innerHTML = `
+                <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0&loop=1&playlist=${movie.youtubeId}" 
+                        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            `;
+            
+            // Update text content
+            heroTitle.textContent = movie.title;
+            heroDescription.textContent = movie.description || movie.desc || 'No description available';
+            heroImage.src = `https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg`;
+            
+            // Update active dot
+            document.querySelectorAll('.hero-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            
+            // Update button actions
+            heroPlayBtn.onclick = () => openVideoPlayer(movie.id);
+            heroImage.onclick = () => openVideoPlayer(movie.id);
+            heroAddBtn.onclick = () => addToMyList(movie.id);
+        }
+
+        function startHeroRotation() {
+            if (heroInterval) clearInterval(heroInterval);
+            heroInterval = setInterval(() => {
+                const nextIndex = (currentHeroIndex + 1) % heroMovies.length;
+                updateHero(nextIndex);
+            }, 10000); // Change every 10 seconds
+        }
+
         // ---------- API FUNCTIONS ----------
         async function fetchMovies() {
             try {
@@ -1838,6 +1899,15 @@
                 
                 if (data.success && Array.isArray(data.movies)) {
                     movies = data.movies;
+                    
+                    // Set hero movies (recent or popular)
+                    heroMovies = movies.slice(0, 5); // Use first 5 movies for hero
+                    if (heroMovies.length > 0) {
+                        updateHero(0);
+                        renderHeroNav();
+                        startHeroRotation();
+                    }
+                    
                     await fetchAllRatings();
                     extractGenres();
                     populateYearFilter();
@@ -1852,6 +1922,23 @@
             } finally {
                 showLoading(false);
             }
+        }
+
+        function renderHeroNav() {
+            heroNav.innerHTML = '';
+            heroMovies.forEach((_, index) => {
+                const dot = document.createElement('span');
+                dot.className = `hero-dot ${index === 0 ? 'active' : ''}`;
+                dot.addEventListener('click', () => {
+                    updateHero(index);
+                    // Reset interval
+                    if (heroInterval) {
+                        clearInterval(heroInterval);
+                        startHeroRotation();
+                    }
+                });
+                heroNav.appendChild(dot);
+            });
         }
 
         async function fetchAllRatings() {
@@ -2763,26 +2850,6 @@
                 }
             });
         });
-
-        if (heroPlayBtn) {
-            heroPlayBtn.addEventListener('click', () => {
-                if (movies.length > 0) openVideoPlayer(movies[0].id);
-            });
-        }
-
-        if (heroImage) {
-            heroImage.addEventListener('click', () => {
-                if (movies.length > 0) openVideoPlayer(movies[0].id);
-            });
-        }
-
-        if (heroAddBtn) {
-            heroAddBtn.addEventListener('click', () => {
-                if (movies.length > 0) {
-                    addToMyList(movies[0].id);
-                }
-            });
-        }
 
         if (closeDetailsModal) {
             closeDetailsModal.addEventListener('click', closeDetailsModalFunc);

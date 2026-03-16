@@ -1775,12 +1775,21 @@
         const shortcutsIcon = document.getElementById('shortcutsIcon');
         const closeShortcuts = document.getElementById('closeShortcuts');
 
-        // ---------- FUNCTION TO EXTRACT NUMERIC ID ----------
+        // ---------- FUNCTION TO GET NUMERIC ID (FIXED FOR NUMERIC IDS) ----------
         function getNumericId(id) {
-            if (!id) return 0;
-            // Extract numbers from movie_123 format
-            const match = id.match(/\d+/);
-            return match ? parseInt(match[0]) : 0;
+            if (id === undefined || id === null) return 0;
+            // If it's already a number, return it
+            if (typeof id === 'number') return id;
+            // If it's a string, try to parse it
+            if (typeof id === 'string') {
+                // Try to parse as integer first
+                const parsed = parseInt(id);
+                if (!isNaN(parsed)) return parsed;
+                // If that fails, try to extract numbers from string like "movie_123"
+                const match = id.match(/\d+/);
+                return match ? parseInt(match[0]) : 0;
+            }
+            return 0;
         }
 
         // ---------- MOBILE MENU FUNCTIONS ----------
@@ -2139,7 +2148,7 @@
 
         // ---------- VIDEO PLAYER FUNCTIONS ----------
         function openVideoPlayer(movieId, episode = null) {
-            const movie = movies.find(m => m.id === movieId);
+            const movie = movies.find(m => m.id == movieId); // Use loose equality to handle string/number mismatch
             if (!movie) {
                 console.error('Movie not found:', movieId);
                 return;
@@ -2161,7 +2170,7 @@
                 updateProgress(movieId, 25);
             }, 30000);
             
-            videoModalAddBtn.innerHTML = isInMyList(movieId) ? 
+            videoModalAddBtn.innerHTML = isInMyList(movie.id) ? 
                 '<i class="fas fa-check"></i> In My List' : 
                 '<i class="fas fa-plus"></i> My List';
         }
@@ -2174,7 +2183,7 @@
 
         // ---------- DETAILS MODAL FUNCTIONS ----------
         async function openDetailsModal(movieId) {
-            const movie = movies.find(m => m.id === movieId);
+            const movie = movies.find(m => m.id == movieId); // Use loose equality
             if (!movie) return;
             
             currentMovie = movie;
@@ -2240,7 +2249,7 @@
                 <span class="rating-value">${avgRating.toFixed(1)} (${ratingCount} ratings)</span>
             `;
             
-            // Rating distribution - Now properly fetches from ratingDistributions
+            // Rating distribution
             const dist = getRatingDistribution(movie.id);
             const total = dist.reduce((a, b) => a + b, 0);
             let distHtml = '<h4>Rating Distribution</h4>';
@@ -2285,7 +2294,7 @@
             
             // More like this - improved algorithm
             const similar = movies.filter(m => 
-                m.id !== movie.id && 
+                m.id != movie.id && 
                 (m.category === movie.category || m.genre === movie.genre || 
                  (m.year && movie.year && Math.abs(parseInt(m.year) - parseInt(movie.year)) <= 2))
             ).sort((a, b) => {
@@ -2579,7 +2588,7 @@
             
             const sorted = [...continueWatching].sort((a, b) => b.timestamp - a.timestamp);
             sorted.forEach(item => {
-                const movie = movies.find(m => m.id === item.id);
+                const movie = movies.find(m => m.id == item.id);
                 if (movie) {
                     continueWatchingRow.appendChild(createMovieCard(movie, true));
                 }

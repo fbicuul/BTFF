@@ -9,6 +9,7 @@
     <!-- Chart.js for beautiful analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
+        /* [Previous CSS styles remain exactly the same] */
         * {
             margin: 0;
             padding: 0;
@@ -244,6 +245,7 @@
             display: flex;
             align-items: center;
             gap: 20px;
+            cursor: pointer;
         }
 
         .admin-avatar {
@@ -530,11 +532,11 @@
             height: 100%;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
-            align-items: flex-start; /* Changed from center to flex-start */
+            align-items: flex-start;
             justify-content: center;
             z-index: 1000;
-            overflow-y: auto; /* Make modal container scrollable */
-            padding: 30px 0; /* Add padding for better scrolling */
+            overflow-y: auto;
+            padding: 30px 0;
         }
 
         .modal.active {
@@ -549,9 +551,9 @@
             max-width: 90vw;
             border: 2px solid var(--primary);
             position: relative;
-            margin: auto; /* Center vertically in scrollable container */
-            max-height: none; /* Remove max-height restriction */
-            overflow-y: visible; /* Content determines height */
+            margin: auto;
+            max-height: none;
+            overflow-y: visible;
         }
 
         .modal-close {
@@ -571,7 +573,7 @@
         .modal h2 {
             margin-bottom: 25px;
             font-size: 1.8rem;
-            padding-right: 40px; /* Prevent overlap with close button */
+            padding-right: 40px;
         }
 
         .form-group {
@@ -730,11 +732,11 @@
             <form class="login-form" id="loginForm">
                 <div class="form-group">
                     <label><i class="fas fa-user" style="margin-right: 8px;"></i>Username</label>
-                    <input type="text" id="username" placeholder="Enter username" value="admin" autocomplete="off">
+                    <input type="text" id="username" placeholder="Enter username" autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-lock" style="margin-right: 8px;"></i>Password</label>
-                    <input type="password" id="password" placeholder="Enter password" value="admin123">
+                    <input type="password" id="password" placeholder="Enter password">
                 </div>
                 <button type="submit">Login to Dashboard</button>
                 <div class="login-error" id="loginError">Invalid username or password</div>
@@ -881,6 +883,7 @@
             <span class="modal-close" id="closePasswordModal">&times;</span>
             <h2>Change Password</h2>
             <form id="passwordForm">
+                <input type="hidden" id="adminId">
                 <div class="form-group">
                     <label>Current Password</label>
                     <input type="password" id="currentPassword" required>
@@ -912,11 +915,7 @@
     <script>
         (function() {
             // ---------- CONFIGURATION ----------
-            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGT2ezyRokx8478wXndDsc9HNNoSkdiQprhZlMaykMwLazsz8RatTDmU32msUhfeA7/exec';
-            
-            // Admin credentials (in a real app, this would be server-side)
-            const ADMIN_USERNAME = 'admin';
-            const ADMIN_PASSWORD = 'admin123';
+            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxq17SaQ5Q9iGKQ3gojVwrSkIZ6-hQDv6O_Xv_S-8HjaEjhAmcrybsmC1O4KgpB7osD/exec';
             
             // ---------- STATE ----------
             let movies = [];
@@ -925,6 +924,7 @@
             let currentView = 'dashboard';
             let charts = {};
             let isAuthenticated = false;
+            let currentAdmin = null;
 
             // DOM elements
             const loginContainer = document.getElementById('loginContainer');
@@ -943,23 +943,46 @@
             const passwordForm = document.getElementById('passwordForm');
             const notification = document.getElementById('notification');
             const loadingOverlay = document.getElementById('loadingOverlay');
+            const adminProfile = document.querySelector('.admin-profile');
 
             // ---------- AUTHENTICATION ----------
-            loginForm.addEventListener('submit', (e) => {
+            loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
                 
-                if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                    isAuthenticated = true;
-                    loginContainer.style.display = 'none';
-                    sidebar.style.display = 'block';
-                    mainContent.style.display = 'block';
-                    renderView('dashboard');
-                    showNotification('Login successful! Welcome back.');
-                } else {
+                showLoading(true);
+                
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=adminLogin&username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password) + '&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        isAuthenticated = true;
+                        currentAdmin = data.admin;
+                        loginContainer.style.display = 'none';
+                        sidebar.style.display = 'block';
+                        mainContent.style.display = 'block';
+                        
+                        // Update admin profile
+                        document.querySelector('.admin-info h4').textContent = data.admin.username;
+                        document.querySelector('.admin-info p').textContent = data.admin.email;
+                        
+                        renderView('dashboard');
+                        showNotification('Login successful! Welcome back.');
+                    } else {
+                        loginError.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
                     loginError.style.display = 'block';
+                } finally {
+                    showLoading(false);
                 }
             });
 
@@ -1119,6 +1142,35 @@
                 return false;
             }
 
+            async function updateAdminPassword(currentPassword, newPassword) {
+                try {
+                    const params = new URLSearchParams({
+                        action: 'updateAdminPassword',
+                        adminId: currentAdmin.id,
+                        currentPassword: currentPassword,
+                        newPassword: newPassword
+                    }).toString();
+                    
+                    const response = await fetch(APPS_SCRIPT_URL + '?' + params + '&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        showNotification('Password updated successfully');
+                        return true;
+                    } else {
+                        showNotification(data.error || 'Failed to update password', 'error');
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Error updating password:', error);
+                    showNotification('Failed to update password', 'error');
+                }
+                return false;
+            }
+
             // ---------- RENDERING FUNCTIONS ----------
             async function renderView(view) {
                 if (!isAuthenticated) return;
@@ -1176,30 +1228,27 @@
                 const activeUsers = new Set(ratings.map(r => r.userId)).size;
                 const totalViews = watchHistory.length;
                 
-                // Get movies by category
                 const trendingMovies = movies.filter(m => m.category === 'trending').length;
                 const popularMovies = movies.filter(m => m.category === 'popular').length;
                 const recentMovies = movies.filter(m => m.category === 'recent').length;
                 
-                // Get recent movies (last 5)
                 const recentMoviesList = movies.slice(0, 5);
                 
                 return `
                     <div class="top-bar">
                         <div class="page-title">
                             <h1>Dashboard</h1>
-                            <p>Welcome back, Admin</p>
+                            <p>Welcome back, ${currentAdmin?.username || 'Admin'}</p>
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>KRO Media</h4>
-                                <p>Administrator</p>
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
                             </div>
-                            <div class="admin-avatar">KRO</div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
                         </div>
                     </div>
                     
-                    <!-- Stats Cards -->
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon"><i class="fas fa-film"></i></div>
@@ -1224,7 +1273,6 @@
                         </div>
                     </div>
                     
-                    <!-- Charts Row -->
                     <div class="charts-row">
                         <div class="chart-card">
                             <div class="chart-header">
@@ -1248,7 +1296,6 @@
                         </div>
                     </div>
                     
-                    <!-- Recent Movies Table -->
                     <div class="section-header">
                         <h2>Recent Movies</h2>
                         <button class="btn-primary" onclick="document.querySelector('[data-view=\"movies\"]').click()">
@@ -1300,10 +1347,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>KRO Media</h4>
-                                <p>Administrator</p>
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
                             </div>
-                            <div class="admin-avatar">KRO</div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
                         </div>
                     </div>
                     
@@ -1365,10 +1412,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>KRO Media</h4>
-                                <p>Administrator</p>
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
                             </div>
-                            <div class="admin-avatar">KRO</div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
                         </div>
                     </div>
                     
@@ -1418,7 +1465,6 @@
             }
 
             function renderGenres() {
-                // Count movies by genre
                 const genreCount = {};
                 movies.forEach(movie => {
                     const genre = movie.genre || movie.category || 'Other';
@@ -1435,10 +1481,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>KRO Media</h4>
-                                <p>Administrator</p>
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
                             </div>
-                            <div class="admin-avatar">KRO</div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
                         </div>
                     </div>
                     
@@ -1492,10 +1538,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>KRO Media</h4>
-                                <p>Administrator</p>
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
                             </div>
-                            <div class="admin-avatar">KRO</div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
                         </div>
                     </div>
                     
@@ -1552,10 +1598,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>KRO Media</h4>
-                                <p>Administrator</p>
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
                             </div>
-                            <div class="admin-avatar">KRO</div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
                         </div>
                     </div>
                     
@@ -1597,10 +1643,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>KRO Media</h4>
-                                <p>Administrator</p>
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
                             </div>
-                            <div class="admin-avatar">KRO</div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
                         </div>
                     </div>
                     
@@ -1658,20 +1704,20 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>KRO Media</h4>
-                                <p>Administrator</p>
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
                             </div>
-                            <div class="admin-avatar">KRO</div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
                         </div>
                     </div>
                     
                     <div class="table-container">
                         <h3 style="margin-bottom: 20px;">Admin Account</h3>
                         <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 30px;">
-                            <div style="width: 80px; height: 80px; background: var(--gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">KRO</div>
+                            <div style="width: 80px; height: 80px; background: var(--gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
                             <div>
-                                <h4>Administrator</h4>
-                                <p style="color: var(--gray); margin-top: 5px;">admin@btff.com</p>
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p style="color: var(--gray); margin-top: 5px;">${currentAdmin?.email || 'admin@btff.com'}</p>
                             </div>
                         </div>
                         
@@ -1702,10 +1748,8 @@
 
             // ---------- CHART FUNCTIONS ----------
             function initializeCharts() {
-                // Destroy existing charts
                 Object.values(charts).forEach(chart => chart?.destroy());
                 
-                // Category Chart
                 const categoryCtx = document.getElementById('categoryChart')?.getContext('2d');
                 if (categoryCtx) {
                     const trendingCount = movies.filter(m => m.category === 'trending').length;
@@ -1733,10 +1777,8 @@
                         }
                     });
                     
-                    // Add event listener for chart type change
                     const typeSelect = document.getElementById('categoryChartType');
                     if (typeSelect) {
-                        // Remove existing listeners
                         const newSelect = typeSelect.cloneNode(true);
                         typeSelect.parentNode.replaceChild(newSelect, typeSelect);
                         
@@ -1768,7 +1810,6 @@
                     }
                 }
                 
-                // Rating Chart
                 const ratingCtx = document.getElementById('ratingChart')?.getContext('2d');
                 if (ratingCtx) {
                     const ratingDist = [0,0,0,0,0];
@@ -1806,7 +1847,6 @@
                     });
                 }
                 
-                // Ratings Distribution Chart (on ratings page)
                 const ratingsDistCtx = document.getElementById('ratingsDistChart')?.getContext('2d');
                 if (ratingsDistCtx) {
                     const ratingDist = [0,0,0,0,0];
@@ -1860,20 +1900,20 @@
                 document.getElementById('movieSeasons').value = '1';
                 document.getElementById('movieEpisodes').value = '10';
                 
-                // Show/hide season fields based on type
                 const seasonFields = document.querySelectorAll('#movieSeasons, #movieEpisodes, label[for="movieSeasons"], label[for="movieEpisodes"]');
                 seasonFields.forEach(field => {
                     field.closest('.form-group').style.display = isSeries ? 'block' : 'none';
                 });
                 
                 movieModal.classList.add('active');
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                document.body.style.overflow = 'hidden';
             };
 
             window.openPasswordModal = () => {
                 document.getElementById('currentPassword').value = '';
                 document.getElementById('newPassword').value = '';
                 document.getElementById('confirmPassword').value = '';
+                document.getElementById('adminId').value = currentAdmin?.id || '';
                 passwordModal.classList.add('active');
                 document.body.style.overflow = 'hidden';
             };
@@ -1895,7 +1935,6 @@
                 document.getElementById('movieSeasons').value = movie.seasons || '1';
                 document.getElementById('movieEpisodes').value = movie.episodes || '10';
                 
-                // Show/hide season fields based on type
                 const isSeries = (movie.type === 'series');
                 const seasonFields = document.querySelectorAll('#movieSeasons, #movieEpisodes, label[for="movieSeasons"], label[for="movieEpisodes"]');
                 seasonFields.forEach(field => {
@@ -1930,7 +1969,6 @@
                 });
             });
 
-            // Modal close handlers
             closeMovieModal.addEventListener('click', () => {
                 movieModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
@@ -1951,7 +1989,6 @@
                 document.body.style.overflow = 'auto';
             });
 
-            // Form submissions
             movieForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
@@ -1969,7 +2006,6 @@
                     type: movieType
                 };
                 
-                // Add season data if it's a series
                 if (movieType === 'series') {
                     movieData.seasons = document.getElementById('movieSeasons').value;
                     movieData.episodes = document.getElementById('movieEpisodes').value;
@@ -1989,17 +2025,12 @@
                 }
             });
 
-            passwordForm.addEventListener('submit', (e) => {
+            passwordForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const current = document.getElementById('currentPassword').value;
                 const newPass = document.getElementById('newPassword').value;
                 const confirm = document.getElementById('confirmPassword').value;
-                
-                if (current !== ADMIN_PASSWORD) {
-                    showNotification('Current password is incorrect', 'error');
-                    return;
-                }
                 
                 if (newPass !== confirm) {
                     showNotification('New passwords do not match', 'error');
@@ -2011,25 +2042,27 @@
                     return;
                 }
                 
-                // In a real app, this would update the server
-                showNotification('Password updated successfully (demo)');
-                passwordModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
+                const success = await updateAdminPassword(current, newPass);
+                
+                if (success) {
+                    passwordModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
             });
 
             document.getElementById('logoutBtn').addEventListener('click', () => {
                 if (confirm('Are you sure you want to logout?')) {
                     isAuthenticated = false;
+                    currentAdmin = null;
                     loginContainer.style.display = 'flex';
                     sidebar.style.display = 'none';
                     mainContent.style.display = 'none';
-                    document.getElementById('username').value = 'admin';
-                    document.getElementById('password').value = 'admin123';
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
                     loginError.style.display = 'none';
                 }
             });
 
-            // Close modals when clicking outside
             window.addEventListener('click', (e) => {
                 if (e.target === movieModal) {
                     movieModal.classList.remove('active');
@@ -2041,7 +2074,6 @@
                 }
             });
 
-            // Handle movie type change to show/hide season fields
             document.addEventListener('change', (e) => {
                 if (e.target.id === 'movieType') {
                     const isSeries = e.target.value === 'series';

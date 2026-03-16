@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTFF · Admin Dashboard</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js for beautiful analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root {
+            --primary: #2f6bc6;
+            --primary-dark: #1e4a8c;
+            --secondary: #1c2a3f;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #0a0f1a;
+            --darker: #05080f;
+            --light: #f3f4f6;
+            --gray: #6b7280;
+            --gradient: linear-gradient(135deg, #2f6bc6, #1e4a8c);
+        }
+
+        body {
+            background-color: var(--dark);
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: var(--darker);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s;
+            overflow-y: auto;
+            z-index: 50;
+        }
+
+        .sidebar-header {
+            padding: 30px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sidebar-header .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #aaccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header .sub {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            color: #b0c7e9;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .nav-item i {
+            width: 24px;
+            font-size: 1.2rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(47, 107, 198, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 20px -5px rgba(47, 107, 198, 0.3);
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.05);
+            margin: 20px 24px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+            background: var(--dark);
+            padding: 30px 40px;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            background: var(--darker);
+            padding: 15px 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #fff, #b0c7e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-title p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--primary);
+        }
+
+        .admin-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .admin-info p {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--darker);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: var(--primary);
+            opacity: 0.03;
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(47, 107, 198, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .stat-change {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        /* ===== CHARTS SECTION ===== */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: var(--darker);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .chart-header select {
+            background: var(--dark);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        /* ===== TABLES SECTION ===== */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .btn-primary, .btn-secondary {
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-secondary:hover {
+            background: #2a3a55;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .table-container {
+            background: var(--darker);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            overflow-x: auto;
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px 10px;
+            color: var(--gray);
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        td {
+            padding: 15px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .movie-thumb {
+            width: 50px;
+            height: 30px;
+            border-radius: 6px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.inactive {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            background: var(--dark);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--darker);
+            border-radius: 30px;
+            padding: 40px;
+            width: 500px;
+            max-width: 90vw;
+            border: 2px solid var(--primary);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+        }
+
+        .modal h2 {
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            background: var(--dark);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        /* ===== NOTIFICATION ===== */
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: translateX(120%);
+            transition: transform 0.3s;
+            z-index: 2000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* ===== LOADING ===== */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .sidebar .logo, .sidebar .sub, .nav-item span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+                padding: 20px;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 14px;
+            }
+            
+            .nav-item i {
+                margin: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">BTFF</div>
+            <div class="sub">admin dashboard</div>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-item active" data-view="dashboard">
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" data-view="movies">
+                <i class="fas fa-film"></i>
+                <span>Movies</span>
+            </div>
+            <div class="nav-item" data-view="series">
+                <i class="fas fa-tv"></i>
+                <span>Series</span>
+            </div>
+            <div class="nav-item" data-view="genres">
+                <i class="fas fa-tags"></i>
+                <span>Genres</span>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <div class="nav-item" data-view="users">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
+            </div>
+            <div class="nav-item" data-view="ratings">
+                <i class="fas fa-star"></i>
+                <span>Ratings</span>
+            </div>
+            <div class="nav-item" data-view="watch-history">
+                <i class="fas fa-clock"></i>
+                <span>Watch History</span>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <div class="nav-item" data-view="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+            <div class="nav-item" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content" id="mainContent">
+        <!-- Dynamic content will be loaded here -->
+    </div>
+
+    <!-- ADD/EDIT MOVIE MODAL -->
+    <div class="modal" id="movieModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeMovieModal">&times;</span>
+            <h2 id="movieModalTitle">Add New Movie</h2>
+            <form id="movieForm">
+                <input type="hidden" id="movieId">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="movieTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>YouTube ID</label>
+                    <input type="text" id="movieYoutubeId" required placeholder="e.g., vgWyjYBvsUk">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="movieCategory">
+                        <option value="trending">Trending</option>
+                        <option value="popular">Popular</option>
+                        <option value="recent">Recent</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Genre</label>
+                    <select id="movieGenre">
+                        <option value="Action">Action</option>
+                        <option value="Adventure">Adventure</option>
+                        <option value="Comedy">Comedy</option>
+                        <option value="Drama">Drama</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Sci-Fi">Sci-Fi</option>
+                        <option value="Thriller">Thriller</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Documentary">Documentary</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Year</label>
+                    <input type="text" id="movieYear" placeholder="2024">
+                </div>
+                <div class="form-group">
+                    <label>Duration</label>
+                    <input type="text" id="movieDuration" placeholder="1h 58m">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="movieDescription" placeholder="Movie description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="movieType">
+                        <option value="movie">Movie</option>
+                        <option value="series">Series</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary" id="saveMovieBtn">Save Movie</button>
+                    <button type="button" class="btn-secondary" id="cancelMovieBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION -->
+    <div class="notification" id="notification">Action completed successfully</div>
+
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- CONFIGURATION ----------
+            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGT2ezyRokx8478wXndDsc9HNNoSkdiQprhZlMaykMwLazsz8RatTDmU32msUhfeA7/exec';
+            
+            // ---------- STATE ----------
+            let movies = [];
+            let ratings = [];
+            let watchHistory = [];
+            let currentView = 'dashboard';
+            let charts = {};
+
+            // DOM elements
+            const mainContent = document.getElementById('mainContent');
+            const navItems = document.querySelectorAll('.nav-item');
+            const movieModal = document.getElementById('movieModal');
+            const closeMovieModal = document.getElementById('closeMovieModal');
+            const cancelMovieBtn = document.getElementById('cancelMovieBtn');
+            const movieForm = document.getElementById('movieForm');
+            const notification = document.getElementById('notification');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            // ---------- UTILITY FUNCTIONS ----------
+            function showLoading(show) {
+                if (show) {
+                    loadingOverlay.classList.add('active');
+                } else {
+                    loadingOverlay.classList.remove('active');
+                }
+            }
+
+            function showNotification(msg, type = 'success') {
+                notification.textContent = msg;
+                notification.style.background = type === 'success' ? '#2f6bc6' : '#ef4444';
+                notification.classList.add('show');
+                setTimeout(() => notification.classList.remove('show'), 3000);
+            }
+
+            // ---------- API FUNCTIONS ----------
+            async function fetchMovies() {
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=getMovies&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        movies = data.movies;
+                        return movies;
+                    }
+                } catch (error) {
+                    console.error('Error fetching movies:', error);
+                    showNotification('Failed to fetch movies', 'error');
+                }
+                return [];
+            }
+
+            async function fetchRatings() {
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=getRatings&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        ratings = data.ratings;
+                        return ratings;
+                    }
+                } catch (error) {
+                    console.error('Error fetching ratings:', error);
+                }
+                return [];
+            }
+
+            async function fetchWatchHistory() {
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=getContinueWatching&userId=admin&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        watchHistory = data.continueWatching || [];
+                        return watchHistory;
+                    }
+                } catch (error) {
+                    console.error('Error fetching watch history:', error);
+                }
+                return [];
+            }
+
+            async function addMovie(movieData) {
+                try {
+                    const params = new URLSearchParams({
+                        action: 'addMovie',
+                        title: movieData.title,
+                        youtubeId: movieData.youtubeId,
+                        category: movieData.category,
+                        genre: movieData.genre,
+                        year: movieData.year,
+                        duration: movieData.duration,
+                        description: movieData.description,
+                        type: movieData.type
+                    }).toString();
+                    
+                    const response = await fetch(APPS_SCRIPT_URL + '?' + params + '&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        showNotification('Movie added successfully');
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Error adding movie:', error);
+                    showNotification('Failed to add movie', 'error');
+                }
+                return false;
+            }
+
+            async function updateMovie(movieId, updates) {
+                try {
+                    const params = new URLSearchParams({
+                        action: 'updateMovie',
+                        id: movieId,
+                        updates: JSON.stringify(updates)
+                    }).toString();
+                    
+                    const response = await fetch(APPS_SCRIPT_URL + '?' + params + '&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        showNotification('Movie updated successfully');
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Error updating movie:', error);
+                    showNotification('Failed to update movie', 'error');
+                }
+                return false;
+            }
+
+            async function deleteMovie(movieId) {
+                if (!confirm('Are you sure you want to delete this movie?')) return false;
+                
+                try {
+                    const params = new URLSearchParams({
+                        action: 'deleteMovie',
+                        id: movieId
+                    }).toString();
+                    
+                    const response = await fetch(APPS_SCRIPT_URL + '?' + params + '&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        showNotification('Movie deleted successfully');
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Error deleting movie:', error);
+                    showNotification('Failed to delete movie', 'error');
+                }
+                return false;
+            }
+
+            // ---------- RENDERING FUNCTIONS ----------
+            async function renderView(view) {
+                currentView = view;
+                showLoading(true);
+                
+                await fetchMovies();
+                await fetchRatings();
+                await fetchWatchHistory();
+                
+                let html = '';
+                
+                switch(view) {
+                    case 'dashboard':
+                        html = renderDashboard();
+                        break;
+                    case 'movies':
+                        html = renderMovies();
+                        break;
+                    case 'series':
+                        html = renderSeries();
+                        break;
+                    case 'genres':
+                        html = renderGenres();
+                        break;
+                    case 'ratings':
+                        html = renderRatings();
+                        break;
+                    case 'watch-history':
+                        html = renderWatchHistory();
+                        break;
+                    default:
+                        html = renderDashboard();
+                }
+                
+                mainContent.innerHTML = html;
+                showLoading(false);
+                
+                // Initialize charts if on dashboard
+                if (view === 'dashboard') {
+                    setTimeout(initializeCharts, 100);
+                }
+            }
+
+            function renderDashboard() {
+                const totalMovies = movies.length;
+                const totalRatings = ratings.length;
+                const activeUsers = new Set(ratings.map(r => r.userId)).size;
+                const totalViews = watchHistory.length;
+                
+                // Get movies by category
+                const trendingMovies = movies.filter(m => m.category === 'trending').length;
+                const popularMovies = movies.filter(m => m.category === 'popular').length;
+                const recentMovies = movies.filter(m => m.category === 'recent').length;
+                
+                // Get recent movies (last 5)
+                const recentMoviesList = movies.slice(0, 5);
+                
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Dashboard</h1>
+                            <p>Welcome back, Admin</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>KRO Media</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">KRO</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-film"></i></div>
+                            <div class="stat-value">${totalMovies}</div>
+                            <div class="stat-label">Total Movies</div>
+                            <div class="stat-change positive">+${movies.length > 0 ? Math.floor(Math.random() * 10) + 1 : 0} this week</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-star"></i></div>
+                            <div class="stat-value">${totalRatings}</div>
+                            <div class="stat-label">Total Ratings</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-value">${activeUsers}</div>
+                            <div class="stat-label">Active Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-eye"></i></div>
+                            <div class="stat-value">${totalViews}</div>
+                            <div class="stat-label">Total Views</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts Row -->
+                    <div class="charts-row">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Movies by Category</h3>
+                                <select id="categoryChartType">
+                                    <option value="pie">Pie Chart</option>
+                                    <option value="bar">Bar Chart</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Rating Distribution</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="ratingChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Movies Table -->
+                    <div class="section-header">
+                        <h2>Recent Movies</h2>
+                        <button class="btn-primary" onclick="document.querySelector('[data-view=\"movies\"]').click()">
+                            <i class="fas fa-plus"></i> View All
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Thumb</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Genre</th>
+                                    <th>Year</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${recentMoviesList.map(movie => `
+                                    <tr>
+                                        <td><div class="movie-thumb" style="background-image: url('https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg')"></div></td>
+                                        <td>${movie.title}</td>
+                                        <td>${movie.category}</td>
+                                        <td>${movie.genre || 'N/A'}</td>
+                                        <td>${movie.year}</td>
+                                        <td><span class="status-badge active">Active</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn" onclick="editMovie('${movie.id}')"><i class="fas fa-edit"></i></button>
+                                                <button class="action-btn delete" onclick="deleteMovie('${movie.id}')"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderMovies() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Movies</h1>
+                            <p>Manage your movie catalog</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>KRO Media</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">KRO</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>All Movies (${movies.length})</h2>
+                        <button class="btn-primary" onclick="openAddMovieModal()">
+                            <i class="fas fa-plus"></i> Add Movie
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Thumb</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Genre</th>
+                                    <th>Year</th>
+                                    <th>Duration</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${movies.map(movie => `
+                                    <tr>
+                                        <td><div class="movie-thumb" style="background-image: url('https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg')"></div></td>
+                                        <td>${movie.title}</td>
+                                        <td>${movie.category}</td>
+                                        <td>${movie.genre || 'N/A'}</td>
+                                        <td>${movie.year}</td>
+                                        <td>${movie.duration}</td>
+                                        <td>${movie.type || 'movie'}</td>
+                                        <td><span class="status-badge active">Active</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn" onclick="editMovie('${movie.id}')"><i class="fas fa-edit"></i></button>
+                                                <button class="action-btn delete" onclick="deleteMovie('${movie.id}')"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderSeries() {
+                const series = movies.filter(m => m.type === 'series');
+                
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Series</h1>
+                            <p>Manage your TV series</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>KRO Media</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">KRO</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>All Series (${series.length})</h2>
+                        <button class="btn-primary" onclick="openAddMovieModal(true)">
+                            <i class="fas fa-plus"></i> Add Series
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Thumb</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Genre</th>
+                                    <th>Year</th>
+                                    <th>Seasons</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${series.map(serie => `
+                                    <tr>
+                                        <td><div class="movie-thumb" style="background-image: url('https://img.youtube.com/vi/${serie.youtubeId}/mqdefault.jpg')"></div></td>
+                                        <td>${serie.title}</td>
+                                        <td>${serie.category}</td>
+                                        <td>${serie.genre || 'N/A'}</td>
+                                        <td>${serie.year}</td>
+                                        <td>${serie.seasons || '1'}</td>
+                                        <td><span class="status-badge active">Active</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn" onclick="editMovie('${serie.id}')"><i class="fas fa-edit"></i></button>
+                                                <button class="action-btn delete" onclick="deleteMovie('${serie.id}')"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderGenres() {
+                // Count movies by genre
+                const genreCount = {};
+                movies.forEach(movie => {
+                    const genre = movie.genre || movie.category || 'Other';
+                    genreCount[genre] = (genreCount[genre] || 0) + 1;
+                });
+                
+                const genres = Object.entries(genreCount).map(([name, count]) => ({ name, count }));
+                
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Genres</h1>
+                            <p>Manage content categories</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>KRO Media</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">KRO</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        ${genres.map(genre => `
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-tag"></i></div>
+                                <div class="stat-value">${genre.count}</div>
+                                <div class="stat-label">${genre.name}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Genre</th>
+                                    <th>Movie Count</th>
+                                    <th>Percentage</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${genres.map(genre => `
+                                    <tr>
+                                        <td><strong>${genre.name}</strong></td>
+                                        <td>${genre.count}</td>
+                                        <td>${((genre.count / movies.length) * 100).toFixed(1)}%</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn" onclick="filterByGenre('${genre.name}')"><i class="fas fa-filter"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderRatings() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Ratings</h1>
+                            <p>View user ratings analytics</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>KRO Media</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">KRO</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-star"></i></div>
+                            <div class="stat-value">${ratings.length}</div>
+                            <div class="stat-label">Total Ratings</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-value">${new Set(ratings.map(r => r.userId)).size}</div>
+                            <div class="stat-label">Unique Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-calculator"></i></div>
+                            <div class="stat-value">${(ratings.reduce((sum, r) => sum + parseInt(r.rating), 0) / ratings.length || 0).toFixed(1)}</div>
+                            <div class="stat-label">Average Rating</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Rating Distribution</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="ratingsDistChart"></canvas>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderWatchHistory() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Watch History</h1>
+                            <p>Track user viewing activity</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>KRO Media</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">KRO</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-eye"></i></div>
+                            <div class="stat-value">${watchHistory.length}</div>
+                            <div class="stat-label">Total Views</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                            <div class="stat-value">${(watchHistory.reduce((sum, w) => sum + parseInt(w.progress || 0), 0) / watchHistory.length || 0).toFixed(0)}%</div>
+                            <div class="stat-label">Avg Progress</div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Movie</th>
+                                    <th>User</th>
+                                    <th>Progress</th>
+                                    <th>Last Watched</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${watchHistory.map(item => {
+                                    const movie = movies.find(m => m.id === item.movieId);
+                                    return `
+                                        <tr>
+                                            <td>${movie ? movie.title : 'Unknown'}</td>
+                                            <td>${item.userId || 'Anonymous'}</td>
+                                            <td>
+                                                <div style="width: 100px; height: 6px; background: #1f3d62; border-radius: 3px; overflow: hidden;">
+                                                    <div style="width: ${item.progress || 0}%; height: 100%; background: #2f6bc6;"></div>
+                                                </div>
+                                            </td>
+                                            <td>${new Date(item.lastWatched).toLocaleString()}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            // ---------- CHART FUNCTIONS ----------
+            function initializeCharts() {
+                // Destroy existing charts
+                Object.values(charts).forEach(chart => chart?.destroy());
+                
+                // Category Chart
+                const categoryCtx = document.getElementById('categoryChart')?.getContext('2d');
+                if (categoryCtx) {
+                    const trendingCount = movies.filter(m => m.category === 'trending').length;
+                    const popularCount = movies.filter(m => m.category === 'popular').length;
+                    const recentCount = movies.filter(m => m.category === 'recent').length;
+                    
+                    charts.category = new Chart(categoryCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Trending', 'Popular', 'Recent'],
+                            datasets: [{
+                                data: [trendingCount, popularCount, recentCount],
+                                backgroundColor: ['#2f6bc6', '#10b981', '#f59e0b'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    labels: { color: '#fff' }
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Add event listener for chart type change
+                    document.getElementById('categoryChartType')?.addEventListener('change', (e) => {
+                        charts.category.destroy();
+                        charts.category = new Chart(categoryCtx, {
+                            type: e.target.value,
+                            data: {
+                                labels: ['Trending', 'Popular', 'Recent'],
+                                datasets: [{
+                                    data: [trendingCount, popularCount, recentCount],
+                                    backgroundColor: ['#2f6bc6', '#10b981', '#f59e0b'],
+                                    borderWidth: 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        labels: { color: '#fff' }
+                                    }
+                                }
+                            }
+                        });
+                    });
+                }
+                
+                // Rating Chart
+                const ratingCtx = document.getElementById('ratingChart')?.getContext('2d');
+                if (ratingCtx) {
+                    const ratingDist = [0,0,0,0,0];
+                    ratings.forEach(r => {
+                        const rating = parseInt(r.rating);
+                        if (rating >= 1 && rating <= 5) ratingDist[rating-1]++;
+                    });
+                    
+                    charts.rating = new Chart(ratingCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['1★', '2★', '3★', '4★', '5★'],
+                            datasets: [{
+                                data: ratingDist,
+                                backgroundColor: '#2f6bc6',
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    grid: { color: 'rgba(255,255,255,0.1)' },
+                                    ticks: { color: '#fff' }
+                                },
+                                x: {
+                                    ticks: { color: '#fff' }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // ---------- MODAL FUNCTIONS ----------
+            window.openAddMovieModal = (isSeries = false) => {
+                document.getElementById('movieModalTitle').textContent = 'Add New Movie';
+                document.getElementById('movieId').value = '';
+                document.getElementById('movieTitle').value = '';
+                document.getElementById('movieYoutubeId').value = '';
+                document.getElementById('movieCategory').value = 'trending';
+                document.getElementById('movieGenre').value = 'Action';
+                document.getElementById('movieYear').value = new Date().getFullYear().toString();
+                document.getElementById('movieDuration').value = '1h 30m';
+                document.getElementById('movieDescription').value = '';
+                document.getElementById('movieType').value = isSeries ? 'series' : 'movie';
+                movieModal.classList.add('active');
+            };
+
+            window.editMovie = (movieId) => {
+                const movie = movies.find(m => m.id === movieId);
+                if (!movie) return;
+                
+                document.getElementById('movieModalTitle').textContent = 'Edit Movie';
+                document.getElementById('movieId').value = movie.id;
+                document.getElementById('movieTitle').value = movie.title;
+                document.getElementById('movieYoutubeId').value = movie.youtubeId;
+                document.getElementById('movieCategory').value = movie.category;
+                document.getElementById('movieGenre').value = movie.genre || 'Action';
+                document.getElementById('movieYear').value = movie.year;
+                document.getElementById('movieDuration').value = movie.duration;
+                document.getElementById('movieDescription').value = movie.description;
+                document.getElementById('movieType').value = movie.type || 'movie';
+                movieModal.classList.add('active');
+            };
+
+            window.deleteMovie = async (movieId) => {
+                if (await deleteMovie(movieId)) {
+                    await renderView(currentView);
+                }
+            };
+
+            window.filterByGenre = (genre) => {
+                // This would filter movies by genre - could implement later
+                showNotification(`Filtering by ${genre}`);
+            };
+
+            // ---------- EVENT LISTENERS ----------
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(n => n.classList.remove('active'));
+                    item.classList.add('active');
+                    const view = item.dataset.view;
+                    if (view) {
+                        renderView(view);
+                    }
+                });
+            });
+
+            closeMovieModal.addEventListener('click', () => {
+                movieModal.classList.remove('active');
+            });
+
+            cancelMovieBtn.addEventListener('click', () => {
+                movieModal.classList.remove('active');
+            });
+
+            movieForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const movieId = document.getElementById('movieId').value;
+                const movieData = {
+                    title: document.getElementById('movieTitle').value,
+                    youtubeId: document.getElementById('movieYoutubeId').value,
+                    category: document.getElementById('movieCategory').value,
+                    genre: document.getElementById('movieGenre').value,
+                    year: document.getElementById('movieYear').value,
+                    duration: document.getElementById('movieDuration').value,
+                    description: document.getElementById('movieDescription').value,
+                    type: document.getElementById('movieType').value
+                };
+                
+                let success;
+                if (movieId) {
+                    success = await updateMovie(movieId, movieData);
+                } else {
+                    success = await addMovie(movieData);
+                }
+                
+                if (success) {
+                    movieModal.classList.remove('active');
+                    await renderView(currentView);
+                }
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                if (confirm('Are you sure you want to logout?')) {
+                    window.location.href = 'index.html';
+                }
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === movieModal) {
+                    movieModal.classList.remove('active');
+                }
+            });
+
+            // ---------- INITIAL LOAD ----------
+            renderView('dashboard');
+        })();
+    </script>
+</body>
+</html>

@@ -37,6 +37,103 @@
             overflow-x: hidden;
         }
 
+        /* ===== LOGIN PAGE ===== */
+        .login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .login-box {
+            background: var(--darker);
+            border-radius: 30px;
+            padding: 50px;
+            width: 450px;
+            max-width: 90vw;
+            border: 2px solid var(--primary);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .login-logo {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #aaccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .login-sub {
+            color: var(--gray);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 25px;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 15px 20px;
+            background: var(--dark);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .login-form input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(47, 107, 198, 0.2);
+        }
+
+        .login-form button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+
+        .login-form button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(47, 107, 198, 0.3);
+        }
+
+        .login-error {
+            color: var(--danger);
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.95rem;
+            display: none;
+        }
+
         /* ===== SIDEBAR ===== */
         .sidebar {
             width: 280px;
@@ -423,7 +520,7 @@
             border-color: var(--danger);
         }
 
-        /* ===== MODAL ===== */
+        /* ===== SCROLLABLE MODAL ===== */
         .modal {
             display: none;
             position: fixed;
@@ -433,9 +530,11 @@
             height: 100%;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
-            align-items: center;
+            align-items: flex-start; /* Changed from center to flex-start */
             justify-content: center;
             z-index: 1000;
+            overflow-y: auto; /* Make modal container scrollable */
+            padding: 30px 0; /* Add padding for better scrolling */
         }
 
         .modal.active {
@@ -446,10 +545,13 @@
             background: var(--darker);
             border-radius: 30px;
             padding: 40px;
-            width: 500px;
+            width: 600px;
             max-width: 90vw;
             border: 2px solid var(--primary);
             position: relative;
+            margin: auto; /* Center vertically in scrollable container */
+            max-height: none; /* Remove max-height restriction */
+            overflow-y: visible; /* Content determines height */
         }
 
         .modal-close {
@@ -469,6 +571,7 @@
         .modal h2 {
             margin-bottom: 25px;
             font-size: 1.8rem;
+            padding-right: 40px; /* Prevent overlap with close button */
         }
 
         .form-group {
@@ -499,8 +602,10 @@
         }
 
         .form-group textarea {
-            height: 100px;
+            height: 120px;
             resize: vertical;
+            min-height: 80px;
+            max-height: 300px;
         }
 
         .modal-buttons {
@@ -609,12 +714,39 @@
                 gap: 15px;
                 align-items: flex-start;
             }
+            
+            .modal-content {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- SIDEBAR -->
-    <div class="sidebar">
+    <!-- LOGIN PAGE -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <div class="login-logo">BTFF</div>
+            <div class="login-sub">admin dashboard</div>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label><i class="fas fa-user" style="margin-right: 8px;"></i>Username</label>
+                    <input type="text" id="username" placeholder="Enter username" value="admin" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock" style="margin-right: 8px;"></i>Password</label>
+                    <input type="password" id="password" placeholder="Enter password" value="admin123">
+                </div>
+                <button type="submit">Login to Dashboard</button>
+                <div class="login-error" id="loginError">Invalid username or password</div>
+            </form>
+            <div style="text-align: center; margin-top: 20px; color: var(--gray); font-size: 0.85rem;">
+                <i class="fas fa-shield-alt"></i> Secure Admin Access
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR (hidden initially) -->
+    <div class="sidebar" id="sidebar" style="display: none;">
         <div class="sidebar-header">
             <div class="logo">BTFF</div>
             <div class="sub">admin dashboard</div>
@@ -666,8 +798,8 @@
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content" id="mainContent">
+    <!-- MAIN CONTENT (hidden initially) -->
+    <div class="main-content" id="mainContent" style="display: none;">
         <!-- Dynamic content will be loaded here -->
     </div>
 
@@ -727,9 +859,43 @@
                         <option value="series">Series</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label>Seasons (for Series)</label>
+                    <input type="number" id="movieSeasons" value="1" min="1" max="20">
+                </div>
+                <div class="form-group">
+                    <label>Episodes per Season</label>
+                    <input type="number" id="movieEpisodes" value="10" min="1" max="50">
+                </div>
                 <div class="modal-buttons">
                     <button type="submit" class="btn-primary" id="saveMovieBtn">Save Movie</button>
                     <button type="button" class="btn-secondary" id="cancelMovieBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CHANGE PASSWORD MODAL -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closePasswordModal">&times;</span>
+            <h2>Change Password</h2>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary">Update Password</button>
+                    <button type="button" class="btn-secondary" id="cancelPasswordBtn">Cancel</button>
                 </div>
             </form>
         </div>
@@ -748,22 +914,54 @@
             // ---------- CONFIGURATION ----------
             const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGT2ezyRokx8478wXndDsc9HNNoSkdiQprhZlMaykMwLazsz8RatTDmU32msUhfeA7/exec';
             
+            // Admin credentials (in a real app, this would be server-side)
+            const ADMIN_USERNAME = 'admin';
+            const ADMIN_PASSWORD = 'admin123';
+            
             // ---------- STATE ----------
             let movies = [];
             let ratings = [];
             let watchHistory = [];
             let currentView = 'dashboard';
             let charts = {};
+            let isAuthenticated = false;
 
             // DOM elements
+            const loginContainer = document.getElementById('loginContainer');
+            const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
+            const loginForm = document.getElementById('loginForm');
+            const loginError = document.getElementById('loginError');
             const navItems = document.querySelectorAll('.nav-item');
             const movieModal = document.getElementById('movieModal');
+            const passwordModal = document.getElementById('passwordModal');
             const closeMovieModal = document.getElementById('closeMovieModal');
+            const closePasswordModal = document.getElementById('closePasswordModal');
             const cancelMovieBtn = document.getElementById('cancelMovieBtn');
+            const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
             const movieForm = document.getElementById('movieForm');
+            const passwordForm = document.getElementById('passwordForm');
             const notification = document.getElementById('notification');
             const loadingOverlay = document.getElementById('loadingOverlay');
+
+            // ---------- AUTHENTICATION ----------
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                    isAuthenticated = true;
+                    loginContainer.style.display = 'none';
+                    sidebar.style.display = 'block';
+                    mainContent.style.display = 'block';
+                    renderView('dashboard');
+                    showNotification('Login successful! Welcome back.');
+                } else {
+                    loginError.style.display = 'block';
+                }
+            });
 
             // ---------- UTILITY FUNCTIONS ----------
             function showLoading(show) {
@@ -848,7 +1046,9 @@
                         year: movieData.year,
                         duration: movieData.duration,
                         description: movieData.description,
-                        type: movieData.type
+                        type: movieData.type,
+                        seasons: movieData.seasons || '1',
+                        episodes: movieData.episodes || '10'
                     }).toString();
                     
                     const response = await fetch(APPS_SCRIPT_URL + '?' + params + '&t=' + Date.now(), {
@@ -921,6 +1121,8 @@
 
             // ---------- RENDERING FUNCTIONS ----------
             async function renderView(view) {
+                if (!isAuthenticated) return;
+                
                 currentView = view;
                 showLoading(true);
                 
@@ -943,11 +1145,17 @@
                     case 'genres':
                         html = renderGenres();
                         break;
+                    case 'users':
+                        html = renderUsers();
+                        break;
                     case 'ratings':
                         html = renderRatings();
                         break;
                     case 'watch-history':
                         html = renderWatchHistory();
+                        break;
+                    case 'settings':
+                        html = renderSettings();
                         break;
                     default:
                         html = renderDashboard();
@@ -1273,6 +1481,68 @@
                 `;
             }
 
+            function renderUsers() {
+                const uniqueUsers = [...new Set(ratings.map(r => r.userId))];
+                
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Users</h1>
+                            <p>Manage platform users</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>KRO Media</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">KRO</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-value">${uniqueUsers.length}</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-star"></i></div>
+                            <div class="stat-value">${ratings.length}</div>
+                            <div class="stat-label">Total Ratings</div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Ratings Count</th>
+                                    <th>Avg Rating</th>
+                                    <th>Last Active</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${uniqueUsers.slice(0, 20).map(userId => {
+                                    const userRatings = ratings.filter(r => r.userId === userId);
+                                    const avgRating = userRatings.reduce((sum, r) => sum + parseInt(r.rating), 0) / userRatings.length || 0;
+                                    const lastActive = userRatings.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0]?.timestamp || 'N/A';
+                                    
+                                    return `
+                                        <tr>
+                                            <td>${userId.substring(0, 15)}...</td>
+                                            <td>${userRatings.length}</td>
+                                            <td>${avgRating.toFixed(1)}</td>
+                                            <td>${lastActive !== 'N/A' ? new Date(lastActive).toLocaleDateString() : 'N/A'}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
             function renderRatings() {
                 return `
                     <div class="top-bar">
@@ -1379,6 +1649,57 @@
                 `;
             }
 
+            function renderSettings() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Settings</h1>
+                            <p>Configure platform settings</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>KRO Media</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">KRO</div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <h3 style="margin-bottom: 20px;">Admin Account</h3>
+                        <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 30px;">
+                            <div style="width: 80px; height: 80px; background: var(--gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">KRO</div>
+                            <div>
+                                <h4>Administrator</h4>
+                                <p style="color: var(--gray); margin-top: 5px;">admin@btff.com</p>
+                            </div>
+                        </div>
+                        
+                        <button class="btn-primary" onclick="openPasswordModal()">
+                            <i class="fas fa-key"></i> Change Password
+                        </button>
+                        
+                        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 40px 0;">
+                        
+                        <h3 style="margin-bottom: 20px;">Platform Settings</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--gray);">Site Title</label>
+                            <input type="text" value="BTFF - Before The First Flight" style="width: 100%; padding: 15px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white;">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--gray);">API Endpoint</label>
+                            <input type="text" value="${APPS_SCRIPT_URL}" readonly style="width: 100%; padding: 15px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--gray);">
+                        </div>
+                        
+                        <button class="btn-primary" style="margin-top: 20px;">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                    </div>
+                `;
+            }
+
             // ---------- CHART FUNCTIONS ----------
             function initializeCharts() {
                 // Destroy existing charts
@@ -1413,29 +1734,38 @@
                     });
                     
                     // Add event listener for chart type change
-                    document.getElementById('categoryChartType')?.addEventListener('change', (e) => {
-                        charts.category.destroy();
-                        charts.category = new Chart(categoryCtx, {
-                            type: e.target.value,
-                            data: {
-                                labels: ['Trending', 'Popular', 'Recent'],
-                                datasets: [{
-                                    data: [trendingCount, popularCount, recentCount],
-                                    backgroundColor: ['#2f6bc6', '#10b981', '#f59e0b'],
-                                    borderWidth: 0
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        labels: { color: '#fff' }
+                    const typeSelect = document.getElementById('categoryChartType');
+                    if (typeSelect) {
+                        // Remove existing listeners
+                        const newSelect = typeSelect.cloneNode(true);
+                        typeSelect.parentNode.replaceChild(newSelect, typeSelect);
+                        
+                        newSelect.addEventListener('change', (e) => {
+                            if (charts.category) {
+                                charts.category.destroy();
+                                charts.category = new Chart(categoryCtx, {
+                                    type: e.target.value,
+                                    data: {
+                                        labels: ['Trending', 'Popular', 'Recent'],
+                                        datasets: [{
+                                            data: [trendingCount, popularCount, recentCount],
+                                            backgroundColor: ['#2f6bc6', '#10b981', '#f59e0b'],
+                                            borderWidth: 0
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: {
+                                                labels: { color: '#fff' }
+                                            }
+                                        }
                                     }
-                                }
+                                });
                             }
                         });
-                    });
+                    }
                 }
                 
                 // Rating Chart
@@ -1448,6 +1778,44 @@
                     });
                     
                     charts.rating = new Chart(ratingCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['1★', '2★', '3★', '4★', '5★'],
+                            datasets: [{
+                                data: ratingDist,
+                                backgroundColor: '#2f6bc6',
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    grid: { color: 'rgba(255,255,255,0.1)' },
+                                    ticks: { color: '#fff' }
+                                },
+                                x: {
+                                    ticks: { color: '#fff' }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Ratings Distribution Chart (on ratings page)
+                const ratingsDistCtx = document.getElementById('ratingsDistChart')?.getContext('2d');
+                if (ratingsDistCtx) {
+                    const ratingDist = [0,0,0,0,0];
+                    ratings.forEach(r => {
+                        const rating = parseInt(r.rating);
+                        if (rating >= 1 && rating <= 5) ratingDist[rating-1]++;
+                    });
+                    
+                    charts.ratingsDist = new Chart(ratingsDistCtx, {
                         type: 'bar',
                         data: {
                             labels: ['1★', '2★', '3★', '4★', '5★'],
@@ -1489,7 +1857,25 @@
                 document.getElementById('movieDuration').value = '1h 30m';
                 document.getElementById('movieDescription').value = '';
                 document.getElementById('movieType').value = isSeries ? 'series' : 'movie';
+                document.getElementById('movieSeasons').value = '1';
+                document.getElementById('movieEpisodes').value = '10';
+                
+                // Show/hide season fields based on type
+                const seasonFields = document.querySelectorAll('#movieSeasons, #movieEpisodes, label[for="movieSeasons"], label[for="movieEpisodes"]');
+                seasonFields.forEach(field => {
+                    field.closest('.form-group').style.display = isSeries ? 'block' : 'none';
+                });
+                
                 movieModal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            };
+
+            window.openPasswordModal = () => {
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                passwordModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
             };
 
             window.editMovie = (movieId) => {
@@ -1506,7 +1892,18 @@
                 document.getElementById('movieDuration').value = movie.duration;
                 document.getElementById('movieDescription').value = movie.description;
                 document.getElementById('movieType').value = movie.type || 'movie';
+                document.getElementById('movieSeasons').value = movie.seasons || '1';
+                document.getElementById('movieEpisodes').value = movie.episodes || '10';
+                
+                // Show/hide season fields based on type
+                const isSeries = (movie.type === 'series');
+                const seasonFields = document.querySelectorAll('#movieSeasons, #movieEpisodes, label[for="movieSeasons"], label[for="movieEpisodes"]');
+                seasonFields.forEach(field => {
+                    field.closest('.form-group').style.display = isSeries ? 'block' : 'none';
+                });
+                
                 movieModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
             };
 
             window.deleteMovie = async (movieId) => {
@@ -1516,13 +1913,14 @@
             };
 
             window.filterByGenre = (genre) => {
-                // This would filter movies by genre - could implement later
-                showNotification(`Filtering by ${genre}`);
+                showNotification(`Filtering by ${genre} - Feature coming soon!`);
             };
 
             // ---------- EVENT LISTENERS ----------
             navItems.forEach(item => {
                 item.addEventListener('click', () => {
+                    if (!isAuthenticated) return;
+                    
                     navItems.forEach(n => n.classList.remove('active'));
                     item.classList.add('active');
                     const view = item.dataset.view;
@@ -1532,18 +1930,34 @@
                 });
             });
 
+            // Modal close handlers
             closeMovieModal.addEventListener('click', () => {
                 movieModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            closePasswordModal.addEventListener('click', () => {
+                passwordModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
             });
 
             cancelMovieBtn.addEventListener('click', () => {
                 movieModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
             });
 
+            cancelPasswordBtn.addEventListener('click', () => {
+                passwordModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            // Form submissions
             movieForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const movieId = document.getElementById('movieId').value;
+                const movieType = document.getElementById('movieType').value;
+                
                 const movieData = {
                     title: document.getElementById('movieTitle').value,
                     youtubeId: document.getElementById('movieYoutubeId').value,
@@ -1552,8 +1966,14 @@
                     year: document.getElementById('movieYear').value,
                     duration: document.getElementById('movieDuration').value,
                     description: document.getElementById('movieDescription').value,
-                    type: document.getElementById('movieType').value
+                    type: movieType
                 };
+                
+                // Add season data if it's a series
+                if (movieType === 'series') {
+                    movieData.seasons = document.getElementById('movieSeasons').value;
+                    movieData.episodes = document.getElementById('movieEpisodes').value;
+                }
                 
                 let success;
                 if (movieId) {
@@ -1564,24 +1984,73 @@
                 
                 if (success) {
                     movieModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
                     await renderView(currentView);
                 }
             });
 
+            passwordForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const current = document.getElementById('currentPassword').value;
+                const newPass = document.getElementById('newPassword').value;
+                const confirm = document.getElementById('confirmPassword').value;
+                
+                if (current !== ADMIN_PASSWORD) {
+                    showNotification('Current password is incorrect', 'error');
+                    return;
+                }
+                
+                if (newPass !== confirm) {
+                    showNotification('New passwords do not match', 'error');
+                    return;
+                }
+                
+                if (newPass.length < 6) {
+                    showNotification('Password must be at least 6 characters', 'error');
+                    return;
+                }
+                
+                // In a real app, this would update the server
+                showNotification('Password updated successfully (demo)');
+                passwordModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
             document.getElementById('logoutBtn').addEventListener('click', () => {
                 if (confirm('Are you sure you want to logout?')) {
-                    window.location.href = 'index.html';
+                    isAuthenticated = false;
+                    loginContainer.style.display = 'flex';
+                    sidebar.style.display = 'none';
+                    mainContent.style.display = 'none';
+                    document.getElementById('username').value = 'admin';
+                    document.getElementById('password').value = 'admin123';
+                    loginError.style.display = 'none';
                 }
             });
 
+            // Close modals when clicking outside
             window.addEventListener('click', (e) => {
                 if (e.target === movieModal) {
                     movieModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (e.target === passwordModal) {
+                    passwordModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
                 }
             });
 
-            // ---------- INITIAL LOAD ----------
-            renderView('dashboard');
+            // Handle movie type change to show/hide season fields
+            document.addEventListener('change', (e) => {
+                if (e.target.id === 'movieType') {
+                    const isSeries = e.target.value === 'series';
+                    const seasonFields = document.querySelectorAll('#movieSeasons, #movieEpisodes, label[for="movieSeasons"], label[for="movieEpisodes"]');
+                    seasonFields.forEach(field => {
+                        field.closest('.form-group').style.display = isSeries ? 'block' : 'none';
+                    });
+                }
+            });
         })();
     </script>
 </body>

@@ -370,25 +370,23 @@
             padding-left: 16px;
         }
 
-        /* hero - FIXED */
+        /* hero - UPDATED (removed hero-right) */
         .hero {
             position: relative;
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 50px;
             padding: 120px 0 100px;
-            flex-wrap: wrap;
             z-index: 10;
             width: 100%;
             min-height: 80vh;
         }
 
         .hero-left {
-            flex: 1.1 1 400px;
+            flex: 1;
             position: relative;
             z-index: 15;
-            max-width: 700px;
+            max-width: 800px;
         }
 
         .hero-eyebrow {
@@ -461,28 +459,6 @@
         .btn-secondary:hover {
             border-color: #2f6bc6;
             background: rgba(47, 107, 198, 0.3);
-        }
-
-        .hero-right {
-            flex: 1 1 350px;
-            position: relative;
-            z-index: 15;
-            display: flex;
-            justify-content: center;
-        }
-
-        .hero-right img {
-            width: 100%;
-            max-width: 450px;
-            border-radius: 24px;
-            border: 3px solid #3d6190;
-            box-shadow: 0 30px 40px -15px black;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .hero-right img:hover {
-            transform: scale(1.02);
-            border-color: #5d8fd0;
         }
 
         /* section headers */
@@ -1321,38 +1297,6 @@
             border-radius: 5px;
         }
 
-        /* Hero Navigation Dots */
-        .hero-nav {
-            position: absolute;
-            bottom: 40px;
-            right: 40px;
-            display: flex;
-            gap: 12px;
-            z-index: 20;
-        }
-        
-        .hero-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-        
-        .hero-dot:hover {
-            background: rgba(255,255,255,0.6);
-            transform: scale(1.2);
-        }
-        
-        .hero-dot.active {
-            background: #2f6bc6;
-            transform: scale(1.3);
-            border-color: white;
-            box-shadow: 0 0 15px #2f6bc6;
-        }
-
         /* ===== MOBILE RESPONSIVE STYLES ===== */
         @media (max-width: 800px) {
             .container { 
@@ -1387,10 +1331,6 @@
                 padding: 15px 30px;
             }
             
-            .hero-right img {
-                max-width: 350px;
-            }
-            
             .nav-links-desktop {
                 display: none;
             }
@@ -1420,17 +1360,6 @@
             .details-buttons {
                 justify-content: center;
             }
-            
-            .hero-nav {
-                bottom: 20px;
-                right: 20px;
-                gap: 8px;
-            }
-            
-            .hero-dot {
-                width: 12px;
-                height: 12px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -1444,15 +1373,6 @@
             
             .mobile-slide-menu {
                 width: 250px;
-            }
-            
-            .hero-right img {
-                max-width: 280px;
-            }
-            
-            .hero-nav {
-                bottom: 15px;
-                right: 15px;
             }
         }
     </style>
@@ -1539,7 +1459,7 @@
                 <div class="search-results-count" id="searchCount"></div>
             </div>
 
-            <!-- HERO Content -->
+            <!-- HERO Content - REMOVED hero-right -->
             <section class="hero">
                 <div class="hero-left">
                     <div class="hero-eyebrow"><i class="fas fa-rocket"></i> FEATURED</div>
@@ -1550,13 +1470,7 @@
                         <button class="btn-secondary" id="heroAddBtn"><i class="fas fa-plus"></i> MY LIST</button>
                     </div>
                 </div>
-                <div class="hero-right">
-                    <img src="https://i.ibb.co/zW81zb3H/Whats-App-Image-2026-02-19-at-5-41-56-PM.jpg" alt="hero still" id="heroImage">
-                </div>
             </section>
-            
-            <!-- Hero Navigation Dots -->
-            <div class="hero-nav" id="heroNav"></div>
         </div>
     </div>
 
@@ -1767,9 +1681,8 @@
         let partyId = null;
         let partyUsers = [];
         let userId = 'user_' + Math.random().toString(36).substring(2, 15);
-        let heroMovies = [];
-        let currentHeroIndex = 0;
-        let heroInterval;
+        let heroMovie = null;
+        let heroTimeout;
 
         // DOM elements
         const trendingRow = document.getElementById('trendingRow');
@@ -1792,11 +1705,9 @@
         const logoHome = document.getElementById('logoHome');
         const heroPlayBtn = document.getElementById('heroPlayBtn');
         const heroAddBtn = document.getElementById('heroAddBtn');
-        const heroImage = document.getElementById('heroImage');
         const heroTitle = document.getElementById('heroTitle');
         const heroDescription = document.getElementById('heroDescription');
         const heroVideoContainer = document.getElementById('heroVideoContainer');
-        const heroNav = document.getElementById('heroNav');
         const notification = document.getElementById('notification');
         const clearMyList = document.getElementById('clearMyList');
         const clearProgress = document.getElementById('clearProgress');
@@ -1880,9 +1791,8 @@
             }
         }
 
-        // ---------- HERO FUNCTIONS ----------
-        function updateHero(index) {
-            const movie = heroMovies[index];
+        // ---------- HERO FUNCTIONS - UPDATED ----------
+        function updateHero(movie) {
             if (!movie) return;
             
             if (!movie.youtubeId) {
@@ -1890,36 +1800,30 @@
                 return;
             }
             
-            currentHeroIndex = index;
+            heroMovie = movie;
             
-            // Update video background
+            // Update video background - autoplay once
             heroVideoContainer.innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0&loop=1&playlist=${movie.youtubeId}" 
+                <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0" 
                         frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             `;
             
             // Update text content
             heroTitle.textContent = movie.title;
             heroDescription.textContent = movie.description || 'No description available';
-            heroImage.src = `https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg`;
-            
-            // Update active dot
-            document.querySelectorAll('.hero-dot').forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
-            });
             
             // Update button actions
             heroPlayBtn.onclick = () => openVideoPlayer(movie.id);
-            heroImage.onclick = () => openVideoPlayer(movie.id);
             heroAddBtn.onclick = () => addToMyList(movie.id);
-        }
-
-        function startHeroRotation() {
-            if (heroInterval) clearInterval(heroInterval);
-            heroInterval = setInterval(() => {
-                const nextIndex = (currentHeroIndex + 1) % heroMovies.length;
-                updateHero(nextIndex);
-            }, 10000); // Change every 10 seconds
+            
+            // Stop video after 5 seconds
+            if (heroTimeout) clearTimeout(heroTimeout);
+            heroTimeout = setTimeout(() => {
+                heroVideoContainer.innerHTML = `
+                    <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=0&mute=1&controls=0&showinfo=0" 
+                            frameborder="0" allow="encrypted-media" allowfullscreen></iframe>
+                `;
+            }, 5000);
         }
 
         // ---------- API FUNCTIONS ----------
@@ -1949,14 +1853,17 @@
                 if (data.success && Array.isArray(data.movies)) {
                     movies = data.movies;
                     console.log('Movies loaded:', movies.length);
-                    console.log('First movie sample:', movies[0]); // Debug log
                     
-                    // Set hero movies (recent or popular)
-                    heroMovies = movies.slice(0, 5); // Use first 5 movies for hero
-                    if (heroMovies.length > 0) {
-                        updateHero(0);
-                        renderHeroNav();
-                        startHeroRotation();
+                    // Sort movies by dateAdded (newest first) for hero
+                    const sortedMovies = [...movies].sort((a, b) => {
+                        const dateA = new Date(a.dateAdded || 0);
+                        const dateB = new Date(b.dateAdded || 0);
+                        return dateB - dateA;
+                    });
+                    
+                    // Set hero to most recent movie
+                    if (sortedMovies.length > 0) {
+                        updateHero(sortedMovies[0]);
                     }
                     
                     await fetchAllRatings();
@@ -1973,23 +1880,6 @@
             } finally {
                 showLoading(false);
             }
-        }
-
-        function renderHeroNav() {
-            heroNav.innerHTML = '';
-            heroMovies.forEach((_, index) => {
-                const dot = document.createElement('span');
-                dot.className = `hero-dot ${index === 0 ? 'active' : ''}`;
-                dot.addEventListener('click', () => {
-                    updateHero(index);
-                    // Reset interval
-                    if (heroInterval) {
-                        clearInterval(heroInterval);
-                        startHeroRotation();
-                    }
-                });
-                heroNav.appendChild(dot);
-            });
         }
 
         async function fetchAllRatings() {
@@ -2427,6 +2317,14 @@
                 filtered = filtered.filter(m => m.genre === currentGenre);
             }
             
+            // Sort by dateAdded (Z-A / newest first) by default
+            filtered.sort((a, b) => {
+                const dateA = new Date(a.dateAdded || 0);
+                const dateB = new Date(b.dateAdded || 0);
+                return dateB - dateA;
+            });
+            
+            // Apply additional sorting if selected
             if (sortFilter && sortFilter.value && sortFilter.value !== 'default') {
                 switch(sortFilter.value) {
                     case 'titleAsc':
@@ -2595,9 +2493,14 @@
             renderMyListRow();
             renderContinueWatchingRow();
 
+            // Update search count with actual visible movies
             const totalVisible = trendingRow.children.length + popularRow.children.length + recentRow.children.length;
             if (searchCount) {
-                searchCount.textContent = searchInput?.value ? `${totalVisible} movies found` : '';
+                if (searchInput?.value) {
+                    searchCount.textContent = `${totalVisible} movies found`;
+                } else {
+                    searchCount.textContent = '';
+                }
             }
         }
 
@@ -2904,20 +2807,14 @@
 
         if (heroPlayBtn) {
             heroPlayBtn.addEventListener('click', () => {
-                if (movies.length > 0) openVideoPlayer(movies[0].id);
-            });
-        }
-
-        if (heroImage) {
-            heroImage.addEventListener('click', () => {
-                if (movies.length > 0) openVideoPlayer(movies[0].id);
+                if (heroMovie) openVideoPlayer(heroMovie.id);
             });
         }
 
         if (heroAddBtn) {
             heroAddBtn.addEventListener('click', () => {
-                if (movies.length > 0) {
-                    addToMyList(movies[0].id);
+                if (heroMovie) {
+                    addToMyList(heroMovie.id);
                 }
             });
         }

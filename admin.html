@@ -945,6 +945,69 @@
             const loadingOverlay = document.getElementById('loadingOverlay');
             const adminProfile = document.querySelector('.admin-profile');
 
+            // ---------- SESSION MANAGEMENT ----------
+            function saveSession(admin) {
+                localStorage.setItem('btffAdminSession', JSON.stringify({
+                    isAuthenticated: true,
+                    admin: admin,
+                    timestamp: new Date().getTime()
+                }));
+            }
+
+            function loadSession() {
+                const session = localStorage.getItem('btffAdminSession');
+                if (session) {
+                    try {
+                        const data = JSON.parse(session);
+                        // Check if session is less than 24 hours old
+                        const age = new Date().getTime() - data.timestamp;
+                        if (age < 24 * 60 * 60 * 1000) { // 24 hours
+                            isAuthenticated = data.isAuthenticated;
+                            currentAdmin = data.admin;
+                            return true;
+                        } else {
+                            clearSession();
+                        }
+                    } catch (e) {
+                        console.error('Error loading session:', e);
+                    }
+                }
+                return false;
+            }
+
+            function clearSession() {
+                localStorage.removeItem('btffAdminSession');
+                isAuthenticated = false;
+                currentAdmin = null;
+            }
+
+            // ---------- AUTO-REFRESH AFTER LOGIN ----------
+            function refreshPage() {
+                window.location.reload();
+            }
+
+            // ---------- CHECK AUTHENTICATION ON LOAD ----------
+            function checkAuth() {
+                if (loadSession()) {
+                    // User has valid session
+                    loginContainer.style.display = 'none';
+                    sidebar.style.display = 'block';
+                    mainContent.style.display = 'block';
+                    
+                    // Update admin profile
+                    document.querySelector('.admin-info h4').textContent = currentAdmin?.username || 'Admin';
+                    document.querySelector('.admin-info p').textContent = currentAdmin?.email || 'Administrator';
+                    
+                    // Load data
+                    renderView('dashboard');
+                } else {
+                    // No valid session, show login
+                    loginContainer.style.display = 'flex';
+                    sidebar.style.display = 'none';
+                    mainContent.style.display = 'none';
+                }
+            }
+
             // ---------- AUTHENTICATION ----------
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -963,25 +1026,18 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        isAuthenticated = true;
-                        currentAdmin = data.admin;
-                        loginContainer.style.display = 'none';
-                        sidebar.style.display = 'block';
-                        mainContent.style.display = 'block';
+                        // Save session
+                        saveSession(data.admin);
                         
-                        // Update admin profile
-                        document.querySelector('.admin-info h4').textContent = data.admin.username;
-                        document.querySelector('.admin-info p').textContent = data.admin.email;
-                        
-                        renderView('dashboard');
-                        showNotification('Login successful! Welcome back.');
+                        // Refresh page to load fresh data
+                        refreshPage();
                     } else {
                         loginError.style.display = 'block';
+                        showLoading(false);
                     }
                 } catch (error) {
                     console.error('Login error:', error);
                     loginError.style.display = 'block';
-                } finally {
                     showLoading(false);
                 }
             });
@@ -2052,8 +2108,7 @@
 
             document.getElementById('logoutBtn').addEventListener('click', () => {
                 if (confirm('Are you sure you want to logout?')) {
-                    isAuthenticated = false;
-                    currentAdmin = null;
+                    clearSession();
                     loginContainer.style.display = 'flex';
                     sidebar.style.display = 'none';
                     mainContent.style.display = 'none';
@@ -2083,6 +2138,9 @@
                     });
                 }
             });
+
+            // ---------- INITIAL LOAD ----------
+            checkAuth();
         })();
     </script>
 </body>

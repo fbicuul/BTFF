@@ -944,7 +944,6 @@
             const passwordForm = document.getElementById('passwordForm');
             const notification = document.getElementById('notification');
             const loadingOverlay = document.getElementById('loadingOverlay');
-            const adminProfile = document.querySelector('.admin-profile');
 
             // ---------- SESSION MANAGEMENT ----------
             function saveSession(admin, view) {
@@ -995,6 +994,26 @@
                 });
             }
 
+            // ---------- UPDATE ADMIN PROFILE ----------
+            function updateAdminProfile() {
+                // Wait a bit for DOM to be ready
+                setTimeout(() => {
+                    const adminInfoName = document.querySelector('.admin-info h4');
+                    const adminInfoEmail = document.querySelector('.admin-info p');
+                    const adminAvatar = document.querySelector('.admin-avatar');
+                    
+                    if (adminInfoName && currentAdmin) {
+                        adminInfoName.textContent = currentAdmin.username || 'Admin';
+                    }
+                    if (adminInfoEmail && currentAdmin) {
+                        adminInfoEmail.textContent = currentAdmin.email || 'Administrator';
+                    }
+                    if (adminAvatar && currentAdmin) {
+                        adminAvatar.textContent = (currentAdmin.username || 'AD').substring(0,2).toUpperCase();
+                    }
+                }, 100);
+            }
+
             // ---------- AUTO-REFRESH AFTER LOGIN ----------
             function refreshWithView(view) {
                 // Save the view we want to load
@@ -1012,9 +1031,8 @@
                     sidebar.style.display = 'block';
                     mainContent.style.display = 'block';
                     
-                    // Update admin profile
-                    document.querySelector('.admin-info h4').textContent = currentAdmin?.username || 'Admin';
-                    document.querySelector('.admin-info p').textContent = currentAdmin?.email || 'Administrator';
+                    // Update admin profile safely
+                    updateAdminProfile();
                     
                     // Update active nav item
                     updateActiveNavItem(currentView);
@@ -1299,6 +1317,9 @@
                 }
                 
                 mainContent.innerHTML = html;
+                
+                // Update admin profile after content is loaded
+                updateAdminProfile();
                 
                 // Initialize charts after content is loaded
                 setTimeout(() => {

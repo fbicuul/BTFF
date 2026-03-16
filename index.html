@@ -1775,6 +1775,14 @@
         const shortcutsIcon = document.getElementById('shortcutsIcon');
         const closeShortcuts = document.getElementById('closeShortcuts');
 
+        // ---------- FUNCTION TO EXTRACT NUMERIC ID ----------
+        function getNumericId(id) {
+            if (!id) return 0;
+            // Extract numbers from movie_123 format
+            const match = id.match(/\d+/);
+            return match ? parseInt(match[0]) : 0;
+        }
+
         // ---------- MOBILE MENU FUNCTIONS ----------
         function openMobileMenu() {
             if (mobileSlideMenu) {
@@ -1792,7 +1800,7 @@
             }
         }
 
-        // ---------- HERO FUNCTIONS - UPDATED ----------
+        // ---------- HERO FUNCTIONS ----------
         function updateHero(movie) {
             if (!movie) return;
             
@@ -1855,14 +1863,14 @@
                     movies = data.movies;
                     console.log('Movies loaded:', movies.length);
                     
-                    // Sort movies by dateAdded (newest first) for display
+                    // Sort movies by ID (newest/highest ID first)
                     movies.sort((a, b) => {
-                        const dateA = new Date(a.dateAdded || 0);
-                        const dateB = new Date(b.dateAdded || 0);
-                        return dateB - dateA;
+                        const idA = getNumericId(a.id);
+                        const idB = getNumericId(b.id);
+                        return idB - idA; // Descending order (highest first)
                     });
                     
-                    // Set hero to most recent movie
+                    // Set hero to movie with highest ID (most recent)
                     if (movies.length > 0) {
                         updateHero(movies[0]);
                     }
@@ -2232,7 +2240,7 @@
                 <span class="rating-value">${avgRating.toFixed(1)} (${ratingCount} ratings)</span>
             `;
             
-            // Rating distribution - FIXED: Now properly fetches from ratingDistributions
+            // Rating distribution - Now properly fetches from ratingDistributions
             const dist = getRatingDistribution(movie.id);
             const total = dist.reduce((a, b) => a + b, 0);
             let distHtml = '<h4>Rating Distribution</h4>';
@@ -2355,9 +2363,16 @@
                 filtered = filtered.filter(m => m.genre === currentGenre);
             }
             
-            // Movies are already sorted by dateAdded (newest first) from initial fetch
-            // Apply additional sorting only if selected
+            // Default sort by ID (newest/highest first)
+            filtered.sort((a, b) => {
+                const idA = getNumericId(a.id);
+                const idB = getNumericId(b.id);
+                return idB - idA;
+            });
+            
+            // Apply additional sorting only if selected and not default
             if (sortFilter && sortFilter.value && sortFilter.value !== 'default') {
+                // If user selects a sort option, we need to re-sort accordingly
                 switch(sortFilter.value) {
                     case 'titleAsc':
                         filtered.sort((a, b) => a.title.localeCompare(b.title));

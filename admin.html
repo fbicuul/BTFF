@@ -925,6 +925,7 @@
             let charts = {};
             let isAuthenticated = false;
             let currentAdmin = null;
+            let isLoading = false;
 
             // DOM elements
             const loginContainer = document.getElementById('loginContainer');
@@ -946,10 +947,11 @@
             const adminProfile = document.querySelector('.admin-profile');
 
             // ---------- SESSION MANAGEMENT ----------
-            function saveSession(admin) {
+            function saveSession(admin, view) {
                 localStorage.setItem('btffAdminSession', JSON.stringify({
                     isAuthenticated: true,
                     admin: admin,
+                    currentView: view || 'dashboard',
                     timestamp: new Date().getTime()
                 }));
             }
@@ -964,6 +966,7 @@
                         if (age < 24 * 60 * 60 * 1000) { // 24 hours
                             isAuthenticated = data.isAuthenticated;
                             currentAdmin = data.admin;
+                            currentView = data.currentView || 'dashboard';
                             return true;
                         } else {
                             clearSession();
@@ -979,15 +982,30 @@
                 localStorage.removeItem('btffAdminSession');
                 isAuthenticated = false;
                 currentAdmin = null;
+                currentView = 'dashboard';
+            }
+
+            // ---------- UPDATE ACTIVE NAV ITEM ----------
+            function updateActiveNavItem(view) {
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.view === view) {
+                        item.classList.add('active');
+                    }
+                });
             }
 
             // ---------- AUTO-REFRESH AFTER LOGIN ----------
-            function refreshPage() {
+            function refreshWithView(view) {
+                // Save the view we want to load
+                if (currentAdmin) {
+                    saveSession(currentAdmin, view);
+                }
                 window.location.reload();
             }
 
             // ---------- CHECK AUTHENTICATION ON LOAD ----------
-            function checkAuth() {
+            async function checkAuth() {
                 if (loadSession()) {
                     // User has valid session
                     loginContainer.style.display = 'none';
@@ -998,8 +1016,11 @@
                     document.querySelector('.admin-info h4').textContent = currentAdmin?.username || 'Admin';
                     document.querySelector('.admin-info p').textContent = currentAdmin?.email || 'Administrator';
                     
-                    // Load data
-                    renderView('dashboard');
+                    // Update active nav item
+                    updateActiveNavItem(currentView);
+                    
+                    // Load the saved view
+                    await renderView(currentView);
                 } else {
                     // No valid session, show login
                     loginContainer.style.display = 'flex';
@@ -1026,11 +1047,9 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        // Save session
-                        saveSession(data.admin);
-                        
-                        // Refresh page to load fresh data
-                        refreshPage();
+                        // Save session and refresh to dashboard
+                        saveSession(data.admin, 'dashboard');
+                        refreshWithView('dashboard');
                     } else {
                         loginError.style.display = 'block';
                         showLoading(false);
@@ -1044,6 +1063,7 @@
 
             // ---------- UTILITY FUNCTIONS ----------
             function showLoading(show) {
+                isLoading = show;
                 if (show) {
                     loadingOverlay.classList.add('active');
                 } else {
@@ -1231,7 +1251,16 @@
             async function renderView(view) {
                 if (!isAuthenticated) return;
                 
+                // Don't re-render if we're already loading the same view
+                if (isLoading && currentView === view) return;
+                
                 currentView = view;
+                
+                // Save current view to session
+                if (currentAdmin) {
+                    saveSession(currentAdmin, view);
+                }
+                
                 showLoading(true);
                 
                 await fetchMovies();
@@ -1270,12 +1299,12 @@
                 }
                 
                 mainContent.innerHTML = html;
-                showLoading(false);
                 
-                // Initialize charts if on dashboard
-                if (view === 'dashboard') {
-                    setTimeout(initializeCharts, 100);
-                }
+                // Initialize charts after content is loaded
+                setTimeout(() => {
+                    initializeCharts();
+                    showLoading(false);
+                }, 100);
             }
 
             function renderDashboard() {
@@ -1804,68 +1833,89 @@
 
             // ---------- CHART FUNCTIONS ----------
             function initializeCharts() {
-                Object.values(charts).forEach(chart => chart?.destroy());
+                // Destroy existing charts
+                Object.values(charts).forEach(chart => {
+                    if (chart) {
+                        try {
+                            chart.destroy();
+                        } catch (e) {
+                            console.error('Error destroying chart:', e);
+                        }
+                    }
+                });
+                charts = {};
                 
+                // Category Chart
                 const categoryCtx = document.getElementById('categoryChart')?.getContext('2d');
                 if (categoryCtx) {
                     const trendingCount = movies.filter(m => m.category === 'trending').length;
                     const popularCount = movies.filter(m => m.category === 'popular').length;
                     const recentCount = movies.filter(m => m.category === 'recent').length;
                     
-                    charts.category = new Chart(categoryCtx, {
-                        type: 'pie',
-                        data: {
-                            labels: ['Trending', 'Popular', 'Recent'],
-                            datasets: [{
-                                data: [trendingCount, popularCount, recentCount],
-                                backgroundColor: ['#2f6bc6', '#10b981', '#f59e0b'],
-                                borderWidth: 0
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    labels: { color: '#fff' }
+                    try {
+                        charts.category = new Chart(categoryCtx, {
+                            type: 'pie',
+                            data: {
+                                labels: ['Trending', 'Popular', 'Recent'],
+                                datasets: [{
+                                    data: [trendingCount, popularCount, recentCount],
+                                    backgroundColor: ['#2f6bc6', '#10b981', '#f59e0b'],
+                                    borderWidth: 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        labels: { color: '#fff' }
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    } catch (e) {
+                        console.error('Error creating category chart:', e);
+                    }
                     
                     const typeSelect = document.getElementById('categoryChartType');
                     if (typeSelect) {
+                        // Remove existing listeners by cloning
                         const newSelect = typeSelect.cloneNode(true);
                         typeSelect.parentNode.replaceChild(newSelect, typeSelect);
                         
                         newSelect.addEventListener('change', (e) => {
                             if (charts.category) {
-                                charts.category.destroy();
-                                charts.category = new Chart(categoryCtx, {
-                                    type: e.target.value,
-                                    data: {
-                                        labels: ['Trending', 'Popular', 'Recent'],
-                                        datasets: [{
-                                            data: [trendingCount, popularCount, recentCount],
-                                            backgroundColor: ['#2f6bc6', '#10b981', '#f59e0b'],
-                                            borderWidth: 0
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        plugins: {
-                                            legend: {
-                                                labels: { color: '#fff' }
+                                try {
+                                    charts.category.destroy();
+                                    charts.category = new Chart(categoryCtx, {
+                                        type: e.target.value,
+                                        data: {
+                                            labels: ['Trending', 'Popular', 'Recent'],
+                                            datasets: [{
+                                                data: [trendingCount, popularCount, recentCount],
+                                                backgroundColor: ['#2f6bc6', '#10b981', '#f59e0b'],
+                                                borderWidth: 0
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: {
+                                                    labels: { color: '#fff' }
+                                                }
                                             }
                                         }
-                                    }
-                                });
+                                    });
+                                } catch (err) {
+                                    console.error('Error updating chart:', err);
+                                }
                             }
                         });
                     }
                 }
                 
+                // Rating Chart
                 const ratingCtx = document.getElementById('ratingChart')?.getContext('2d');
                 if (ratingCtx) {
                     const ratingDist = [0,0,0,0,0];
@@ -1874,35 +1924,40 @@
                         if (rating >= 1 && rating <= 5) ratingDist[rating-1]++;
                     });
                     
-                    charts.rating = new Chart(ratingCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['1★', '2★', '3★', '4★', '5★'],
-                            datasets: [{
-                                data: ratingDist,
-                                backgroundColor: '#2f6bc6',
-                                borderRadius: 6
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false }
+                    try {
+                        charts.rating = new Chart(ratingCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['1★', '2★', '3★', '4★', '5★'],
+                                datasets: [{
+                                    data: ratingDist,
+                                    backgroundColor: '#2f6bc6',
+                                    borderRadius: 6
+                                }]
                             },
-                            scales: {
-                                y: {
-                                    grid: { color: 'rgba(255,255,255,0.1)' },
-                                    ticks: { color: '#fff' }
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false }
                                 },
-                                x: {
-                                    ticks: { color: '#fff' }
+                                scales: {
+                                    y: {
+                                        grid: { color: 'rgba(255,255,255,0.1)' },
+                                        ticks: { color: '#fff' }
+                                    },
+                                    x: {
+                                        ticks: { color: '#fff' }
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    } catch (e) {
+                        console.error('Error creating rating chart:', e);
+                    }
                 }
                 
+                // Ratings Distribution Chart (on ratings page)
                 const ratingsDistCtx = document.getElementById('ratingsDistChart')?.getContext('2d');
                 if (ratingsDistCtx) {
                     const ratingDist = [0,0,0,0,0];
@@ -1911,33 +1966,37 @@
                         if (rating >= 1 && rating <= 5) ratingDist[rating-1]++;
                     });
                     
-                    charts.ratingsDist = new Chart(ratingsDistCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['1★', '2★', '3★', '4★', '5★'],
-                            datasets: [{
-                                data: ratingDist,
-                                backgroundColor: '#2f6bc6',
-                                borderRadius: 6
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false }
+                    try {
+                        charts.ratingsDist = new Chart(ratingsDistCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['1★', '2★', '3★', '4★', '5★'],
+                                datasets: [{
+                                    data: ratingDist,
+                                    backgroundColor: '#2f6bc6',
+                                    borderRadius: 6
+                                }]
                             },
-                            scales: {
-                                y: {
-                                    grid: { color: 'rgba(255,255,255,0.1)' },
-                                    ticks: { color: '#fff' }
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false }
                                 },
-                                x: {
-                                    ticks: { color: '#fff' }
+                                scales: {
+                                    y: {
+                                        grid: { color: 'rgba(255,255,255,0.1)' },
+                                        ticks: { color: '#fff' }
+                                    },
+                                    x: {
+                                        ticks: { color: '#fff' }
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    } catch (e) {
+                        console.error('Error creating ratings distribution chart:', e);
+                    }
                 }
             }
 
@@ -2016,10 +2075,13 @@
                 item.addEventListener('click', () => {
                     if (!isAuthenticated) return;
                     
-                    navItems.forEach(n => n.classList.remove('active'));
-                    item.classList.add('active');
                     const view = item.dataset.view;
-                    if (view) {
+                    if (view && view !== currentView) {
+                        // Update active state
+                        navItems.forEach(n => n.classList.remove('active'));
+                        item.classList.add('active');
+                        
+                        // Render the new view
                         renderView(view);
                     }
                 });

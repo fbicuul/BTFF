@@ -1673,7 +1673,8 @@
         let movies = [];
         let myList = JSON.parse(localStorage.getItem('btffMyList')) || [];
         let continueWatching = JSON.parse(localStorage.getItem('btffContinueWatching')) || [];
-        let ratings = JSON.parse(localStorage.getItem('btffRatings')) || {};
+        let ratings = {}; // Will store { movieId: [ratings] }
+        let ratingDistributions = {}; // Will store pre-calculated distributions
         let currentMovie = null;
         let currentRating = 0;
         let currentGenre = 'all';
@@ -1840,7 +1841,7 @@
                 });
                 
                 const text = await response.text();
-                console.log('Raw response:', text.substring(0, 200)); // Debug log
+                console.log('Raw response:', text.substring(0, 200));
                 
                 let data;
                 try {
@@ -1854,16 +1855,16 @@
                     movies = data.movies;
                     console.log('Movies loaded:', movies.length);
                     
-                    // Sort movies by dateAdded (newest first) for hero
-                    const sortedMovies = [...movies].sort((a, b) => {
+                    // Sort movies by dateAdded (newest first) for display
+                    movies.sort((a, b) => {
                         const dateA = new Date(a.dateAdded || 0);
                         const dateB = new Date(b.dateAdded || 0);
                         return dateB - dateA;
                     });
                     
                     // Set hero to most recent movie
-                    if (sortedMovies.length > 0) {
-                        updateHero(sortedMovies[0]);
+                    if (movies.length > 0) {
+                        updateHero(movies[0]);
                     }
                     
                     await fetchAllRatings();
@@ -1893,13 +1894,27 @@
                 if (data.success && data.ratings) {
                     // Group ratings by movieId
                     const ratingsMap = {};
+                    const distributionsMap = {};
+                    
                     data.ratings.forEach(r => {
                         if (!ratingsMap[r.movieId]) {
                             ratingsMap[r.movieId] = [];
                         }
                         ratingsMap[r.movieId].push(parseInt(r.rating));
                     });
+                    
+                    // Pre-calculate distributions for each movie
+                    Object.keys(ratingsMap).forEach(movieId => {
+                        const movieRatings = ratingsMap[movieId];
+                        const distribution = [0, 0, 0, 0, 0];
+                        movieRatings.forEach(r => {
+                            if (r >= 1 && r <= 5) distribution[r-1]++;
+                        });
+                        distributionsMap[movieId] = distribution;
+                    });
+                    
                     ratings = ratingsMap;
+                    ratingDistributions = distributionsMap;
                     localStorage.setItem('btffRatings', JSON.stringify(ratings));
                 }
             } catch (error) {
@@ -1916,6 +1931,17 @@
                 
                 const data = await response.json();
                 if (data.success) {
+                    // Update local ratings
+                    ratings[movieId] = data.ratings || [];
+                    
+                    // Update distribution
+                    const distribution = [0, 0, 0, 0, 0];
+                    (data.ratings || []).forEach(r => {
+                        if (r >= 1 && r <= 5) distribution[r-1]++;
+                    });
+                    ratingDistributions[movieId] = distribution;
+                    
+                    localStorage.setItem('btffRatings', JSON.stringify(ratings));
                     return data;
                 }
             } catch (error) {
@@ -2024,12 +2050,7 @@
         }
 
         function getRatingDistribution(movieId) {
-            const movieRatings = ratings[movieId] || [];
-            const distribution = [0, 0, 0, 0, 0];
-            movieRatings.forEach(r => {
-                if (r >= 1 && r <= 5) distribution[r-1]++;
-            });
-            return distribution;
+            return ratingDistributions[movieId] || [0, 0, 0, 0, 0];
         }
 
         async function addRating(movieId, rating) {
@@ -2043,7 +2064,11 @@
                 if (data.success) {
                     await fetchAllRatings();
                     if (currentMovie && currentMovie.id === movieId) {
-                        updateDetailsModal(currentMovie);
+                        // Force refresh of details modal with new ratings
+                        const ratingData = await fetchMovieRatings(movieId);
+                        if (ratingData) {
+                            updateDetailsModal(currentMovie);
+                        }
                     }
                     showNotification(`⭐ Rated ${rating} stars`);
                 }
@@ -2150,7 +2175,7 @@
             const ratingData = await fetchMovieRatings(movieId);
             if (ratingData) {
                 ratings[movieId] = ratingData.ratings || [];
-                localStorage.setItem('btffRatings', JSON.stringify(ratings));
+                // Distribution already updated in fetchMovieRatings
             }
             
             updateDetailsModal(movie);
@@ -2207,20 +2232,33 @@
                 <span class="rating-value">${avgRating.toFixed(1)} (${ratingCount} ratings)</span>
             `;
             
-            // Rating distribution
+            // Rating distribution - FIXED: Now properly fetches from ratingDistributions
             const dist = getRatingDistribution(movie.id);
             const total = dist.reduce((a, b) => a + b, 0);
             let distHtml = '<h4>Rating Distribution</h4>';
-            for (let i = 5; i >= 1; i--) {
-                const count = dist[i-1];
-                const percentage = total > 0 ? (count / total) * 100 : 0;
-                distHtml += `
-                    <div class="rating-bar-dist">
-                        <span>${i}★</span>
-                        <div class="bar-bg"><div class="bar-fill" style="width: ${percentage}%"></div></div>
-                        <span>${count}</span>
-                    </div>
-                `;
+            
+            if (total > 0) {
+                for (let i = 5; i >= 1; i--) {
+                    const count = dist[i-1];
+                    const percentage = (count / total) * 100;
+                    distHtml += `
+                        <div class="rating-bar-dist">
+                            <span>${i}★</span>
+                            <div class="bar-bg"><div class="bar-fill" style="width: ${percentage}%"></div></div>
+                            <span>${count}</span>
+                        </div>
+                    `;
+                }
+            } else {
+                for (let i = 5; i >= 1; i--) {
+                    distHtml += `
+                        <div class="rating-bar-dist">
+                            <span>${i}★</span>
+                            <div class="bar-bg"><div class="bar-fill" style="width: 0%"></div></div>
+                            <span>0</span>
+                        </div>
+                    `;
+                }
             }
             ratingDistribution.innerHTML = distHtml;
             
@@ -2317,14 +2355,8 @@
                 filtered = filtered.filter(m => m.genre === currentGenre);
             }
             
-            // Sort by dateAdded (Z-A / newest first) by default
-            filtered.sort((a, b) => {
-                const dateA = new Date(a.dateAdded || 0);
-                const dateB = new Date(b.dateAdded || 0);
-                return dateB - dateA;
-            });
-            
-            // Apply additional sorting if selected
+            // Movies are already sorted by dateAdded (newest first) from initial fetch
+            // Apply additional sorting only if selected
             if (sortFilter && sortFilter.value && sortFilter.value !== 'default') {
                 switch(sortFilter.value) {
                     case 'titleAsc':
@@ -2379,7 +2411,7 @@
                 ratingBarsHtml = '<div class="rating-bars">';
                 for (let i = 5; i >= 1; i--) {
                     const count = dist[i-1];
-                    const percentage = total > 0 ? (count / total) * 100 : 0;
+                    const percentage = (count / total) * 100;
                     ratingBarsHtml += `
                         <div class="rating-bar-item">
                             <span class="rating-bar-label">${i}★</span>

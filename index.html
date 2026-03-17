@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- YouTube IFrame API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
     <style>
         * {
             margin: 0;
@@ -1673,7 +1671,7 @@
             </div>
             <span class="video-modal-close" id="closeVideoModal">&times;</span>
         </div>
-        <iframe id="videoIframe" src="" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+        <iframe id="videoIframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </div>
 </div>
 
@@ -2318,7 +2316,7 @@
             
             if (heroVideoContainer) {
                 heroVideoContainer.innerHTML = `
-                    <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0&modestbranding=1&playsinline=1&origin=${encodeURIComponent(window.location.origin)}" 
+                    <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0&modestbranding=1&playsinline=1" 
                             frameborder="0" 
                             allow="autoplay; encrypted-media; picture-in-picture" 
                             allowfullscreen
@@ -2341,7 +2339,7 @@
             heroTimeout = setTimeout(() => {
                 if (heroVideoContainer) {
                     heroVideoContainer.innerHTML = `
-                        <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=0&mute=1&controls=0&showinfo=0&modestbranding=1&origin=${encodeURIComponent(window.location.origin)}" 
+                        <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=0&mute=1&controls=0&showinfo=0&modestbranding=1" 
                                 frameborder="0" 
                                 allow="encrypted-media; picture-in-picture" 
                                 allowfullscreen
@@ -2648,13 +2646,15 @@
             
             currentMovie = movie;
             
+            // Extract clean YouTube ID
             const youtubeId = movie.youtubeId.split('?')[0].split('&')[0];
             
             if (videoModalTitle) {
                 videoModalTitle.textContent = episode ? `${movie.title} - ${episode}` : movie.title;
             }
             
-            const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&enablejsapi=1&rel=0&modestbranding=1&origin=${encodeURIComponent(window.location.origin)}`;
+            // Simple YouTube embed URL
+            const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
             
             if (videoIframe) {
                 videoIframe.src = embedUrl;
@@ -2666,6 +2666,7 @@
             
             document.body.style.overflow = 'hidden';
             
+            // Update progress after 30 seconds
             setTimeout(() => {
                 updateProgress(movieId, 25);
             }, 30000);
@@ -2706,7 +2707,7 @@
             if (trailerBackground && movie.youtubeId) {
                 const youtubeId = movie.youtubeId.split('?')[0].split('&')[0];
                 trailerBackground.innerHTML = `
-                    <iframe src="https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0&loop=1&playlist=${youtubeId}&origin=${encodeURIComponent(window.location.origin)}" 
+                    <iframe src="https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0&loop=1&playlist=${youtubeId}" 
                             frameborder="0" 
                             allow="autoplay; encrypted-media" 
                             allowfullscreen>
@@ -3216,9 +3217,6 @@
             switch(key) {
                 case ' ':
                     e.preventDefault();
-                    if (videoModal && videoModal.classList.contains('active') && videoIframe) {
-                        videoIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-                    }
                     break;
                 case 'f':
                     e.preventDefault();

@@ -58,7 +58,7 @@ function injectEnvVars(html) {
 // Route for main page
 app.get('/', (req, res) => {
     try {
-        const templatePath = path.join(__dirname, 'templates', 'index.template.html');
+        const templatePath = path.join(__dirname, 'index.html');
         let html = fs.readFileSync(templatePath, 'utf8');
         html = injectEnvVars(html);
         res.send(html);
@@ -71,7 +71,7 @@ app.get('/', (req, res) => {
 // Route for admin page
 app.get('/admin', (req, res) => {
     try {
-        const templatePath = path.join(__dirname, 'templates', 'admin.template.html');
+        const templatePath = path.join(__dirname, 'admin.html');
         let html = fs.readFileSync(templatePath, 'utf8');
         html = injectEnvVars(html);
         res.send(html);

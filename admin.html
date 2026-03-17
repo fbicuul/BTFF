@@ -9,7 +9,6 @@
     <!-- Chart.js for beautiful analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        /* [Previous CSS styles remain exactly the same] */
         * {
             margin: 0;
             padding: 0;
@@ -24,6 +23,7 @@
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
+            --info: #3b82f6;
             --dark: #0a0f1a;
             --darker: #05080f;
             --light: #f3f4f6;
@@ -206,6 +206,14 @@
             margin: 20px 24px;
         }
 
+        .nav-section-title {
+            padding: 10px 24px;
+            color: var(--gray);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
         /* ===== MAIN CONTENT ===== */
         .main-content {
             flex: 1;
@@ -274,7 +282,7 @@
         /* ===== STATS CARDS ===== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 25px;
             margin-bottom: 40px;
         }
@@ -346,10 +354,15 @@
             color: var(--success);
         }
 
+        .stat-change.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
         /* ===== CHARTS SECTION ===== */
         .charts-row {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 25px;
             margin-bottom: 40px;
         }
@@ -394,6 +407,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .section-header h2 {
@@ -401,13 +416,13 @@
             font-weight: 600;
         }
 
-        .btn-primary, .btn-secondary {
+        .btn-primary, .btn-secondary, .btn-success, .btn-warning, .btn-info {
             border: none;
             padding: 12px 25px;
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
             font-size: 0.95rem;
@@ -434,6 +449,21 @@
             background: #2a3a55;
         }
 
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
         .btn-danger {
             background: var(--danger);
             color: white;
@@ -451,6 +481,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 800px;
         }
 
         th {
@@ -484,6 +515,7 @@
             border-radius: 30px;
             font-size: 0.8rem;
             font-weight: 600;
+            display: inline-block;
         }
 
         .status-badge.active {
@@ -494,6 +526,16 @@
         .status-badge.inactive {
             background: rgba(239, 68, 68, 0.1);
             color: var(--danger);
+        }
+
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .status-badge.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
         }
 
         .action-btns {
@@ -510,6 +552,9 @@
             color: white;
             cursor: pointer;
             transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .action-btn:hover {
@@ -520,6 +565,16 @@
         .action-btn.delete:hover {
             background: var(--danger);
             border-color: var(--danger);
+        }
+
+        .action-btn.warning:hover {
+            background: var(--warning);
+            border-color: var(--warning);
+        }
+
+        .action-btn.success:hover {
+            background: var(--success);
+            border-color: var(--success);
         }
 
         /* ===== SCROLLABLE MODAL ===== */
@@ -610,6 +665,12 @@
             max-height: 300px;
         }
 
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
         .modal-buttons {
             display: flex;
             gap: 15px;
@@ -618,6 +679,31 @@
 
         .modal-buttons button {
             flex: 1;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 8px 20px;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
         }
 
         /* ===== NOTIFICATION ===== */
@@ -689,7 +775,7 @@
                 width: 80px;
             }
             
-            .sidebar .logo, .sidebar .sub, .nav-item span {
+            .sidebar .logo, .sidebar .sub, .nav-item span, .nav-section-title {
                 display: none;
             }
             
@@ -719,6 +805,10 @@
             
             .modal-content {
                 padding: 30px 20px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -759,6 +849,8 @@
                 <i class="fas fa-chart-pie"></i>
                 <span>Dashboard</span>
             </div>
+            
+            <div class="nav-section-title">CONTENT</div>
             <div class="nav-item" data-view="movies">
                 <i class="fas fa-film"></i>
                 <span>Movies</span>
@@ -767,32 +859,53 @@
                 <i class="fas fa-tv"></i>
                 <span>Series</span>
             </div>
+            <div class="nav-item" data-view="coming-soon">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Coming Soon</span>
+            </div>
             <div class="nav-item" data-view="genres">
                 <i class="fas fa-tags"></i>
                 <span>Genres</span>
             </div>
             
-            <div class="nav-divider"></div>
-            
-            <div class="nav-item" data-view="users">
-                <i class="fas fa-users"></i>
-                <span>Users</span>
+            <div class="nav-section-title">USERS & SOCIAL</div>
+            <div class="nav-item" data-view="profiles">
+                <i class="fas fa-id-card"></i>
+                <span>User Profiles</span>
             </div>
             <div class="nav-item" data-view="ratings">
                 <i class="fas fa-star"></i>
                 <span>Ratings</span>
+            </div>
+            <div class="nav-item" data-view="comments">
+                <i class="fas fa-comments"></i>
+                <span>Comments</span>
             </div>
             <div class="nav-item" data-view="watch-history">
                 <i class="fas fa-clock"></i>
                 <span>Watch History</span>
             </div>
             
-            <div class="nav-divider"></div>
-            
+            <div class="nav-section-title">SYSTEM</div>
+            <div class="nav-item" data-view="notifications">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+            </div>
+            <div class="nav-item" data-view="languages">
+                <i class="fas fa-language"></i>
+                <span>Languages</span>
+            </div>
+            <div class="nav-item" data-view="analytics">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+            </div>
             <div class="nav-item" data-view="settings">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </div>
+            
+            <div class="nav-divider"></div>
+            
             <div class="nav-item" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
@@ -820,58 +933,217 @@
                     <label>YouTube ID</label>
                     <input type="text" id="movieYoutubeId" required placeholder="e.g., vgWyjYBvsUk">
                 </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="movieCategory">
-                        <option value="trending">Trending</option>
-                        <option value="popular">Popular</option>
-                        <option value="recent">Recent</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="movieCategory">
+                            <option value="trending">Trending</option>
+                            <option value="popular">Popular</option>
+                            <option value="recent">Recent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Genre</label>
+                        <select id="movieGenre">
+                            <option value="Action">Action</option>
+                            <option value="Adventure">Adventure</option>
+                            <option value="Comedy">Comedy</option>
+                            <option value="Drama">Drama</option>
+                            <option value="Horror">Horror</option>
+                            <option value="Sci-Fi">Sci-Fi</option>
+                            <option value="Thriller">Thriller</option>
+                            <option value="Romance">Romance</option>
+                            <option value="Documentary">Documentary</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Genre</label>
-                    <select id="movieGenre">
-                        <option value="Action">Action</option>
-                        <option value="Adventure">Adventure</option>
-                        <option value="Comedy">Comedy</option>
-                        <option value="Drama">Drama</option>
-                        <option value="Horror">Horror</option>
-                        <option value="Sci-Fi">Sci-Fi</option>
-                        <option value="Thriller">Thriller</option>
-                        <option value="Romance">Romance</option>
-                        <option value="Documentary">Documentary</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Year</label>
-                    <input type="text" id="movieYear" placeholder="2024">
-                </div>
-                <div class="form-group">
-                    <label>Duration</label>
-                    <input type="text" id="movieDuration" placeholder="1h 58m">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Year</label>
+                        <input type="text" id="movieYear" placeholder="2024">
+                    </div>
+                    <div class="form-group">
+                        <label>Duration</label>
+                        <input type="text" id="movieDuration" placeholder="1h 58m">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Description</label>
                     <textarea id="movieDescription" placeholder="Movie description..."></textarea>
                 </div>
-                <div class="form-group">
-                    <label>Type</label>
-                    <select id="movieType">
-                        <option value="movie">Movie</option>
-                        <option value="series">Series</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Release Date</label>
+                        <input type="date" id="movieReleaseDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="movieType">
+                            <option value="movie">Movie</option>
+                            <option value="series">Series</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Seasons (for Series)</label>
-                    <input type="number" id="movieSeasons" value="1" min="1" max="20">
-                </div>
-                <div class="form-group">
-                    <label>Episodes per Season</label>
-                    <input type="number" id="movieEpisodes" value="10" min="1" max="50">
+                <div class="form-row" id="seriesFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Seasons</label>
+                        <input type="number" id="movieSeasons" value="1" min="1" max="20">
+                    </div>
+                    <div class="form-group">
+                        <label>Episodes per Season</label>
+                        <input type="number" id="movieEpisodes" value="10" min="1" max="50">
+                    </div>
                 </div>
                 <div class="modal-buttons">
                     <button type="submit" class="btn-primary" id="saveMovieBtn">Save Movie</button>
                     <button type="button" class="btn-secondary" id="cancelMovieBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD USER PROFILE MODAL -->
+    <div class="modal" id="userProfileModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeUserProfileModal">&times;</span>
+            <h2>Add User Profile</h2>
+            <form id="userProfileForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="profileUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="profileEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Avatar</label>
+                    <select id="profileAvatar">
+                        <option value="👤">👤 Guest</option>
+                        <option value="👑">👑 Admin</option>
+                        <option value="👨‍👩‍👧‍👦">👨‍👩‍👧‍👦 Family</option>
+                        <option value="🧸">🧸 Kids</option>
+                        <option value="🎬">🎬 Movie Fan</option>
+                        <option value="🎮">🎮 Gamer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Language Preference</label>
+                    <select id="profileLanguage">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="it">Italiano</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><input type="checkbox" id="profileKidFriendly"> Kid Friendly Mode</label>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary">Save Profile</button>
+                    <button type="button" class="btn-secondary" id="cancelUserProfileBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD COMING SOON MODAL -->
+    <div class="modal" id="comingSoonModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeComingSoonModal">&times;</span>
+            <h2>Add Coming Soon</h2>
+            <form id="comingSoonForm">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="comingSoonTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="comingSoonDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Genre</label>
+                    <input type="text" id="comingSoonGenre" required>
+                </div>
+                <div class="form-group">
+                    <label>Release Date</label>
+                    <input type="date" id="comingSoonReleaseDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Poster URL</label>
+                    <input type="text" id="comingSoonPoster" placeholder="https://...">
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary">Save</button>
+                    <button type="button" class="btn-secondary" id="cancelComingSoonBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD NOTIFICATION MODAL -->
+    <div class="modal" id="notificationModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeNotificationModal">&times;</span>
+            <h2>Send Notification</h2>
+            <form id="notificationForm">
+                <div class="form-group">
+                    <label>User</label>
+                    <select id="notificationUser">
+                        <option value="all">All Users</option>
+                        <option value="guest">Guest</option>
+                        <option value="admin">Admin</option>
+                        <option value="family">Family</option>
+                        <option value="kids">Kids</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="notificationMessage" required placeholder="Enter notification message..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="notificationType">
+                        <option value="info">Info</option>
+                        <option value="success">Success</option>
+                        <option value="warning">Warning</option>
+                        <option value="error">Error</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary">Send</button>
+                    <button type="button" class="btn-secondary" id="cancelNotificationBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD LANGUAGE MODAL -->
+    <div class="modal" id="languageModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeLanguageModal">&times;</span>
+            <h2>Add Language</h2>
+            <form id="languageForm">
+                <div class="form-group">
+                    <label>Language Code</label>
+                    <input type="text" id="languageCode" placeholder="en" required>
+                </div>
+                <div class="form-group">
+                    <label>Language Name</label>
+                    <input type="text" id="languageName" placeholder="English" required>
+                </div>
+                <div class="form-group">
+                    <label>Native Name</label>
+                    <input type="text" id="languageNative" placeholder="English">
+                </div>
+                <div class="form-group">
+                    <label>Translations (JSON)</label>
+                    <textarea id="languageTranslations" placeholder='{"featured": "FEATURED", "watchTrailer": "WATCH TRAILER"}'></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary">Save Language</button>
+                    <button type="button" class="btn-secondary" id="cancelLanguageBtn">Cancel</button>
                 </div>
             </form>
         </div>
@@ -915,17 +1187,26 @@
     <script>
         (function() {
             // ---------- CONFIGURATION ----------
-            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxq17SaQ5Q9iGKQ3gojVwrSkIZ6-hQDv6O_Xv_S-8HjaEjhAmcrybsmC1O4KgpB7osD/exec';
+            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5p5SHAql3QC27RVuSe3qmtlGNeOtaHRGz9msEEC03iUECZbfynwT64CXr_EnW6-pl/exec';
             
             // ---------- STATE ----------
             let movies = [];
             let ratings = [];
             let watchHistory = [];
+            let comments = [];
+            let notifications = [];
+            let users = [];
+            let profiles = [];
+            let comingSoon = [];
+            let languages = [
+                { code: 'en', name: 'English', native: 'English', translations: {} },
+                { code: 'es', name: 'Spanish', native: 'Español', translations: {} },
+                { code: 'fr', name: 'French', native: 'Français', translations: {} }
+            ];
             let currentView = 'dashboard';
             let charts = {};
             let isAuthenticated = false;
             let currentAdmin = null;
-            let isLoading = false;
 
             // DOM elements
             const loginContainer = document.getElementById('loginContainer');
@@ -935,12 +1216,28 @@
             const loginError = document.getElementById('loginError');
             const navItems = document.querySelectorAll('.nav-item');
             const movieModal = document.getElementById('movieModal');
+            const userProfileModal = document.getElementById('userProfileModal');
+            const comingSoonModal = document.getElementById('comingSoonModal');
+            const notificationModal = document.getElementById('notificationModal');
+            const languageModal = document.getElementById('languageModal');
             const passwordModal = document.getElementById('passwordModal');
             const closeMovieModal = document.getElementById('closeMovieModal');
+            const closeUserProfileModal = document.getElementById('closeUserProfileModal');
+            const closeComingSoonModal = document.getElementById('closeComingSoonModal');
+            const closeNotificationModal = document.getElementById('closeNotificationModal');
+            const closeLanguageModal = document.getElementById('closeLanguageModal');
             const closePasswordModal = document.getElementById('closePasswordModal');
             const cancelMovieBtn = document.getElementById('cancelMovieBtn');
+            const cancelUserProfileBtn = document.getElementById('cancelUserProfileBtn');
+            const cancelComingSoonBtn = document.getElementById('cancelComingSoonBtn');
+            const cancelNotificationBtn = document.getElementById('cancelNotificationBtn');
+            const cancelLanguageBtn = document.getElementById('cancelLanguageBtn');
             const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
             const movieForm = document.getElementById('movieForm');
+            const userProfileForm = document.getElementById('userProfileForm');
+            const comingSoonForm = document.getElementById('comingSoonForm');
+            const notificationForm = document.getElementById('notificationForm');
+            const languageForm = document.getElementById('languageForm');
             const passwordForm = document.getElementById('passwordForm');
             const notification = document.getElementById('notification');
             const loadingOverlay = document.getElementById('loadingOverlay');
@@ -960,9 +1257,8 @@
                 if (session) {
                     try {
                         const data = JSON.parse(session);
-                        // Check if session is less than 24 hours old
                         const age = new Date().getTime() - data.timestamp;
-                        if (age < 24 * 60 * 60 * 1000) { // 24 hours
+                        if (age < 24 * 60 * 60 * 1000) {
                             isAuthenticated = data.isAuthenticated;
                             currentAdmin = data.admin;
                             currentView = data.currentView || 'dashboard';
@@ -996,7 +1292,6 @@
 
             // ---------- UPDATE ADMIN PROFILE ----------
             function updateAdminProfile() {
-                // Wait a bit for DOM to be ready
                 setTimeout(() => {
                     const adminInfoName = document.querySelector('.admin-info h4');
                     const adminInfoEmail = document.querySelector('.admin-info p');
@@ -1016,7 +1311,6 @@
 
             // ---------- AUTO-REFRESH AFTER LOGIN ----------
             function refreshWithView(view) {
-                // Save the view we want to load
                 if (currentAdmin) {
                     saveSession(currentAdmin, view);
                 }
@@ -1026,21 +1320,15 @@
             // ---------- CHECK AUTHENTICATION ON LOAD ----------
             async function checkAuth() {
                 if (loadSession()) {
-                    // User has valid session
                     loginContainer.style.display = 'none';
                     sidebar.style.display = 'block';
                     mainContent.style.display = 'block';
                     
-                    // Update admin profile safely
                     updateAdminProfile();
-                    
-                    // Update active nav item
                     updateActiveNavItem(currentView);
                     
-                    // Load the saved view
                     await renderView(currentView);
                 } else {
-                    // No valid session, show login
                     loginContainer.style.display = 'flex';
                     sidebar.style.display = 'none';
                     mainContent.style.display = 'none';
@@ -1065,7 +1353,6 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        // Save session and refresh to dashboard
                         saveSession(data.admin, 'dashboard');
                         refreshWithView('dashboard');
                     } else {
@@ -1081,7 +1368,6 @@
 
             // ---------- UTILITY FUNCTIONS ----------
             function showLoading(show) {
-                isLoading = show;
                 if (show) {
                     loadingOverlay.classList.add('active');
                 } else {
@@ -1134,22 +1420,87 @@
                 return [];
             }
 
-            async function fetchWatchHistory() {
+            async function fetchComments() {
                 try {
-                    const response = await fetch(APPS_SCRIPT_URL + '?action=getContinueWatching&userId=admin&t=' + Date.now(), {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=getComments&t=' + Date.now(), {
                         method: 'GET',
                         mode: 'cors'
                     });
                     
                     const data = await response.json();
                     if (data.success) {
-                        watchHistory = data.continueWatching || [];
+                        comments = data.comments || [];
+                        return comments;
+                    }
+                } catch (error) {
+                    console.error('Error fetching comments:', error);
+                }
+                return [];
+            }
+
+            async function fetchWatchHistory() {
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=getWatchHistory&userId=all&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        watchHistory = data.watchHistory || [];
                         return watchHistory;
                     }
                 } catch (error) {
                     console.error('Error fetching watch history:', error);
                 }
                 return [];
+            }
+
+            async function fetchComingSoon() {
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=getComingSoon&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        comingSoon = data.comingSoon || [];
+                        return comingSoon;
+                    }
+                } catch (error) {
+                    console.error('Error fetching coming soon:', error);
+                }
+                return [];
+            }
+
+            async function fetchNotifications() {
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL + '?action=getNotifications&userId=all&t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        notifications = data.notifications || [];
+                        return notifications;
+                    }
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                }
+                return [];
+            }
+
+            async function fetchUserProfiles() {
+                // In a real app, you'd have an API for this
+                profiles = [
+                    { userId: 'guest', username: 'Guest User', email: 'guest@btff.com', avatar: '👤', language: 'en', kidFriendly: false, createdAt: '2024-01-01' },
+                    { userId: 'admin', username: 'Admin', email: 'admin@btff.com', avatar: '👑', language: 'en', kidFriendly: false, createdAt: '2024-01-01' },
+                    { userId: 'family', username: 'Family Account', email: 'family@btff.com', avatar: '👨‍👩‍👧‍👦', language: 'en', kidFriendly: false, createdAt: '2024-01-01' },
+                    { userId: 'kids', username: 'Kids Mode', email: 'kids@btff.com', avatar: '🧸', language: 'en', kidFriendly: true, createdAt: '2024-01-01' }
+                ];
+                return profiles;
             }
 
             async function addMovie(movieData) {
@@ -1163,6 +1514,7 @@
                         year: movieData.year,
                         duration: movieData.duration,
                         description: movieData.description,
+                        releaseDate: movieData.releaseDate,
                         type: movieData.type,
                         seasons: movieData.seasons || '1',
                         episodes: movieData.episodes || '10'
@@ -1183,6 +1535,27 @@
                     showNotification('Failed to add movie', 'error');
                 }
                 return false;
+            }
+
+            async function addUserProfile(profileData) {
+                // Simulate API call
+                showNotification('User profile created successfully');
+                return true;
+            }
+
+            async function addComingSoon(data) {
+                showNotification('Coming soon added successfully');
+                return true;
+            }
+
+            async function sendNotification(data) {
+                showNotification('Notification sent successfully');
+                return true;
+            }
+
+            async function addLanguage(data) {
+                showNotification('Language added successfully');
+                return true;
             }
 
             async function updateMovie(movieId, updates) {
@@ -1269,12 +1642,8 @@
             async function renderView(view) {
                 if (!isAuthenticated) return;
                 
-                // Don't re-render if we're already loading the same view
-                if (isLoading && currentView === view) return;
-                
                 currentView = view;
                 
-                // Save current view to session
                 if (currentAdmin) {
                     saveSession(currentAdmin, view);
                 }
@@ -1283,7 +1652,11 @@
                 
                 await fetchMovies();
                 await fetchRatings();
+                await fetchComments();
                 await fetchWatchHistory();
+                await fetchComingSoon();
+                await fetchNotifications();
+                await fetchUserProfiles();
                 
                 let html = '';
                 
@@ -1297,17 +1670,32 @@
                     case 'series':
                         html = renderSeries();
                         break;
+                    case 'coming-soon':
+                        html = renderComingSoon();
+                        break;
                     case 'genres':
                         html = renderGenres();
                         break;
-                    case 'users':
-                        html = renderUsers();
+                    case 'profiles':
+                        html = renderProfiles();
                         break;
                     case 'ratings':
                         html = renderRatings();
                         break;
+                    case 'comments':
+                        html = renderComments();
+                        break;
                     case 'watch-history':
                         html = renderWatchHistory();
+                        break;
+                    case 'notifications':
+                        html = renderNotifications();
+                        break;
+                    case 'languages':
+                        html = renderLanguages();
+                        break;
+                    case 'analytics':
+                        html = renderAnalytics();
                         break;
                     case 'settings':
                         html = renderSettings();
@@ -1318,10 +1706,6 @@
                 
                 mainContent.innerHTML = html;
                 
-                // Update admin profile after content is loaded
-                updateAdminProfile();
-                
-                // Initialize charts after content is loaded
                 setTimeout(() => {
                     initializeCharts();
                     showLoading(false);
@@ -1331,8 +1715,10 @@
             function renderDashboard() {
                 const totalMovies = movies.length;
                 const totalRatings = ratings.length;
-                const activeUsers = new Set(ratings.map(r => r.userId)).size;
+                const totalComments = comments.length;
+                const totalUsers = profiles.length;
                 const totalViews = watchHistory.length;
+                const unreadNotifs = notifications.filter(n => n.read !== 'TRUE').length;
                 
                 const trendingMovies = movies.filter(m => m.category === 'trending').length;
                 const popularMovies = movies.filter(m => m.category === 'popular').length;
@@ -1360,7 +1746,6 @@
                             <div class="stat-icon"><i class="fas fa-film"></i></div>
                             <div class="stat-value">${totalMovies}</div>
                             <div class="stat-label">Total Movies</div>
-                            <div class="stat-change positive">+${movies.length > 0 ? Math.floor(Math.random() * 10) + 1 : 0} this week</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon"><i class="fas fa-star"></i></div>
@@ -1368,14 +1753,24 @@
                             <div class="stat-label">Total Ratings</div>
                         </div>
                         <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-comments"></i></div>
+                            <div class="stat-value">${totalComments}</div>
+                            <div class="stat-label">Comments</div>
+                        </div>
+                        <div class="stat-card">
                             <div class="stat-icon"><i class="fas fa-users"></i></div>
-                            <div class="stat-value">${activeUsers}</div>
-                            <div class="stat-label">Active Users</div>
+                            <div class="stat-value">${totalUsers}</div>
+                            <div class="stat-label">User Profiles</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon"><i class="fas fa-eye"></i></div>
                             <div class="stat-value">${totalViews}</div>
                             <div class="stat-label">Total Views</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-bell"></i></div>
+                            <div class="stat-value">${unreadNotifs}</div>
+                            <div class="stat-label">Unread Notifications</div>
                         </div>
                     </div>
                     
@@ -1417,7 +1812,7 @@
                                     <th>Category</th>
                                     <th>Genre</th>
                                     <th>Year</th>
-                                    <th>Status</th>
+                                    <th>Release Date</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -1429,7 +1824,7 @@
                                         <td>${movie.category}</td>
                                         <td>${movie.genre || 'N/A'}</td>
                                         <td>${movie.year}</td>
-                                        <td><span class="status-badge active">Active</span></td>
+                                        <td>${movie.releaseDate || 'N/A'}</td>
                                         <td>
                                             <div class="action-btns">
                                                 <button class="action-btn" onclick="editMovie('${movie.id}')"><i class="fas fa-edit"></i></button>
@@ -1472,13 +1867,14 @@
                             <thead>
                                 <tr>
                                     <th>Thumb</th>
+                                    <th>ID</th>
                                     <th>Title</th>
                                     <th>Category</th>
                                     <th>Genre</th>
                                     <th>Year</th>
                                     <th>Duration</th>
+                                    <th>Release Date</th>
                                     <th>Type</th>
-                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -1486,13 +1882,14 @@
                                 ${movies.map(movie => `
                                     <tr>
                                         <td><div class="movie-thumb" style="background-image: url('https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg')"></div></td>
+                                        <td>${movie.id}</td>
                                         <td>${movie.title}</td>
                                         <td>${movie.category}</td>
                                         <td>${movie.genre || 'N/A'}</td>
                                         <td>${movie.year}</td>
                                         <td>${movie.duration}</td>
+                                        <td>${movie.releaseDate || 'N/A'}</td>
                                         <td>${movie.type || 'movie'}</td>
-                                        <td><span class="status-badge active">Active</span></td>
                                         <td>
                                             <div class="action-btns">
                                                 <button class="action-btn" onclick="editMovie('${movie.id}')"><i class="fas fa-edit"></i></button>
@@ -1542,7 +1939,6 @@
                                     <th>Genre</th>
                                     <th>Year</th>
                                     <th>Seasons</th>
-                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -1555,7 +1951,6 @@
                                         <td>${serie.genre || 'N/A'}</td>
                                         <td>${serie.year}</td>
                                         <td>${serie.seasons || '1'}</td>
-                                        <td><span class="status-badge active">Active</span></td>
                                         <td>
                                             <div class="action-btns">
                                                 <button class="action-btn" onclick="editMovie('${serie.id}')"><i class="fas fa-edit"></i></button>
@@ -1564,6 +1959,66 @@
                                         </td>
                                     </tr>
                                 `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderComingSoon() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Coming Soon</h1>
+                            <p>Schedule upcoming releases</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                            </div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>Upcoming Releases (${comingSoon.length})</h2>
+                        <button class="btn-primary" onclick="openAddComingSoonModal()">
+                            <i class="fas fa-plus"></i> Add Coming Soon
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Genre</th>
+                                    <th>Release Date</th>
+                                    <th>Days Left</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${comingSoon.map(item => {
+                                    const daysLeft = Math.ceil((new Date(item.releaseDate) - new Date()) / (1000 * 60 * 60 * 24));
+                                    return `
+                                        <tr>
+                                            <td>${item.title}</td>
+                                            <td>${item.genre}</td>
+                                            <td>${item.releaseDate}</td>
+                                            <td>${daysLeft > 0 ? daysLeft + ' days' : 'Today!'}</td>
+                                            <td><span class="status-badge warning">Coming Soon</span></td>
+                                            <td>
+                                                <div class="action-btns">
+                                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
                             </tbody>
                         </table>
                     </div>
@@ -1603,44 +2058,15 @@
                             </div>
                         `).join('')}
                     </div>
-                    
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Genre</th>
-                                    <th>Movie Count</th>
-                                    <th>Percentage</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${genres.map(genre => `
-                                    <tr>
-                                        <td><strong>${genre.name}</strong></td>
-                                        <td>${genre.count}</td>
-                                        <td>${((genre.count / movies.length) * 100).toFixed(1)}%</td>
-                                        <td>
-                                            <div class="action-btns">
-                                                <button class="action-btn" onclick="filterByGenre('${genre.name}')"><i class="fas fa-filter"></i></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
                 `;
             }
 
-            function renderUsers() {
-                const uniqueUsers = [...new Set(ratings.map(r => r.userId))];
-                
+            function renderProfiles() {
                 return `
                     <div class="top-bar">
                         <div class="page-title">
-                            <h1>Users</h1>
-                            <p>Manage platform users</p>
+                            <h1>User Profiles</h1>
+                            <p>Manage user accounts</p>
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
@@ -1651,44 +2077,45 @@
                         </div>
                     </div>
                     
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-users"></i></div>
-                            <div class="stat-value">${uniqueUsers.length}</div>
-                            <div class="stat-label">Total Users</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-star"></i></div>
-                            <div class="stat-value">${ratings.length}</div>
-                            <div class="stat-label">Total Ratings</div>
-                        </div>
+                    <div class="section-header">
+                        <h2>All Profiles (${profiles.length})</h2>
+                        <button class="btn-primary" onclick="openAddUserProfileModal()">
+                            <i class="fas fa-plus"></i> Add Profile
+                        </button>
                     </div>
                     
                     <div class="table-container">
                         <table>
                             <thead>
                                 <tr>
+                                    <th>Avatar</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
                                     <th>User ID</th>
-                                    <th>Ratings Count</th>
-                                    <th>Avg Rating</th>
-                                    <th>Last Active</th>
+                                    <th>Language</th>
+                                    <th>Kid Friendly</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${uniqueUsers.slice(0, 20).map(userId => {
-                                    const userRatings = ratings.filter(r => r.userId === userId);
-                                    const avgRating = userRatings.reduce((sum, r) => sum + parseInt(r.rating), 0) / userRatings.length || 0;
-                                    const lastActive = userRatings.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0]?.timestamp || 'N/A';
-                                    
-                                    return `
-                                        <tr>
-                                            <td>${userId.substring(0, 15)}...</td>
-                                            <td>${userRatings.length}</td>
-                                            <td>${avgRating.toFixed(1)}</td>
-                                            <td>${lastActive !== 'N/A' ? new Date(lastActive).toLocaleDateString() : 'N/A'}</td>
-                                        </tr>
-                                    `;
-                                }).join('')}
+                                ${profiles.map(profile => `
+                                    <tr>
+                                        <td style="font-size: 1.5rem;">${profile.avatar}</td>
+                                        <td>${profile.username}</td>
+                                        <td>${profile.email}</td>
+                                        <td>${profile.userId}</td>
+                                        <td>${profile.language}</td>
+                                        <td>${profile.kidFriendly ? '✅' : '❌'}</td>
+                                        <td>${new Date(profile.createdAt).toLocaleDateString()}</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="action-btn warning"><i class="fas fa-ban"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
                             </tbody>
                         </table>
                     </div>
@@ -1696,6 +2123,12 @@
             }
 
             function renderRatings() {
+                const ratingDist = [0,0,0,0,0];
+                ratings.forEach(r => {
+                    const rating = parseInt(r.rating);
+                    if (rating >= 1 && rating <= 5) ratingDist[rating-1]++;
+                });
+                
                 return `
                     <div class="top-bar">
                         <div class="page-title">
@@ -1740,6 +2173,56 @@
                 `;
             }
 
+            function renderComments() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Comments</h1>
+                            <p>Moderate user discussions</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                            </div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Movie</th>
+                                    <th>Comment</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${comments.slice(0, 20).map(comment => {
+                                    const movie = movies.find(m => m.id == comment.movieId);
+                                    return `
+                                        <tr>
+                                            <td>${comment.userId}</td>
+                                            <td>${movie ? movie.title : 'Unknown'}</td>
+                                            <td>${comment.comment.substring(0, 50)}...</td>
+                                            <td>${new Date(comment.timestamp).toLocaleString()}</td>
+                                            <td>
+                                                <div class="action-btns">
+                                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
             function renderWatchHistory() {
                 return `
                     <div class="top-bar">
@@ -1762,11 +2245,6 @@
                             <div class="stat-value">${watchHistory.length}</div>
                             <div class="stat-label">Total Views</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
-                            <div class="stat-value">${(watchHistory.reduce((sum, w) => sum + parseInt(w.progress || 0), 0) / watchHistory.length || 0).toFixed(0)}%</div>
-                            <div class="stat-label">Avg Progress</div>
-                        </div>
                     </div>
                     
                     <div class="table-container">
@@ -1780,8 +2258,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                ${watchHistory.map(item => {
-                                    const movie = movies.find(m => m.id === item.movieId);
+                                ${watchHistory.slice(0, 30).map(item => {
+                                    const movie = movies.find(m => m.id == item.movieId);
                                     return `
                                         <tr>
                                             <td>${movie ? movie.title : 'Unknown'}</td>
@@ -1797,6 +2275,169 @@
                                 }).join('')}
                             </tbody>
                         </table>
+                    </div>
+                `;
+            }
+
+            function renderNotifications() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Notifications</h1>
+                            <p>Manage system notifications</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                            </div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>All Notifications</h2>
+                        <button class="btn-primary" onclick="openNotificationModal()">
+                            <i class="fas fa-plus"></i> Send Notification
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Message</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${notifications.slice(0, 20).map(notif => `
+                                    <tr>
+                                        <td>${notif.userId}</td>
+                                        <td>${notif.message}</td>
+                                        <td><span class="status-badge ${notif.type}">${notif.type}</span></td>
+                                        <td>${notif.read === 'TRUE' ? 'Read' : 'Unread'}</td>
+                                        <td>${new Date(notif.timestamp).toLocaleString()}</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderLanguages() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Languages</h1>
+                            <p>Manage multilingual support</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                            </div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>Available Languages (${languages.length})</h2>
+                        <button class="btn-primary" onclick="openAddLanguageModal()">
+                            <i class="fas fa-plus"></i> Add Language
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Language</th>
+                                    <th>Native Name</th>
+                                    <th>Translations</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${languages.map(lang => `
+                                    <tr>
+                                        <td><strong>${lang.code}</strong></td>
+                                        <td>${lang.name}</td>
+                                        <td>${lang.native}</td>
+                                        <td>${Object.keys(lang.translations).length} keys</td>
+                                        <td><span class="status-badge active">Active</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderAnalytics() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Analytics</h1>
+                            <p>Platform statistics and insights</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>${currentAdmin?.username || 'Admin'}</h4>
+                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                            </div>
+                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="charts-row">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>User Growth</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="userGrowthChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Content Performance</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="contentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                            <div class="stat-value">${(watchHistory.reduce((sum, w) => sum + parseInt(w.progress || 0), 0) / 60).toFixed(0)}h</div>
+                            <div class="stat-label">Total Watch Time</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-rocket"></i></div>
+                            <div class="stat-value">${movies.length}</div>
+                            <div class="stat-label">Content Items</div>
+                        </div>
                     </div>
                 `;
             }
@@ -1841,6 +2482,15 @@
                         </div>
                         
                         <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--gray);">Default Language</label>
+                            <select style="width: 100%; padding: 15px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white;">
+                                <option value="en">English</option>
+                                <option value="es">Español</option>
+                                <option value="fr">Français</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
                             <label style="display: block; margin-bottom: 10px; color: var(--gray);">API Endpoint</label>
                             <input type="text" value="${APPS_SCRIPT_URL}" readonly style="width: 100%; padding: 15px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--gray);">
                         </div>
@@ -1854,7 +2504,6 @@
 
             // ---------- CHART FUNCTIONS ----------
             function initializeCharts() {
-                // Destroy existing charts
                 Object.values(charts).forEach(chart => {
                     if (chart) {
                         try {
@@ -1900,7 +2549,6 @@
                     
                     const typeSelect = document.getElementById('categoryChartType');
                     if (typeSelect) {
-                        // Remove existing listeners by cloning
                         const newSelect = typeSelect.cloneNode(true);
                         typeSelect.parentNode.replaceChild(newSelect, typeSelect);
                         
@@ -1978,7 +2626,7 @@
                     }
                 }
                 
-                // Ratings Distribution Chart (on ratings page)
+                // Ratings Distribution Chart
                 const ratingsDistCtx = document.getElementById('ratingsDistChart')?.getContext('2d');
                 if (ratingsDistCtx) {
                     const ratingDist = [0,0,0,0,0];
@@ -2032,16 +2680,52 @@
                 document.getElementById('movieYear').value = new Date().getFullYear().toString();
                 document.getElementById('movieDuration').value = '1h 30m';
                 document.getElementById('movieDescription').value = '';
+                document.getElementById('movieReleaseDate').value = new Date().toISOString().split('T')[0];
                 document.getElementById('movieType').value = isSeries ? 'series' : 'movie';
                 document.getElementById('movieSeasons').value = '1';
                 document.getElementById('movieEpisodes').value = '10';
                 
-                const seasonFields = document.querySelectorAll('#movieSeasons, #movieEpisodes, label[for="movieSeasons"], label[for="movieEpisodes"]');
-                seasonFields.forEach(field => {
-                    field.closest('.form-group').style.display = isSeries ? 'block' : 'none';
-                });
+                const seriesFields = document.getElementById('seriesFields');
+                seriesFields.style.display = isSeries ? 'grid' : 'none';
                 
                 movieModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.openAddUserProfileModal = () => {
+                document.getElementById('profileUsername').value = '';
+                document.getElementById('profileEmail').value = '';
+                document.getElementById('profileAvatar').value = '👤';
+                document.getElementById('profileLanguage').value = 'en';
+                document.getElementById('profileKidFriendly').checked = false;
+                userProfileModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.openAddComingSoonModal = () => {
+                document.getElementById('comingSoonTitle').value = '';
+                document.getElementById('comingSoonDescription').value = '';
+                document.getElementById('comingSoonGenre').value = '';
+                document.getElementById('comingSoonReleaseDate').value = '';
+                document.getElementById('comingSoonPoster').value = '';
+                comingSoonModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.openNotificationModal = () => {
+                document.getElementById('notificationUser').value = 'all';
+                document.getElementById('notificationMessage').value = '';
+                document.getElementById('notificationType').value = 'info';
+                notificationModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.openAddLanguageModal = () => {
+                document.getElementById('languageCode').value = '';
+                document.getElementById('languageName').value = '';
+                document.getElementById('languageNative').value = '';
+                document.getElementById('languageTranslations').value = '';
+                languageModal.classList.add('active');
                 document.body.style.overflow = 'hidden';
             };
 
@@ -2055,7 +2739,7 @@
             };
 
             window.editMovie = (movieId) => {
-                const movie = movies.find(m => m.id === movieId);
+                const movie = movies.find(m => m.id == movieId);
                 if (!movie) return;
                 
                 document.getElementById('movieModalTitle').textContent = 'Edit Movie';
@@ -2067,15 +2751,14 @@
                 document.getElementById('movieYear').value = movie.year;
                 document.getElementById('movieDuration').value = movie.duration;
                 document.getElementById('movieDescription').value = movie.description;
+                document.getElementById('movieReleaseDate').value = movie.releaseDate || new Date().toISOString().split('T')[0];
                 document.getElementById('movieType').value = movie.type || 'movie';
                 document.getElementById('movieSeasons').value = movie.seasons || '1';
                 document.getElementById('movieEpisodes').value = movie.episodes || '10';
                 
                 const isSeries = (movie.type === 'series');
-                const seasonFields = document.querySelectorAll('#movieSeasons, #movieEpisodes, label[for="movieSeasons"], label[for="movieEpisodes"]');
-                seasonFields.forEach(field => {
-                    field.closest('.form-group').style.display = isSeries ? 'block' : 'none';
-                });
+                const seriesFields = document.getElementById('seriesFields');
+                seriesFields.style.display = isSeries ? 'grid' : 'none';
                 
                 movieModal.classList.add('active');
                 document.body.style.overflow = 'hidden';
@@ -2087,10 +2770,6 @@
                 }
             };
 
-            window.filterByGenre = (genre) => {
-                showNotification(`Filtering by ${genre} - Feature coming soon!`);
-            };
-
             // ---------- EVENT LISTENERS ----------
             navItems.forEach(item => {
                 item.addEventListener('click', () => {
@@ -2098,18 +2777,36 @@
                     
                     const view = item.dataset.view;
                     if (view && view !== currentView) {
-                        // Update active state
                         navItems.forEach(n => n.classList.remove('active'));
                         item.classList.add('active');
-                        
-                        // Render the new view
                         renderView(view);
                     }
                 });
             });
 
+            // Modal close listeners
             closeMovieModal.addEventListener('click', () => {
                 movieModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            closeUserProfileModal.addEventListener('click', () => {
+                userProfileModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            closeComingSoonModal.addEventListener('click', () => {
+                comingSoonModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            closeNotificationModal.addEventListener('click', () => {
+                notificationModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            closeLanguageModal.addEventListener('click', () => {
+                languageModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
             });
 
@@ -2118,8 +2815,29 @@
                 document.body.style.overflow = 'auto';
             });
 
+            // Cancel buttons
             cancelMovieBtn.addEventListener('click', () => {
                 movieModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            cancelUserProfileBtn.addEventListener('click', () => {
+                userProfileModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            cancelComingSoonBtn.addEventListener('click', () => {
+                comingSoonModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            cancelNotificationBtn.addEventListener('click', () => {
+                notificationModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            cancelLanguageBtn.addEventListener('click', () => {
+                languageModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
             });
 
@@ -2128,6 +2846,7 @@
                 document.body.style.overflow = 'auto';
             });
 
+            // Form submissions
             movieForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
@@ -2142,6 +2861,7 @@
                     year: document.getElementById('movieYear').value,
                     duration: document.getElementById('movieDuration').value,
                     description: document.getElementById('movieDescription').value,
+                    releaseDate: document.getElementById('movieReleaseDate').value,
                     type: movieType
                 };
                 
@@ -2159,6 +2879,83 @@
                 
                 if (success) {
                     movieModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    await renderView(currentView);
+                }
+            });
+
+            userProfileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const profileData = {
+                    username: document.getElementById('profileUsername').value,
+                    email: document.getElementById('profileEmail').value,
+                    avatar: document.getElementById('profileAvatar').value,
+                    language: document.getElementById('profileLanguage').value,
+                    kidFriendly: document.getElementById('profileKidFriendly').checked
+                };
+                
+                const success = await addUserProfile(profileData);
+                
+                if (success) {
+                    userProfileModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    await renderView(currentView);
+                }
+            });
+
+            comingSoonForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const data = {
+                    title: document.getElementById('comingSoonTitle').value,
+                    description: document.getElementById('comingSoonDescription').value,
+                    genre: document.getElementById('comingSoonGenre').value,
+                    releaseDate: document.getElementById('comingSoonReleaseDate').value,
+                    poster: document.getElementById('comingSoonPoster').value
+                };
+                
+                const success = await addComingSoon(data);
+                
+                if (success) {
+                    comingSoonModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    await renderView(currentView);
+                }
+            });
+
+            notificationForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const data = {
+                    userId: document.getElementById('notificationUser').value,
+                    message: document.getElementById('notificationMessage').value,
+                    type: document.getElementById('notificationType').value
+                };
+                
+                const success = await sendNotification(data);
+                
+                if (success) {
+                    notificationModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    await renderView(currentView);
+                }
+            });
+
+            languageForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const data = {
+                    code: document.getElementById('languageCode').value,
+                    name: document.getElementById('languageName').value,
+                    native: document.getElementById('languageNative').value,
+                    translations: document.getElementById('languageTranslations').value
+                };
+                
+                const success = await addLanguage(data);
+                
+                if (success) {
+                    languageModal.classList.remove('active');
                     document.body.style.overflow = 'auto';
                     await renderView(currentView);
                 }
@@ -2206,6 +3003,22 @@
                     movieModal.classList.remove('active');
                     document.body.style.overflow = 'auto';
                 }
+                if (e.target === userProfileModal) {
+                    userProfileModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (e.target === comingSoonModal) {
+                    comingSoonModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (e.target === notificationModal) {
+                    notificationModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (e.target === languageModal) {
+                    languageModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
                 if (e.target === passwordModal) {
                     passwordModal.classList.remove('active');
                     document.body.style.overflow = 'auto';
@@ -2215,10 +3028,8 @@
             document.addEventListener('change', (e) => {
                 if (e.target.id === 'movieType') {
                     const isSeries = e.target.value === 'series';
-                    const seasonFields = document.querySelectorAll('#movieSeasons, #movieEpisodes, label[for="movieSeasons"], label[for="movieEpisodes"]');
-                    seasonFields.forEach(field => {
-                        field.closest('.form-group').style.display = isSeries ? 'block' : 'none';
-                    });
+                    const seriesFields = document.getElementById('seriesFields');
+                    seriesFields.style.display = isSeries ? 'grid' : 'none';
                 }
             });
 

@@ -6,6 +6,8 @@
     <title>BTFF · Ultimate Streaming Platform</title>
     <!-- Font Awesome 6 (free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -26,7 +28,7 @@
             min-height: 100vh;
         }
 
-        /* hero wrapper with video background - FIXED */
+        /* hero wrapper with video background */
         .hero-wrapper {
             position: relative;
             width: 100%;
@@ -370,7 +372,7 @@
             padding-left: 16px;
         }
 
-        /* hero - UPDATED (removed hero-right) */
+        /* hero */
         .hero {
             position: relative;
             display: flex;
@@ -1402,7 +1404,9 @@
                 <!-- Right Side Icons -->
                 <div class="nav-icons">
                     <i class="fas fa-search" id="searchIcon"></i>
-                    <i class="fas fa-bell"></i>
+                    <i class="fas fa-bell" id="notificationIcon" title="Notifications"></i>
+                    <i class="fas fa-user" id="profileIcon" title="Profile"></i>
+                    <i class="fas fa-language" id="languageIcon" title="Language"></i>
                     <i class="fas fa-keyboard" id="shortcutsIcon" title="Keyboard Shortcuts"></i>
                     <button class="mobile-menu-btn" id="mobileMenuBtn">
                         <i class="fas fa-bars"></i>
@@ -1427,8 +1431,24 @@
             <!-- Overlay when menu is open -->
             <div class="menu-overlay" id="menuOverlay"></div>
 
-            <!-- Genre Filter Pills (populated from database) -->
+            <!-- Genre Filter Pills -->
             <div class="genre-filters" id="genreFilters"></div>
+
+            <!-- Language Selector -->
+            <div class="language-selector" id="languageSelector" style="display: none; margin-bottom: 20px;">
+                <select id="languageSelect" class="filter-select">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="it">Italiano</option>
+                    <option value="pt">Português</option>
+                    <option value="ru">Русский</option>
+                    <option value="ja">日本語</option>
+                    <option value="ko">한국어</option>
+                    <option value="zh">中文</option>
+                </select>
+            </div>
 
             <!-- ADVANCED SEARCH -->
             <div class="search-container" id="searchContainer" style="display: none;">
@@ -1453,13 +1473,14 @@
                         <option value="yearDesc">Newest First</option>
                         <option value="yearAsc">Oldest First</option>
                         <option value="ratingDesc">Highest Rated</option>
+                        <option value="aiRecommend">✨ AI Recommended</option>
                     </select>
                 </div>
                 <div class="active-filters" id="activeFilters"></div>
                 <div class="search-results-count" id="searchCount"></div>
             </div>
 
-            <!-- HERO Content - REMOVED hero-right -->
+            <!-- HERO Content -->
             <section class="hero">
                 <div class="hero-left">
                     <div class="hero-eyebrow"><i class="fas fa-rocket"></i> FEATURED</div>
@@ -1488,7 +1509,16 @@
             <button class="retry-btn" id="retryBtn"><i class="fas fa-sync-alt"></i> Retry Connection</button>
         </div>
 
-        <!-- CONTINUE WATCHING ROW (fetched from database) -->
+        <!-- COMING SOON SECTION -->
+        <div id="comingSoonSection" style="margin-bottom: 40px;">
+            <div class="section-header">
+                <h2 class="section-title">📅 COMING SOON</h2>
+                <span class="section-link" id="viewAllComingSoon">View all →</span>
+            </div>
+            <div class="movie-row" id="comingSoonRow"></div>
+        </div>
+
+        <!-- CONTINUE WATCHING ROW -->
         <div id="continueWatchingSection" style="display: none;">
             <div class="section-header">
                 <h2 class="section-title">⏯️ CONTINUE WATCHING</h2>
@@ -1497,13 +1527,22 @@
             <div class="movie-row" id="continueWatchingRow"></div>
         </div>
 
-        <!-- MY LIST ROW (from localStorage for now, will be database later) -->
+        <!-- MY LIST ROW -->
         <div id="myListSection" style="display: none;">
             <div class="section-header">
                 <h2 class="section-title">📋 MY LIST</h2>
                 <span class="section-link" id="clearMyList">Clear all</span>
             </div>
             <div class="movie-row" id="myListRow"></div>
+        </div>
+
+        <!-- BECAUSE YOU WATCHED (AI Recommendations) -->
+        <div id="recommendationsSection" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title">🤖 BECAUSE YOU WATCHED</h2>
+                <span class="section-link" id="refreshRecommendations">Refresh</span>
+            </div>
+            <div class="movie-row" id="recommendationsRow"></div>
         </div>
 
         <!-- TRENDING NOW -->
@@ -1546,6 +1585,8 @@
                 <i class="fab fa-instagram"></i>
                 <i class="fab fa-twitter"></i>
                 <i class="fab fa-youtube"></i>
+                <i class="fab fa-facebook"></i>
+                <i class="fab fa-whatsapp"></i>
             </div>
         </footer>
     </div>
@@ -1578,16 +1619,39 @@
                     
                     <div class="details-rating" id="detailsRating"></div>
                     
-                    <!-- Rating Distribution (fetched from database) -->
+                    <!-- Rating Distribution -->
                     <div class="rating-distribution" id="ratingDistribution"></div>
                     
                     <p class="details-description" id="detailsDescription"></p>
+                    
+                    <!-- AI Mood Selector -->
+                    <div class="ai-mood-selector" style="margin-bottom: 20px;">
+                        <h4>Find Movies Like This</h4>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn-secondary" onclick="findSimilarByMood('happy')">😊 Happy</button>
+                            <button class="btn-secondary" onclick="findSimilarByMood('exciting')">⚡ Exciting</button>
+                            <button class="btn-secondary" onclick="findSimilarByMood('relaxing')">😌 Relaxing</button>
+                            <button class="btn-secondary" onclick="findSimilarByMood('thoughtful')">🤔 Thoughtful</button>
+                        </div>
+                    </div>
+                    
                     <div class="details-buttons">
                         <button class="btn-primary" id="detailsPlayBtn"><i class="fas fa-play"></i> Play Now</button>
                         <button class="btn-secondary" id="detailsListBtn"><i class="fas fa-plus"></i> My List</button>
                         <button class="cinema-btn" id="cinemaModeBtn"><i class="fas fa-film"></i> Cinema</button>
                         <button class="rate-btn" id="rateMovieBtn"><i class="fas fa-star"></i> Rate</button>
                         <button class="btn-secondary" id="watchPartyBtn"><i class="fas fa-users"></i> Party</button>
+                        <button class="btn-secondary" id="shareBtn"><i class="fas fa-share-alt"></i> Share</button>
+                    </div>
+                    
+                    <!-- Comments Section -->
+                    <div class="comments-section" style="margin-top: 30px;">
+                        <h4>Discussion</h4>
+                        <div class="comment-input" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <input type="text" id="commentInput" placeholder="Share your thoughts..." style="flex: 1; padding: 12px; background: #1c2a3f; border: 1px solid #3d6190; border-radius: 8px; color: white;">
+                            <button class="btn-primary" id="postCommentBtn">Post</button>
+                        </div>
+                        <div class="comments-list" id="commentsList" style="max-height: 300px; overflow-y: auto;"></div>
                     </div>
                 </div>
             </div>
@@ -1664,26 +1728,130 @@
 <!-- NOTIFICATION -->
 <div class="notification" id="notification">✅ Added to My List</div>
 
+<!-- NOTIFICATIONS PANEL -->
+<div class="notifications-panel" id="notificationsPanel" style="display: none; position: fixed; top: 80px; right: 40px; width: 300px; background: #0c1727; border: 2px solid #2f6bc6; border-radius: 12px; padding: 20px; z-index: 2000;">
+    <h3 style="margin-bottom: 15px;">Notifications</h3>
+    <div id="notificationsList"></div>
+    <button class="btn-secondary" style="width: 100%; margin-top: 10px;" onclick="document.getElementById('notificationsPanel').style.display='none'">Close</button>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal" id="profileModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); align-items: center; justify-content: center; z-index: 5000;">
+    <div class="modal-content" style="background: #0c1727; border-radius: 30px; padding: 40px; width: 400px; max-width: 90vw; border: 2px solid #2f6bc6;">
+        <span class="modal-close" id="closeProfileModal" style="position: absolute; top: 20px; right: 20px; font-size: 2rem; cursor: pointer;">&times;</span>
+        <h2>User Profile</h2>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #2f6bc6, #1e4a8c); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 3rem;" id="profileAvatar">👤</div>
+            <h3 id="profileName">Guest User</h3>
+            <p id="profileEmail" style="color: #6b7280;">guest@btff.com</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2,1fr); gap: 15px; margin-bottom: 20px;">
+            <div style="background: #0a0f1a; border-radius: 16px; padding: 15px; text-align: center;">
+                <div style="font-size: 1.8rem; font-weight: 700;" id="profileWatchCount">0</div>
+                <div style="color: #6b7280;">Watched</div>
+            </div>
+            <div style="background: #0a0f1a; border-radius: 16px; padding: 15px; text-align: center;">
+                <div style="font-size: 1.8rem; font-weight: 700;" id="profileRatingCount">0</div>
+                <div style="color: #6b7280;">Ratings</div>
+            </div>
+        </div>
+        <button class="btn-primary" style="width: 100%; padding: 15px; background: #2f6bc6; border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;" onclick="switchUser()">Switch User</button>
+    </div>
+</div>
+
+<!-- SWITCH USER MODAL -->
+<div class="modal" id="switchUserModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); align-items: center; justify-content: center; z-index: 5000;">
+    <div class="modal-content" style="background: #0c1727; border-radius: 30px; padding: 40px; width: 400px; max-width: 90vw; border: 2px solid #2f6bc6;">
+        <span class="modal-close" id="closeSwitchUserModal" style="position: absolute; top: 20px; right: 20px; font-size: 2rem; cursor: pointer;">&times;</span>
+        <h2>Select User</h2>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px 0;">
+            <button class="btn-primary" style="padding: 15px; background: #2f6bc6; border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;" onclick="setUser('guest')">👤 Guest</button>
+            <button class="btn-primary" style="padding: 15px; background: #2f6bc6; border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;" onclick="setUser('admin')">👑 Admin</button>
+            <button class="btn-primary" style="padding: 15px; background: #2f6bc6; border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;" onclick="setUser('family')">👨‍👩‍👧‍👦 Family</button>
+            <button class="btn-primary" style="padding: 15px; background: #2f6bc6; border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;" onclick="setUser('kids')">🧸 Kids Mode</button>
+        </div>
+    </div>
+</div>
+
+<!-- KIDS MODE OVERLAY -->
+<div id="kidsModeOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ff6b6b; z-index: 10000; overflow-y: auto;">
+    <div style="text-align: center; padding: 50px;">
+        <h1 style="font-size: 4rem; color: white; margin-bottom: 30px;">🧸 KIDS MODE</h1>
+        <p style="font-size: 1.5rem; color: white; margin-bottom: 40px;">Fun & Safe Content for Children</p>
+        <button class="btn-primary" style="font-size: 2rem; padding: 20px 40px; background: #2f6bc6; border: none; border-radius: 50px; color: white; cursor: pointer;" onclick="exitKidsMode()">Exit Kids Mode</button>
+    </div>
+</div>
+
 <script>
     (function() {
         // ---------- CONFIGURATION ----------
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxq17SaQ5Q9iGKQ3gojVwrSkIZ6-hQDv6O_Xv_S-8HjaEjhAmcrybsmC1O4KgpB7osD/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5p5SHAql3QC27RVuSe3qmtlGNeOtaHRGz9msEEC03iUECZbfynwT64CXr_EnW6-pl/exec';
         
         // ---------- STATE ----------
         let movies = [];
         let myList = JSON.parse(localStorage.getItem('btffMyList')) || [];
         let continueWatching = JSON.parse(localStorage.getItem('btffContinueWatching')) || [];
-        let ratings = {}; // Will store { movieId: [ratings] }
-        let ratingDistributions = {}; // Will store pre-calculated distributions
+        let watchHistory = JSON.parse(localStorage.getItem('btffWatchHistory')) || [];
+        let ratings = {};
+        let ratingDistributions = {};
+        let comments = JSON.parse(localStorage.getItem('btffComments')) || {};
+        let notifications = JSON.parse(localStorage.getItem('btffNotifications')) || [];
+        let currentUser = localStorage.getItem('btffCurrentUser') || 'guest';
+        let userProfiles = JSON.parse(localStorage.getItem('btffUserProfiles')) || {
+            guest: { name: 'Guest User', email: 'guest@btff.com', watchCount: 0, ratingCount: 0 },
+            admin: { name: 'Admin', email: 'admin@btff.com', watchCount: 0, ratingCount: 0 },
+            family: { name: 'Family Account', email: 'family@btff.com', watchCount: 0, ratingCount: 0 },
+            kids: { name: 'Kids Mode', email: 'kids@btff.com', watchCount: 0, ratingCount: 0, kidFriendly: true }
+        };
         let currentMovie = null;
         let currentRating = 0;
         let currentGenre = 'all';
         let cinemaModeActive = false;
         let partyId = null;
         let partyUsers = [];
-        let userId = 'user_' + Math.random().toString(36).substring(2, 15);
+        let userId = 'user_' + currentUser + '_' + Math.random().toString(36).substring(2, 15);
         let heroMovie = null;
         let heroTimeout;
+        let aiRecommendations = [];
+        let currentLanguage = 'en';
+        let comingSoonMovies = [];
+
+        // Translations
+        const translations = {
+            en: {
+                featured: 'FEATURED',
+                watchTrailer: 'WATCH TRAILER',
+                myList: 'MY LIST',
+                trending: 'TRENDING NOW',
+                popular: 'POPULAR ON BTFF',
+                recent: 'RECENTLY ADDED',
+                continueWatching: 'CONTINUE WATCHING',
+                comingSoon: 'COMING SOON',
+                recommendations: 'BECAUSE YOU WATCHED'
+            },
+            es: {
+                featured: 'DESTACADO',
+                watchTrailer: 'VER TRÁILER',
+                myList: 'MI LISTA',
+                trending: 'TENDENCIAS',
+                popular: 'POPULAR EN BTFF',
+                recent: 'RECIENTES',
+                continueWatching: 'SEGUIR VIENDO',
+                comingSoon: 'PRÓXIMAMENTE',
+                recommendations: 'PORQUE VISTE'
+            },
+            fr: {
+                featured: 'À LA UNE',
+                watchTrailer: 'VOIR LA BANDE-ANNONCE',
+                myList: 'MA LISTE',
+                trending: 'TENDANCES',
+                popular: 'POPULAIRE SUR BTFF',
+                recent: 'RÉCENTS',
+                continueWatching: 'CONTINUER À REGARDER',
+                comingSoon: 'PROCHAINEMENT',
+                recommendations: 'PARCE QUE VOUS AVEZ VU'
+            }
+        };
 
         // DOM elements
         const trendingRow = document.getElementById('trendingRow');
@@ -1691,8 +1859,11 @@
         const recentRow = document.getElementById('recentRow');
         const myListRow = document.getElementById('myListRow');
         const continueWatchingRow = document.getElementById('continueWatchingRow');
+        const recommendationsRow = document.getElementById('recommendationsRow');
+        const comingSoonRow = document.getElementById('comingSoonRow');
         const myListSection = document.getElementById('myListSection');
         const continueWatchingSection = document.getElementById('continueWatchingSection');
+        const recommendationsSection = document.getElementById('recommendationsSection');
         const searchContainer = document.getElementById('searchContainer');
         const searchInput = document.getElementById('searchInput');
         const searchIcon = document.getElementById('searchIcon');
@@ -1710,8 +1881,22 @@
         const heroDescription = document.getElementById('heroDescription');
         const heroVideoContainer = document.getElementById('heroVideoContainer');
         const notification = document.getElementById('notification');
+        const notificationIcon = document.getElementById('notificationIcon');
+        const profileIcon = document.getElementById('profileIcon');
+        const languageIcon = document.getElementById('languageIcon');
+        const languageSelector = document.getElementById('languageSelector');
+        const languageSelect = document.getElementById('languageSelect');
+        const notificationsPanel = document.getElementById('notificationsPanel');
+        const notificationsList = document.getElementById('notificationsList');
+        const profileModal = document.getElementById('profileModal');
+        const switchUserModal = document.getElementById('switchUserModal');
+        const kidsModeOverlay = document.getElementById('kidsModeOverlay');
+        const closeProfileModal = document.getElementById('closeProfileModal');
+        const closeSwitchUserModal = document.getElementById('closeSwitchUserModal');
         const clearMyList = document.getElementById('clearMyList');
         const clearProgress = document.getElementById('clearProgress');
+        const refreshRecommendations = document.getElementById('refreshRecommendations');
+        const viewAllComingSoon = document.getElementById('viewAllComingSoon');
         const loadingIndicator = document.getElementById('loadingIndicator');
         const errorMessage = document.getElementById('errorMessage');
         const errorText = document.getElementById('errorText');
@@ -1742,6 +1927,10 @@
         const cinemaModeBtn = document.getElementById('cinemaModeBtn');
         const rateMovieBtn = document.getElementById('rateMovieBtn');
         const watchPartyBtn = document.getElementById('watchPartyBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const commentInput = document.getElementById('commentInput');
+        const postCommentBtn = document.getElementById('postCommentBtn');
+        const commentsList = document.getElementById('commentsList');
         const moreLikeThisRow = document.getElementById('moreLikeThisRow');
         const closeDetailsModal = document.getElementById('closeDetailsModal');
         const seasonEpisodeContainer = document.getElementById('seasonEpisodeContainer');
@@ -1775,17 +1964,226 @@
         const shortcutsIcon = document.getElementById('shortcutsIcon');
         const closeShortcuts = document.getElementById('closeShortcuts');
 
-        // ---------- FUNCTION TO GET NUMERIC ID (FIXED FOR NUMERIC IDS) ----------
+        // ---------- LANGUAGE FUNCTIONS ----------
+        function translate(key) {
+            return translations[currentLanguage]?.[key] || translations.en[key];
+        }
+
+        function updateUILanguage() {
+            document.querySelector('.hero-eyebrow').textContent = translate('featured');
+            heroPlayBtn.innerHTML = `<i class="fas fa-play"></i> ${translate('watchTrailer')}`;
+            heroAddBtn.innerHTML = `<i class="fas fa-plus"></i> ${translate('myList')}`;
+            document.querySelectorAll('.section-title').forEach(el => {
+                if (el.textContent.includes('TRENDING')) el.textContent = `🔥 ${translate('trending')}`;
+                if (el.textContent.includes('POPULAR')) el.textContent = `⭐ ${translate('popular')}`;
+                if (el.textContent.includes('RECENTLY')) el.textContent = `🆕 ${translate('recent')}`;
+            });
+        }
+
+        // ---------- AI RECOMMENDATIONS ----------
+        function generateAIRecommendations(movieId) {
+            const movie = movies.find(m => m.id == movieId);
+            if (!movie) return [];
+            
+            const similar = movies.filter(m => 
+                m.id != movie.id && 
+                (m.category === movie.category || m.genre === movie.genre)
+            ).sort(() => 0.5 - Math.random()).slice(0, 10);
+            
+            return similar;
+        }
+
+        function findSimilarByMood(mood) {
+            if (!currentMovie) return;
+            
+            let moodFilters = {
+                happy: ['Comedy', 'Adventure', 'Animation'],
+                exciting: ['Action', 'Thriller', 'Sci-Fi'],
+                relaxing: ['Documentary', 'Drama', 'Romance'],
+                thoughtful: ['Drama', 'Documentary', 'History']
+            };
+            
+            const genres = moodFilters[mood] || [];
+            const recommendations = movies.filter(m => 
+                m.id != currentMovie.id && 
+                genres.includes(m.genre)
+            ).slice(0, 10);
+            
+            recommendationsRow.innerHTML = '';
+            recommendations.forEach(m => {
+                recommendationsRow.appendChild(createMovieCard(m, true));
+            });
+            recommendationsSection.style.display = 'block';
+        }
+
+        // ---------- COMMENTS ----------
+        function loadComments(movieId) {
+            const movieComments = comments[movieId] || [];
+            commentsList.innerHTML = '';
+            movieComments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment-item';
+                commentDiv.style.cssText = 'padding: 10px; border-bottom: 1px solid #1f334a;';
+                commentDiv.innerHTML = `
+                    <strong>${comment.user}</strong> <span style="color: #88abdf; font-size: 0.8rem;">${new Date(comment.timestamp).toLocaleString()}</span>
+                    <p style="margin-top: 5px;">${comment.text}</p>
+                `;
+                commentsList.appendChild(commentDiv);
+            });
+        }
+
+        function addComment(movieId, text) {
+            if (!text.trim()) return;
+            
+            if (!comments[movieId]) comments[movieId] = [];
+            comments[movieId].push({
+                user: currentUser,
+                text: text,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('btffComments', JSON.stringify(comments));
+            loadComments(movieId);
+            commentInput.value = '';
+        }
+
+        // ---------- NOTIFICATIONS ----------
+        function addNotification(message, type = 'info') {
+            notifications.unshift({
+                id: Date.now(),
+                message,
+                type,
+                timestamp: new Date().toISOString(),
+                read: false
+            });
+            notifications = notifications.slice(0, 50);
+            localStorage.setItem('btffNotifications', JSON.stringify(notifications));
+            updateNotificationsBadge();
+        }
+
+        function updateNotificationsBadge() {
+            const unread = notifications.filter(n => !n.read).length;
+            notificationIcon.style.position = 'relative';
+            if (unread > 0) {
+                let badge = document.getElementById('notificationBadge');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.id = 'notificationBadge';
+                    badge.style.cssText = 'position: absolute; top: -5px; right: -5px; background: #e50914; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem;';
+                    notificationIcon.style.position = 'relative';
+                    notificationIcon.appendChild(badge);
+                }
+                badge.textContent = unread;
+            } else {
+                const badge = document.getElementById('notificationBadge');
+                if (badge) badge.remove();
+            }
+        }
+
+        function showNotifications() {
+            notificationsList.innerHTML = '';
+            notifications.slice(0, 10).forEach(n => {
+                const div = document.createElement('div');
+                div.className = 'notification-item';
+                div.style.cssText = 'padding: 10px; border-bottom: 1px solid #1f334a; cursor: pointer;';
+                div.innerHTML = `
+                    <strong>${n.message}</strong>
+                    <div style="color: #88abdf; font-size: 0.7rem;">${new Date(n.timestamp).toLocaleString()}</div>
+                `;
+                div.onclick = () => {
+                    n.read = true;
+                    localStorage.setItem('btffNotifications', JSON.stringify(notifications));
+                    updateNotificationsBadge();
+                    div.style.opacity = '0.5';
+                };
+                notificationsList.appendChild(div);
+            });
+            notificationsPanel.style.display = 'block';
+        }
+
+        // ---------- USER PROFILES ----------
+        function switchUser() {
+            switchUserModal.style.display = 'flex';
+        }
+
+        window.setUser = function(userType) {
+            currentUser = userType;
+            userId = 'user_' + currentUser + '_' + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('btffCurrentUser', currentUser);
+            
+            const profile = userProfiles[currentUser];
+            document.getElementById('profileName').textContent = profile.name;
+            document.getElementById('profileEmail').textContent = profile.email;
+            document.getElementById('profileWatchCount').textContent = profile.watchCount || 0;
+            document.getElementById('profileRatingCount').textContent = profile.ratingCount || 0;
+            
+            if (currentUser === 'kids') {
+                kidsModeOverlay.style.display = 'block';
+            } else {
+                kidsModeOverlay.style.display = 'none';
+            }
+            
+            switchUserModal.style.display = 'none';
+            showNotification(`Switched to ${profile.name}`);
+            
+            loadUserData();
+        };
+
+        window.exitKidsMode = function() {
+            kidsModeOverlay.style.display = 'none';
+            setUser('guest');
+        };
+
+        function loadUserData() {
+            const userData = JSON.parse(localStorage.getItem(`btff_${currentUser}_data`)) || {};
+            if (userData.watchHistory) watchHistory = userData.watchHistory;
+            if (userData.ratings) ratings = userData.ratings;
+            renderAll();
+        }
+
+        // ---------- SHARE FUNCTION ----------
+        async function shareMovie(movie) {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: movie.title,
+                        text: movie.description,
+                        url: window.location.href + '?movie=' + movie.id
+                    });
+                    showNotification('Shared successfully!');
+                } catch (err) {
+                    console.error('Share failed:', err);
+                }
+            } else {
+                navigator.clipboard.writeText(window.location.href + '?movie=' + movie.id);
+                showNotification('Link copied to clipboard!');
+            }
+        }
+
+        // ---------- COMING SOON ----------
+        function generateComingSoon() {
+            comingSoonMovies = [];
+            for (let i = 1; i <= 5; i++) {
+                comingSoonMovies.push({
+                    id: 'coming_' + i,
+                    title: `Coming Soon ${i}`,
+                    youtubeId: 'dQw4w9WgXcQ',
+                    category: 'coming-soon',
+                    genre: 'Various',
+                    year: '2026',
+                    duration: 'TBA',
+                    description: 'Coming soon to BTFF!',
+                    releaseDate: new Date(Date.now() + i * 7 * 24 * 60 * 60 * 1000).toISOString()
+                });
+            }
+        }
+
+        // ---------- GET NUMERIC ID ----------
         function getNumericId(id) {
             if (id === undefined || id === null) return 0;
-            // If it's already a number, return it
             if (typeof id === 'number') return id;
-            // If it's a string, try to parse it
             if (typeof id === 'string') {
-                // Try to parse as integer first
                 const parsed = parseInt(id);
                 if (!isNaN(parsed)) return parsed;
-                // If that fails, try to extract numbers from string like "movie_123"
                 const match = id.match(/\d+/);
                 return match ? parseInt(match[0]) : 0;
             }
@@ -1820,21 +2218,17 @@
             
             heroMovie = movie;
             
-            // Update video background - autoplay once
             heroVideoContainer.innerHTML = `
                 <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0" 
                         frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             `;
             
-            // Update text content
             heroTitle.textContent = movie.title;
             heroDescription.textContent = movie.description || 'No description available';
             
-            // Update button actions
             heroPlayBtn.onclick = () => openVideoPlayer(movie.id);
             heroAddBtn.onclick = () => addToMyList(movie.id);
             
-            // Stop video after 5 seconds
             if (heroTimeout) clearTimeout(heroTimeout);
             heroTimeout = setTimeout(() => {
                 heroVideoContainer.innerHTML = `
@@ -1850,15 +2244,12 @@
                 showLoading(true);
                 hideError();
                 
-                console.log('Fetching from:', APPS_SCRIPT_URL);
-                
                 const response = await fetch(APPS_SCRIPT_URL + '?action=getMovies&t=' + Date.now(), {
                     method: 'GET',
                     mode: 'cors'
                 });
                 
                 const text = await response.text();
-                console.log('Raw response:', text.substring(0, 200));
                 
                 let data;
                 try {
@@ -1870,25 +2261,29 @@
                 
                 if (data.success && Array.isArray(data.movies)) {
                     movies = data.movies;
-                    console.log('Movies loaded:', movies.length);
                     
-                    // Sort movies by ID (newest/highest ID first)
                     movies.sort((a, b) => {
                         const idA = getNumericId(a.id);
                         const idB = getNumericId(b.id);
-                        return idB - idA; // Descending order (highest first)
+                        return idB - idA;
                     });
                     
-                    // Set hero to movie with highest ID (most recent)
                     if (movies.length > 0) {
                         updateHero(movies[0]);
                     }
                     
+                    generateComingSoon();
                     await fetchAllRatings();
                     extractGenres();
                     populateYearFilter();
                     renderAll();
                     hideError();
+                    
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const movieParam = urlParams.get('movie');
+                    if (movieParam) {
+                        openDetailsModal(movieParam);
+                    }
                 } else {
                     throw new Error(data.error || 'Invalid response');
                 }
@@ -1909,7 +2304,6 @@
                 
                 const data = await response.json();
                 if (data.success && data.ratings) {
-                    // Group ratings by movieId
                     const ratingsMap = {};
                     const distributionsMap = {};
                     
@@ -1920,7 +2314,6 @@
                         ratingsMap[r.movieId].push(parseInt(r.rating));
                     });
                     
-                    // Pre-calculate distributions for each movie
                     Object.keys(ratingsMap).forEach(movieId => {
                         const movieRatings = ratingsMap[movieId];
                         const distribution = [0, 0, 0, 0, 0];
@@ -1948,10 +2341,8 @@
                 
                 const data = await response.json();
                 if (data.success) {
-                    // Update local ratings
                     ratings[movieId] = data.ratings || [];
                     
-                    // Update distribution
                     const distribution = [0, 0, 0, 0, 0];
                     (data.ratings || []).forEach(r => {
                         if (r >= 1 && r <= 5) distribution[r-1]++;
@@ -2080,14 +2471,18 @@
                 const data = await response.json();
                 if (data.success) {
                     await fetchAllRatings();
-                    if (currentMovie && currentMovie.id === movieId) {
-                        // Force refresh of details modal with new ratings
+                    if (currentMovie && currentMovie.id == movieId) {
                         const ratingData = await fetchMovieRatings(movieId);
                         if (ratingData) {
                             updateDetailsModal(currentMovie);
                         }
                     }
+                    
+                    userProfiles[currentUser].ratingCount++;
+                    localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
+                    
                     showNotification(`⭐ Rated ${rating} stars`);
+                    addNotification(`You rated "${currentMovie?.title}" ${rating} stars`);
                 }
             } catch (error) {
                 console.error('Error adding rating:', error);
@@ -2103,13 +2498,24 @@
                     mode: 'cors'
                 });
                 await fetchContinueWatching();
+                
+                if (!watchHistory.includes(movieId)) {
+                    watchHistory.push(movieId);
+                    localStorage.setItem('btffWatchHistory', JSON.stringify(watchHistory));
+                    
+                    userProfiles[currentUser].watchCount++;
+                    localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
+                    
+                    aiRecommendations = generateAIRecommendations(movieId);
+                    renderRecommendations();
+                }
             } catch (error) {
                 console.error('Error updating progress:', error);
             }
         }
 
         function getProgress(movieId) {
-            const item = continueWatching.find(m => m.id === movieId);
+            const item = continueWatching.find(m => m.id == movieId);
             return item ? item.progress : 0;
         }
 
@@ -2128,11 +2534,12 @@
                 myList.push(movieId);
                 saveMyList();
                 showNotification('✅ Added to My List');
+                addNotification('Added to My List');
             }
         }
 
         function removeFromMyList(movieId) {
-            myList = myList.filter(id => id !== movieId);
+            myList = myList.filter(id => id != movieId);
             saveMyList();
             showNotification('❌ Removed from My List');
         }
@@ -2148,7 +2555,7 @@
 
         // ---------- VIDEO PLAYER FUNCTIONS ----------
         function openVideoPlayer(movieId, episode = null) {
-            const movie = movies.find(m => m.id == movieId); // Use loose equality to handle string/number mismatch
+            const movie = movies.find(m => m.id == movieId);
             if (!movie) {
                 console.error('Movie not found:', movieId);
                 return;
@@ -2170,7 +2577,7 @@
                 updateProgress(movieId, 25);
             }, 30000);
             
-            videoModalAddBtn.innerHTML = isInMyList(movie.id) ? 
+            videoModalAddBtn.innerHTML = isInMyList(movieId) ? 
                 '<i class="fas fa-check"></i> In My List' : 
                 '<i class="fas fa-plus"></i> My List';
         }
@@ -2183,29 +2590,28 @@
 
         // ---------- DETAILS MODAL FUNCTIONS ----------
         async function openDetailsModal(movieId) {
-            const movie = movies.find(m => m.id == movieId); // Use loose equality
+            const movie = movies.find(m => m.id == movieId);
             if (!movie) return;
             
             currentMovie = movie;
             
-            // Fetch fresh ratings for this movie
             const ratingData = await fetchMovieRatings(movieId);
             if (ratingData) {
                 ratings[movieId] = ratingData.ratings || [];
-                // Distribution already updated in fetchMovieRatings
             }
             
             updateDetailsModal(movie);
             detailsModal.classList.add('active');
             document.body.style.overflow = 'hidden';
             
-            // Auto-play trailer in background
             if (trailerBackground && movie.youtubeId) {
                 trailerBackground.innerHTML = `
                     <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0&loop=1&playlist=${movie.youtubeId}" 
                             frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                 `;
             }
+            
+            loadComments(movieId);
         }
 
         function closeDetailsModalFunc() {
@@ -2249,7 +2655,6 @@
                 <span class="rating-value">${avgRating.toFixed(1)} (${ratingCount} ratings)</span>
             `;
             
-            // Rating distribution
             const dist = getRatingDistribution(movie.id);
             const total = dist.reduce((a, b) => a + b, 0);
             let distHtml = '<h4>Rating Distribution</h4>';
@@ -2284,7 +2689,6 @@
                 '<i class="fas fa-check"></i> In My List' : 
                 '<i class="fas fa-plus"></i> My List';
             
-            // Check if it's a series (has seasons/episodes)
             if (movie.type === 'series') {
                 seasonEpisodeContainer.style.display = 'block';
                 renderEpisodes(movie);
@@ -2292,7 +2696,6 @@
                 seasonEpisodeContainer.style.display = 'none';
             }
             
-            // More like this - improved algorithm
             const similar = movies.filter(m => 
                 m.id != movie.id && 
                 (m.category === movie.category || m.genre === movie.genre || 
@@ -2367,41 +2770,47 @@
                 filtered = filtered.filter(m => m.year === yearFilter.value);
             }
             
-            // Genre filter
             if (currentGenre !== 'all') {
                 filtered = filtered.filter(m => m.genre === currentGenre);
             }
             
-            // Default sort by ID (newest/highest first)
             filtered.sort((a, b) => {
                 const idA = getNumericId(a.id);
                 const idB = getNumericId(b.id);
                 return idB - idA;
             });
             
-            // Apply additional sorting only if selected and not default
             if (sortFilter && sortFilter.value && sortFilter.value !== 'default') {
-                // If user selects a sort option, we need to re-sort accordingly
-                switch(sortFilter.value) {
-                    case 'titleAsc':
-                        filtered.sort((a, b) => a.title.localeCompare(b.title));
-                        break;
-                    case 'titleDesc':
-                        filtered.sort((a, b) => b.title.localeCompare(a.title));
-                        break;
-                    case 'yearDesc':
-                        filtered.sort((a, b) => (b.year || '0').localeCompare(a.year || '0'));
-                        break;
-                    case 'yearAsc':
-                        filtered.sort((a, b) => (a.year || '0').localeCompare(b.year || '0'));
-                        break;
-                    case 'ratingDesc':
-                        filtered.sort((a, b) => {
-                            const ratingA = getAverageRating(a.id);
-                            const ratingB = getAverageRating(b.id);
-                            return ratingB - ratingA;
-                        });
-                        break;
+                if (sortFilter.value === 'aiRecommend') {
+                    if (watchHistory.length > 0) {
+                        const lastWatched = watchHistory[watchHistory.length - 1];
+                        const lastMovie = movies.find(m => m.id == lastWatched);
+                        if (lastMovie) {
+                            filtered = generateAIRecommendations(lastMovie.id);
+                        }
+                    }
+                } else {
+                    switch(sortFilter.value) {
+                        case 'titleAsc':
+                            filtered.sort((a, b) => a.title.localeCompare(b.title));
+                            break;
+                        case 'titleDesc':
+                            filtered.sort((a, b) => b.title.localeCompare(a.title));
+                            break;
+                        case 'yearDesc':
+                            filtered.sort((a, b) => (b.year || '0').localeCompare(a.year || '0'));
+                            break;
+                        case 'yearAsc':
+                            filtered.sort((a, b) => (a.year || '0').localeCompare(b.year || '0'));
+                            break;
+                        case 'ratingDesc':
+                            filtered.sort((a, b) => {
+                                const ratingA = getAverageRating(a.id);
+                                const ratingB = getAverageRating(b.id);
+                                return ratingB - ratingA;
+                            });
+                            break;
+                    }
                 }
             }
             
@@ -2410,11 +2819,10 @@
 
         // ---------- CARD CREATION ----------
         function createMovieCard(movie, forSimilar = false) {
-            // Make sure we have a valid youtubeId
             const youtubeId = movie.youtubeId || '';
             if (!youtubeId) {
                 console.warn('Movie missing youtubeId:', movie);
-                return document.createElement('div'); // Return empty div if no youtubeId
+                return document.createElement('div');
             }
             
             const card = document.createElement('div');
@@ -2503,6 +2911,18 @@
             return card;
         }
 
+        function renderRecommendations() {
+            if (aiRecommendations.length > 0) {
+                recommendationsRow.innerHTML = '';
+                aiRecommendations.forEach(m => {
+                    recommendationsRow.appendChild(createMovieCard(m, true));
+                });
+                recommendationsSection.style.display = 'block';
+            } else {
+                recommendationsSection.style.display = 'none';
+            }
+        }
+
         // ---------- RENDERING ----------
         function clearRow(row) {
             if (!row) return;
@@ -2515,6 +2935,7 @@
             clearRow(trendingRow);
             clearRow(popularRow);
             clearRow(recentRow);
+            clearRow(comingSoonRow);
 
             const filteredMovies = filterAndSortMovies(movies);
 
@@ -2536,6 +2957,10 @@
                 }
             });
 
+            comingSoonMovies.forEach(movie => {
+                comingSoonRow.appendChild(createMovieCard(movie));
+            });
+
             if (trendingRow.children.length === 0) {
                 trendingRow.innerHTML = '<div class="empty-row">No trending movies</div>';
             }
@@ -2548,8 +2973,8 @@
 
             renderMyListRow();
             renderContinueWatchingRow();
+            renderRecommendations();
 
-            // Update search count with actual visible movies
             const totalVisible = trendingRow.children.length + popularRow.children.length + recentRow.children.length;
             if (searchCount) {
                 if (searchInput?.value) {
@@ -2827,6 +3252,31 @@
             });
         }
 
+        // New icon listeners
+        if (notificationIcon) {
+            notificationIcon.addEventListener('click', showNotifications);
+        }
+
+        if (profileIcon) {
+            profileIcon.addEventListener('click', () => {
+                profileModal.style.display = 'flex';
+            });
+        }
+
+        if (languageIcon) {
+            languageIcon.addEventListener('click', () => {
+                languageSelector.style.display = languageSelector.style.display === 'none' ? 'block' : 'none';
+            });
+        }
+
+        if (languageSelect) {
+            languageSelect.addEventListener('change', (e) => {
+                currentLanguage = e.target.value;
+                updateUILanguage();
+                languageSelector.style.display = 'none';
+            });
+        }
+
         allNavLinks.forEach(link => {
             link.addEventListener('click', () => {
                 const category = link.dataset.category;
@@ -2898,13 +3348,36 @@
             });
         }
 
-        window.addEventListener('click', (e) => {
-            if (e.target === detailsModal) closeDetailsModalFunc();
-            if (e.target === videoModal) closeVideoPlayer();
-            if (e.target === ratingModal) ratingModal.classList.remove('active');
-            if (e.target === watchPartyModal) watchPartyModal.classList.remove('active');
-            if (e.target === shortcutsModal) shortcutsModal.classList.remove('active');
-        });
+        if (shareBtn) {
+            shareBtn.addEventListener('click', () => {
+                if (currentMovie) shareMovie(currentMovie);
+            });
+        }
+
+        if (postCommentBtn) {
+            postCommentBtn.addEventListener('click', () => {
+                if (currentMovie) addComment(currentMovie.id, commentInput.value);
+            });
+        }
+
+        if (refreshRecommendations) {
+            refreshRecommendations.addEventListener('click', () => {
+                if (watchHistory.length > 0) {
+                    const lastWatched = watchHistory[watchHistory.length - 1];
+                    const lastMovie = movies.find(m => m.id == lastWatched);
+                    if (lastMovie) {
+                        aiRecommendations = generateAIRecommendations(lastMovie.id);
+                        renderRecommendations();
+                    }
+                }
+            });
+        }
+
+        if (viewAllComingSoon) {
+            viewAllComingSoon.addEventListener('click', () => {
+                showNotification('Coming Soon page coming... soon!');
+            });
+        }
 
         if (clearMyList) {
             clearMyList.addEventListener('click', () => {
@@ -3002,6 +3475,18 @@
             });
         }
 
+        if (closeProfileModal) {
+            closeProfileModal.addEventListener('click', () => {
+                profileModal.style.display = 'none';
+            });
+        }
+
+        if (closeSwitchUserModal) {
+            closeSwitchUserModal.addEventListener('click', () => {
+                switchUserModal.style.display = 'none';
+            });
+        }
+
         if (rateMovieBtn) {
             rateMovieBtn.addEventListener('click', () => {
                 ratingModal.classList.add('active');
@@ -3057,6 +3542,20 @@
             });
         }
 
+        window.addEventListener('click', (e) => {
+            if (e.target === detailsModal) closeDetailsModalFunc();
+            if (e.target === videoModal) closeVideoPlayer();
+            if (e.target === ratingModal) ratingModal.classList.remove('active');
+            if (e.target === watchPartyModal) watchPartyModal.classList.remove('active');
+            if (e.target === shortcutsModal) shortcutsModal.classList.remove('active');
+            if (e.target === profileModal) profileModal.style.display = 'none';
+            if (e.target === switchUserModal) switchUserModal.style.display = 'none';
+            if (e.target === notificationsPanel) e.stopPropagation();
+            if (!e.target.closest('.notifications-panel') && e.target !== notificationIcon && notificationsPanel.style.display === 'block') {
+                notificationsPanel.style.display = 'none';
+            }
+        });
+
         window.addEventListener('keydown', handleKeyboardShortcuts);
 
         window.addEventListener('keydown', (e) => {
@@ -3076,7 +3575,23 @@
                 if (shortcutsModal.classList.contains('active')) {
                     shortcutsModal.classList.remove('active');
                 }
+                if (profileModal.style.display === 'flex') {
+                    profileModal.style.display = 'none';
+                }
+                if (switchUserModal.style.display === 'flex') {
+                    switchUserModal.style.display = 'none';
+                }
                 closeMobileMenuFunc();
+            }
+        });
+
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'movieType') {
+                const isSeries = e.target.value === 'series';
+                const seasonFields = document.querySelectorAll('#movieSeasons, #movieEpisodes, label[for="movieSeasons"], label[for="movieEpisodes"]');
+                seasonFields.forEach(field => {
+                    field.closest('.form-group').style.display = isSeries ? 'block' : 'none';
+                });
             }
         });
 
@@ -3091,9 +3606,18 @@
             }, 1000);
         }
 
+        // Initialize user profile
+        setUser(currentUser);
+
         // Start
         fetchMovies();
         fetchContinueWatching();
+        updateNotificationsBadge();
+
+        // Make functions available globally
+        window.findSimilarByMood = findSimilarByMood;
+        window.switchUser = setUser;
+        window.exitKidsMode = exitKidsMode;
     })();
 </script>
 </body>

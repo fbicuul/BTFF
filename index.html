@@ -1797,12 +1797,27 @@
         let comments = JSON.parse(localStorage.getItem('btffComments')) || {};
         let notifications = JSON.parse(localStorage.getItem('btffNotifications')) || [];
         let currentUser = localStorage.getItem('btffCurrentUser') || 'guest';
+        
+        // FIXED: User profiles with fallback
         let userProfiles = JSON.parse(localStorage.getItem('btffUserProfiles')) || {
-            guest: { name: 'Guest User', email: 'guest@btff.com', watchCount: 0, ratingCount: 0 },
-            admin: { name: 'Admin', email: 'admin@btff.com', watchCount: 0, ratingCount: 0 },
-            family: { name: 'Family Account', email: 'family@btff.com', watchCount: 0, ratingCount: 0 },
-            kids: { name: 'Kids Mode', email: 'kids@btff.com', watchCount: 0, ratingCount: 0, kidFriendly: true }
+            guest: { name: 'Guest User', email: 'guest@btff.com', watchCount: 0, ratingCount: 0, avatar: '👤' },
+            admin: { name: 'Admin', email: 'admin@btff.com', watchCount: 0, ratingCount: 0, avatar: '👑' },
+            family: { name: 'Family Account', email: 'family@btff.com', watchCount: 0, ratingCount: 0, avatar: '👨‍👩‍👧‍👦' },
+            kids: { name: 'Kids Mode', email: 'kids@btff.com', watchCount: 0, ratingCount: 0, avatar: '🧸', kidFriendly: true }
         };
+        
+        // Ensure current user exists in profiles
+        if (!userProfiles[currentUser]) {
+            userProfiles[currentUser] = { 
+                name: currentUser.charAt(0).toUpperCase() + currentUser.slice(1) + ' User', 
+                email: currentUser + '@btff.com', 
+                watchCount: 0, 
+                ratingCount: 0,
+                avatar: '👤'
+            };
+            localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
+        }
+        
         let currentMovie = null;
         let currentRating = 0;
         let currentGenre = 'all';
@@ -1970,9 +1985,10 @@
         }
 
         function updateUILanguage() {
-            document.querySelector('.hero-eyebrow').textContent = translate('featured');
-            heroPlayBtn.innerHTML = `<i class="fas fa-play"></i> ${translate('watchTrailer')}`;
-            heroAddBtn.innerHTML = `<i class="fas fa-plus"></i> ${translate('myList')}`;
+            const eyebrow = document.querySelector('.hero-eyebrow');
+            if (eyebrow) eyebrow.textContent = translate('featured');
+            if (heroPlayBtn) heroPlayBtn.innerHTML = `<i class="fas fa-play"></i> ${translate('watchTrailer')}`;
+            if (heroAddBtn) heroAddBtn.innerHTML = `<i class="fas fa-plus"></i> ${translate('myList')}`;
             document.querySelectorAll('.section-title').forEach(el => {
                 if (el.textContent.includes('TRENDING')) el.textContent = `🔥 ${translate('trending')}`;
                 if (el.textContent.includes('POPULAR')) el.textContent = `⭐ ${translate('popular')}`;
@@ -1993,7 +2009,7 @@
             return similar;
         }
 
-        function findSimilarByMood(mood) {
+        window.findSimilarByMood = function(mood) {
             if (!currentMovie) return;
             
             let moodFilters = {
@@ -2009,27 +2025,31 @@
                 genres.includes(m.genre)
             ).slice(0, 10);
             
-            recommendationsRow.innerHTML = '';
-            recommendations.forEach(m => {
-                recommendationsRow.appendChild(createMovieCard(m, true));
-            });
-            recommendationsSection.style.display = 'block';
-        }
+            if (recommendationsRow) {
+                recommendationsRow.innerHTML = '';
+                recommendations.forEach(m => {
+                    recommendationsRow.appendChild(createMovieCard(m, true));
+                });
+            }
+            if (recommendationsSection) recommendationsSection.style.display = 'block';
+        };
 
         // ---------- COMMENTS ----------
         function loadComments(movieId) {
             const movieComments = comments[movieId] || [];
-            commentsList.innerHTML = '';
-            movieComments.forEach(comment => {
-                const commentDiv = document.createElement('div');
-                commentDiv.className = 'comment-item';
-                commentDiv.style.cssText = 'padding: 10px; border-bottom: 1px solid #1f334a;';
-                commentDiv.innerHTML = `
-                    <strong>${comment.user}</strong> <span style="color: #88abdf; font-size: 0.8rem;">${new Date(comment.timestamp).toLocaleString()}</span>
-                    <p style="margin-top: 5px;">${comment.text}</p>
-                `;
-                commentsList.appendChild(commentDiv);
-            });
+            if (commentsList) {
+                commentsList.innerHTML = '';
+                movieComments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment-item';
+                    commentDiv.style.cssText = 'padding: 10px; border-bottom: 1px solid #1f334a;';
+                    commentDiv.innerHTML = `
+                        <strong>${comment.user}</strong> <span style="color: #88abdf; font-size: 0.8rem;">${new Date(comment.timestamp).toLocaleString()}</span>
+                        <p style="margin-top: 5px;">${comment.text}</p>
+                    `;
+                    commentsList.appendChild(commentDiv);
+                });
+            }
         }
 
         function addComment(movieId, text) {
@@ -2043,7 +2063,7 @@
             });
             localStorage.setItem('btffComments', JSON.stringify(comments));
             loadComments(movieId);
-            commentInput.value = '';
+            if (commentInput) commentInput.value = '';
         }
 
         // ---------- NOTIFICATIONS ----------
@@ -2062,75 +2082,108 @@
 
         function updateNotificationsBadge() {
             const unread = notifications.filter(n => !n.read).length;
-            notificationIcon.style.position = 'relative';
-            if (unread > 0) {
-                let badge = document.getElementById('notificationBadge');
-                if (!badge) {
-                    badge = document.createElement('span');
-                    badge.id = 'notificationBadge';
-                    badge.style.cssText = 'position: absolute; top: -5px; right: -5px; background: #e50914; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem;';
-                    notificationIcon.style.position = 'relative';
-                    notificationIcon.appendChild(badge);
+            if (notificationIcon) {
+                notificationIcon.style.position = 'relative';
+                if (unread > 0) {
+                    let badge = document.getElementById('notificationBadge');
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.id = 'notificationBadge';
+                        badge.style.cssText = 'position: absolute; top: -5px; right: -5px; background: #e50914; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem;';
+                        notificationIcon.style.position = 'relative';
+                        notificationIcon.appendChild(badge);
+                    }
+                    badge.textContent = unread;
+                } else {
+                    const badge = document.getElementById('notificationBadge');
+                    if (badge) badge.remove();
                 }
-                badge.textContent = unread;
-            } else {
-                const badge = document.getElementById('notificationBadge');
-                if (badge) badge.remove();
             }
         }
 
         function showNotifications() {
-            notificationsList.innerHTML = '';
-            notifications.slice(0, 10).forEach(n => {
-                const div = document.createElement('div');
-                div.className = 'notification-item';
-                div.style.cssText = 'padding: 10px; border-bottom: 1px solid #1f334a; cursor: pointer;';
-                div.innerHTML = `
-                    <strong>${n.message}</strong>
-                    <div style="color: #88abdf; font-size: 0.7rem;">${new Date(n.timestamp).toLocaleString()}</div>
-                `;
-                div.onclick = () => {
-                    n.read = true;
-                    localStorage.setItem('btffNotifications', JSON.stringify(notifications));
-                    updateNotificationsBadge();
-                    div.style.opacity = '0.5';
-                };
-                notificationsList.appendChild(div);
-            });
-            notificationsPanel.style.display = 'block';
+            if (notificationsList) {
+                notificationsList.innerHTML = '';
+                notifications.slice(0, 10).forEach(n => {
+                    const div = document.createElement('div');
+                    div.className = 'notification-item';
+                    div.style.cssText = 'padding: 10px; border-bottom: 1px solid #1f334a; cursor: pointer;';
+                    div.innerHTML = `
+                        <strong>${n.message}</strong>
+                        <div style="color: #88abdf; font-size: 0.7rem;">${new Date(n.timestamp).toLocaleString()}</div>
+                    `;
+                    div.onclick = () => {
+                        n.read = true;
+                        localStorage.setItem('btffNotifications', JSON.stringify(notifications));
+                        updateNotificationsBadge();
+                        div.style.opacity = '0.5';
+                    };
+                    notificationsList.appendChild(div);
+                });
+            }
+            if (notificationsPanel) notificationsPanel.style.display = 'block';
         }
 
-        // ---------- USER PROFILES ----------
-        function switchUser() {
-            switchUserModal.style.display = 'flex';
-        }
+        // ---------- USER PROFILES - FIXED ----------
+        window.switchUser = function() {
+            if (switchUserModal) switchUserModal.style.display = 'flex';
+        };
 
         window.setUser = function(userType) {
             currentUser = userType;
             userId = 'user_' + currentUser + '_' + Math.random().toString(36).substring(2, 15);
             localStorage.setItem('btffCurrentUser', currentUser);
             
-            const profile = userProfiles[currentUser];
-            document.getElementById('profileName').textContent = profile.name;
-            document.getElementById('profileEmail').textContent = profile.email;
-            document.getElementById('profileWatchCount').textContent = profile.watchCount || 0;
-            document.getElementById('profileRatingCount').textContent = profile.ratingCount || 0;
-            
-            if (currentUser === 'kids') {
-                kidsModeOverlay.style.display = 'block';
-            } else {
-                kidsModeOverlay.style.display = 'none';
+            // Ensure profile exists
+            if (!userProfiles[currentUser]) {
+                userProfiles[currentUser] = { 
+                    name: userType.charAt(0).toUpperCase() + userType.slice(1) + ' User', 
+                    email: userType + '@btff.com', 
+                    watchCount: 0, 
+                    ratingCount: 0,
+                    avatar: '👤'
+                };
+                localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
             }
             
-            switchUserModal.style.display = 'none';
-            showNotification(`Switched to ${profile.name}`);
+            const profile = userProfiles[currentUser];
+            
+            // Safely update DOM elements
+            const profileNameEl = document.getElementById('profileName');
+            const profileEmailEl = document.getElementById('profileEmail');
+            const profileWatchCountEl = document.getElementById('profileWatchCount');
+            const profileRatingCountEl = document.getElementById('profileRatingCount');
+            const profileAvatarEl = document.getElementById('profileAvatar');
+            
+            if (profileNameEl) profileNameEl.textContent = profile.name || 'User';
+            if (profileEmailEl) profileEmailEl.textContent = profile.email || 'user@btff.com';
+            if (profileWatchCountEl) profileWatchCountEl.textContent = profile.watchCount || 0;
+            if (profileRatingCountEl) profileRatingCountEl.textContent = profile.ratingCount || 0;
+            
+            // Set avatar based on user type
+            const avatars = {
+                guest: '👤',
+                admin: '👑',
+                family: '👨‍👩‍👧‍👦',
+                kids: '🧸'
+            };
+            if (profileAvatarEl) profileAvatarEl.textContent = avatars[userType] || profile.avatar || '👤';
+            
+            // Handle kids mode
+            if (kidsModeOverlay) {
+                kidsModeOverlay.style.display = currentUser === 'kids' ? 'block' : 'none';
+            }
+            
+            if (switchUserModal) switchUserModal.style.display = 'none';
+            
+            showNotification(`Switched to ${profile.name || userType}`);
             
             loadUserData();
         };
 
         window.exitKidsMode = function() {
-            kidsModeOverlay.style.display = 'none';
-            setUser('guest');
+            if (kidsModeOverlay) kidsModeOverlay.style.display = 'none';
+            window.setUser('guest');
         };
 
         function loadUserData() {
@@ -2139,6 +2192,11 @@
             if (userData.ratings) ratings = userData.ratings;
             renderAll();
         }
+
+        // Initialize user profile on page load
+        setTimeout(() => {
+            window.setUser(currentUser);
+        }, 100);
 
         // ---------- SHARE FUNCTION ----------
         async function shareMovie(movie) {
@@ -2194,7 +2252,7 @@
         function openMobileMenu() {
             if (mobileSlideMenu) {
                 mobileSlideMenu.classList.add('active');
-                menuOverlay.classList.add('active');
+                if (menuOverlay) menuOverlay.classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
         }
@@ -2202,7 +2260,7 @@
         function closeMobileMenuFunc() {
             if (mobileSlideMenu) {
                 mobileSlideMenu.classList.remove('active');
-                menuOverlay.classList.remove('active');
+                if (menuOverlay) menuOverlay.classList.remove('active');
                 document.body.style.overflow = 'auto';
             }
         }
@@ -2218,23 +2276,31 @@
             
             heroMovie = movie;
             
-            heroVideoContainer.innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0" 
-                        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            `;
+            if (heroVideoContainer) {
+                heroVideoContainer.innerHTML = `
+                    <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0" 
+                            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                `;
+            }
             
-            heroTitle.textContent = movie.title;
-            heroDescription.textContent = movie.description || 'No description available';
+            if (heroTitle) heroTitle.textContent = movie.title;
+            if (heroDescription) heroDescription.textContent = movie.description || 'No description available';
             
-            heroPlayBtn.onclick = () => openVideoPlayer(movie.id);
-            heroAddBtn.onclick = () => addToMyList(movie.id);
+            if (heroPlayBtn) {
+                heroPlayBtn.onclick = () => openVideoPlayer(movie.id);
+            }
+            if (heroAddBtn) {
+                heroAddBtn.onclick = () => addToMyList(movie.id);
+            }
             
             if (heroTimeout) clearTimeout(heroTimeout);
             heroTimeout = setTimeout(() => {
-                heroVideoContainer.innerHTML = `
-                    <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=0&mute=1&controls=0&showinfo=0" 
-                            frameborder="0" allow="encrypted-media" allowfullscreen></iframe>
-                `;
+                if (heroVideoContainer) {
+                    heroVideoContainer.innerHTML = `
+                        <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=0&mute=1&controls=0&showinfo=0" 
+                                frameborder="0" allow="encrypted-media" allowfullscreen></iframe>
+                    `;
+                }
             }, 5000);
         }
 
@@ -2393,6 +2459,7 @@
         }
 
         function renderGenrePills(genresList) {
+            if (!genreFilters) return;
             genreFilters.innerHTML = '<span class="genre-pill active" data-genre="all">All</span>';
             genresList.sort().forEach(genre => {
                 if (typeof genre === 'string') {
@@ -2418,10 +2485,12 @@
                 if (movie.year) years.add(movie.year);
             });
             
-            yearFilter.innerHTML = '<option value="">All Years</option>';
-            Array.from(years).sort().reverse().forEach(year => {
-                yearFilter.innerHTML += `<option value="${year}">${year}</option>`;
-            });
+            if (yearFilter) {
+                yearFilter.innerHTML = '<option value="">All Years</option>';
+                Array.from(years).sort().reverse().forEach(year => {
+                    yearFilter.innerHTML += `<option value="${year}">${year}</option>`;
+                });
+            }
         }
 
         // ---------- UI STATE FUNCTIONS ----------
@@ -2478,8 +2547,10 @@
                         }
                     }
                     
-                    userProfiles[currentUser].ratingCount++;
-                    localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
+                    if (userProfiles[currentUser]) {
+                        userProfiles[currentUser].ratingCount = (userProfiles[currentUser].ratingCount || 0) + 1;
+                        localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
+                    }
                     
                     showNotification(`⭐ Rated ${rating} stars`);
                     addNotification(`You rated "${currentMovie?.title}" ${rating} stars`);
@@ -2503,8 +2574,10 @@
                     watchHistory.push(movieId);
                     localStorage.setItem('btffWatchHistory', JSON.stringify(watchHistory));
                     
-                    userProfiles[currentUser].watchCount++;
-                    localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
+                    if (userProfiles[currentUser]) {
+                        userProfiles[currentUser].watchCount = (userProfiles[currentUser].watchCount || 0) + 1;
+                        localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
+                    }
                     
                     aiRecommendations = generateAIRecommendations(movieId);
                     renderRecommendations();
@@ -2568,23 +2641,25 @@
             }
             
             currentMovie = movie;
-            videoModalTitle.textContent = episode ? `${movie.title} - ${episode}` : movie.title;
-            videoIframe.src = `https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&enablejsapi=1`;
-            videoModal.classList.add('active');
+            if (videoModalTitle) videoModalTitle.textContent = episode ? `${movie.title} - ${episode}` : movie.title;
+            if (videoIframe) videoIframe.src = `https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&enablejsapi=1`;
+            if (videoModal) videoModal.classList.add('active');
             document.body.style.overflow = 'hidden';
             
             setTimeout(() => {
                 updateProgress(movieId, 25);
             }, 30000);
             
-            videoModalAddBtn.innerHTML = isInMyList(movieId) ? 
-                '<i class="fas fa-check"></i> In My List' : 
-                '<i class="fas fa-plus"></i> My List';
+            if (videoModalAddBtn) {
+                videoModalAddBtn.innerHTML = isInMyList(movieId) ? 
+                    '<i class="fas fa-check"></i> In My List' : 
+                    '<i class="fas fa-plus"></i> My List';
+            }
         }
 
         function closeVideoPlayer() {
-            videoModal.classList.remove('active');
-            videoIframe.src = '';
+            if (videoModal) videoModal.classList.remove('active');
+            if (videoIframe) videoIframe.src = '';
             document.body.style.overflow = 'auto';
         }
 
@@ -2601,7 +2676,7 @@
             }
             
             updateDetailsModal(movie);
-            detailsModal.classList.add('active');
+            if (detailsModal) detailsModal.classList.add('active');
             document.body.style.overflow = 'hidden';
             
             if (trailerBackground && movie.youtubeId) {
@@ -2615,10 +2690,10 @@
         }
 
         function closeDetailsModalFunc() {
-            detailsModal.classList.remove('active');
+            if (detailsModal) detailsModal.classList.remove('active');
             document.body.style.overflow = 'auto';
             cinemaModeActive = false;
-            detailsModal.classList.remove('cinema-mode');
+            if (detailsModal) detailsModal.classList.remove('cinema-mode');
             if (trailerBackground) {
                 trailerBackground.innerHTML = '';
             }
@@ -2627,33 +2702,37 @@
         function toggleCinemaMode() {
             cinemaModeActive = !cinemaModeActive;
             if (cinemaModeActive) {
-                detailsModal.classList.add('cinema-mode');
-                cinemaModeBtn.innerHTML = '<i class="fas fa-times"></i> Exit Cinema';
+                if (detailsModal) detailsModal.classList.add('cinema-mode');
+                if (cinemaModeBtn) cinemaModeBtn.innerHTML = '<i class="fas fa-times"></i> Exit Cinema';
             } else {
-                detailsModal.classList.remove('cinema-mode');
-                cinemaModeBtn.innerHTML = '<i class="fas fa-film"></i> Cinema';
+                if (detailsModal) detailsModal.classList.remove('cinema-mode');
+                if (cinemaModeBtn) cinemaModeBtn.innerHTML = '<i class="fas fa-film"></i> Cinema';
             }
         }
 
         function updateDetailsModal(movie) {
             const thumb = `https://img.youtube.com/vi/${movie.youtubeId}/maxresdefault.jpg`;
-            detailsPoster.src = `https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg`;
-            detailsTitle.textContent = movie.title;
-            detailsMeta.innerHTML = `
-                <span>${movie.year || '2024'}</span>
-                <span>${movie.duration || '1h 30m'}</span>
-                <span>${movie.category}</span>
-                ${movie.genre ? `<span>${movie.genre}</span>` : ''}
-            `;
+            if (detailsPoster) detailsPoster.src = `https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg`;
+            if (detailsTitle) detailsTitle.textContent = movie.title;
+            if (detailsMeta) {
+                detailsMeta.innerHTML = `
+                    <span>${movie.year || '2024'}</span>
+                    <span>${movie.duration || '1h 30m'}</span>
+                    <span>${movie.category}</span>
+                    ${movie.genre ? `<span>${movie.genre}</span>` : ''}
+                `;
+            }
             
             const avgRating = getAverageRating(movie.id);
             const ratingCount = getRatingCount(movie.id);
             const fullStars = '★'.repeat(Math.floor(avgRating));
             const emptyStars = '☆'.repeat(5 - Math.floor(avgRating));
-            detailsRating.innerHTML = `
-                <span class="stars">${fullStars}${emptyStars}</span>
-                <span class="rating-value">${avgRating.toFixed(1)} (${ratingCount} ratings)</span>
-            `;
+            if (detailsRating) {
+                detailsRating.innerHTML = `
+                    <span class="stars">${fullStars}${emptyStars}</span>
+                    <span class="rating-value">${avgRating.toFixed(1)} (${ratingCount} ratings)</span>
+                `;
+            }
             
             const dist = getRatingDistribution(movie.id);
             const total = dist.reduce((a, b) => a + b, 0);
@@ -2682,18 +2761,20 @@
                     `;
                 }
             }
-            ratingDistribution.innerHTML = distHtml;
+            if (ratingDistribution) ratingDistribution.innerHTML = distHtml;
             
-            detailsDescription.textContent = movie.description || movie.desc || 'No description available';
-            detailsListBtn.innerHTML = isInMyList(movie.id) ? 
-                '<i class="fas fa-check"></i> In My List' : 
-                '<i class="fas fa-plus"></i> My List';
+            if (detailsDescription) detailsDescription.textContent = movie.description || movie.desc || 'No description available';
+            if (detailsListBtn) {
+                detailsListBtn.innerHTML = isInMyList(movie.id) ? 
+                    '<i class="fas fa-check"></i> In My List' : 
+                    '<i class="fas fa-plus"></i> My List';
+            }
             
             if (movie.type === 'series') {
-                seasonEpisodeContainer.style.display = 'block';
+                if (seasonEpisodeContainer) seasonEpisodeContainer.style.display = 'block';
                 renderEpisodes(movie);
             } else {
-                seasonEpisodeContainer.style.display = 'none';
+                if (seasonEpisodeContainer) seasonEpisodeContainer.style.display = 'none';
             }
             
             const similar = movies.filter(m => 
@@ -2707,13 +2788,17 @@
                 return Math.abs(ratingB - targetRating) - Math.abs(ratingA - targetRating);
             }).slice(0, 10);
             
-            moreLikeThisRow.innerHTML = '';
-            similar.forEach(m => {
-                moreLikeThisRow.appendChild(createMovieCard(m, true));
-            });
+            if (moreLikeThisRow) {
+                moreLikeThisRow.innerHTML = '';
+                similar.forEach(m => {
+                    moreLikeThisRow.appendChild(createMovieCard(m, true));
+                });
+            }
         }
 
         function renderEpisodes(movie) {
+            if (!seasonSelect || !episodeList) return;
+            
             const seasons = movie.seasons || 1;
             seasonSelect.innerHTML = '';
             for (let i = 1; i <= seasons; i++) {
@@ -2737,13 +2822,15 @@
 
         // ---------- SEARCH AND FILTER FUNCTIONS ----------
         function updateActiveFilters() {
-            activeFilters.innerHTML = '';
-            
-            if (categoryFilter.value) {
-                activeFilters.innerHTML += `<span class="filter-tag">${categoryFilter.value} <i class="fas fa-times" onclick="document.getElementById('categoryFilter').value=''; applyFilters();"></i></span>`;
-            }
-            if (yearFilter.value) {
-                activeFilters.innerHTML += `<span class="filter-tag">${yearFilter.value} <i class="fas fa-times" onclick="document.getElementById('yearFilter').value=''; applyFilters();"></i></span>`;
+            if (activeFilters) {
+                activeFilters.innerHTML = '';
+                
+                if (categoryFilter && categoryFilter.value) {
+                    activeFilters.innerHTML += `<span class="filter-tag">${categoryFilter.value} <i class="fas fa-times" onclick="document.getElementById('categoryFilter').value=''; applyFilters();"></i></span>`;
+                }
+                if (yearFilter && yearFilter.value) {
+                    activeFilters.innerHTML += `<span class="filter-tag">${yearFilter.value} <i class="fas fa-times" onclick="document.getElementById('yearFilter').value=''; applyFilters();"></i></span>`;
+                }
             }
         }
 
@@ -2913,13 +3000,15 @@
 
         function renderRecommendations() {
             if (aiRecommendations.length > 0) {
-                recommendationsRow.innerHTML = '';
-                aiRecommendations.forEach(m => {
-                    recommendationsRow.appendChild(createMovieCard(m, true));
-                });
-                recommendationsSection.style.display = 'block';
+                if (recommendationsRow) {
+                    recommendationsRow.innerHTML = '';
+                    aiRecommendations.forEach(m => {
+                        recommendationsRow.appendChild(createMovieCard(m, true));
+                    });
+                }
+                if (recommendationsSection) recommendationsSection.style.display = 'block';
             } else {
-                recommendationsSection.style.display = 'none';
+                if (recommendationsSection) recommendationsSection.style.display = 'none';
             }
         }
 
@@ -2941,33 +3030,35 @@
 
             filteredMovies.forEach(movie => {
                 if (movie.category === 'trending') {
-                    trendingRow.appendChild(createMovieCard(movie));
+                    if (trendingRow) trendingRow.appendChild(createMovieCard(movie));
                 }
             });
             
             filteredMovies.forEach(movie => {
                 if (movie.category === 'popular') {
-                    popularRow.appendChild(createMovieCard(movie));
+                    if (popularRow) popularRow.appendChild(createMovieCard(movie));
                 }
             });
             
             filteredMovies.forEach(movie => {
                 if (movie.category === 'recent') {
-                    recentRow.appendChild(createMovieCard(movie));
+                    if (recentRow) recentRow.appendChild(createMovieCard(movie));
                 }
             });
 
-            comingSoonMovies.forEach(movie => {
-                comingSoonRow.appendChild(createMovieCard(movie));
-            });
+            if (comingSoonMovies && comingSoonRow) {
+                comingSoonMovies.forEach(movie => {
+                    comingSoonRow.appendChild(createMovieCard(movie));
+                });
+            }
 
-            if (trendingRow.children.length === 0) {
+            if (trendingRow && trendingRow.children.length === 0) {
                 trendingRow.innerHTML = '<div class="empty-row">No trending movies</div>';
             }
-            if (popularRow.children.length === 0) {
+            if (popularRow && popularRow.children.length === 0) {
                 popularRow.innerHTML = '<div class="empty-row">No popular movies</div>';
             }
-            if (recentRow.children.length === 0) {
+            if (recentRow && recentRow.children.length === 0) {
                 recentRow.innerHTML = '<div class="empty-row">No recent movies</div>';
             }
 
@@ -2975,7 +3066,7 @@
             renderContinueWatchingRow();
             renderRecommendations();
 
-            const totalVisible = trendingRow.children.length + popularRow.children.length + recentRow.children.length;
+            const totalVisible = (trendingRow?.children.length || 0) + (popularRow?.children.length || 0) + (recentRow?.children.length || 0);
             if (searchCount) {
                 if (searchInput?.value) {
                     searchCount.textContent = `${totalVisible} movies found`;
@@ -2986,14 +3077,15 @@
         }
 
         function renderMyListRow() {
+            if (!myListRow) return;
             clearRow(myListRow);
             
             if (myList.length === 0) {
-                myListSection.style.display = 'none';
+                if (myListSection) myListSection.style.display = 'none';
                 return;
             }
             
-            myListSection.style.display = 'block';
+            if (myListSection) myListSection.style.display = 'block';
             
             const myMovies = movies.filter(m => myList.includes(m.id));
             myMovies.forEach(movie => {
@@ -3002,14 +3094,15 @@
         }
 
         function renderContinueWatchingRow() {
+            if (!continueWatchingRow) return;
             clearRow(continueWatchingRow);
             
             if (continueWatching.length === 0) {
-                continueWatchingSection.style.display = 'none';
+                if (continueWatchingSection) continueWatchingSection.style.display = 'none';
                 return;
             }
             
-            continueWatchingSection.style.display = 'block';
+            if (continueWatchingSection) continueWatchingSection.style.display = 'block';
             
             const sorted = [...continueWatching].sort((a, b) => b.timestamp - a.timestamp);
             sorted.forEach(item => {
@@ -3043,8 +3136,8 @@
                 const data = await response.json();
                 if (data.success) {
                     partyId = data.partyId;
-                    partyLinkInput.value = window.location.href + '?party=' + partyId;
-                    watchPartyModal.classList.add('active');
+                    if (partyLinkInput) partyLinkInput.value = window.location.href + '?party=' + partyId;
+                    if (watchPartyModal) watchPartyModal.classList.add('active');
                     addChatMessage('System', 'Party created! Share the link with friends.');
                     startPartyPolling(partyId);
                 }
@@ -3067,7 +3160,7 @@
                 });
                 
                 const data = await response.json();
-                if (data.success && data.messages) {
+                if (data.success && data.messages && chatBox) {
                     chatBox.innerHTML = '';
                     data.messages.forEach(msg => {
                         addChatMessage(msg.userId === userId ? 'You' : 'Friend', msg.message);
@@ -3086,13 +3179,14 @@
                     method: 'GET',
                     mode: 'cors'
                 });
-                chatInput.value = '';
+                if (chatInput) chatInput.value = '';
             } catch (error) {
                 console.error('Error sending message:', error);
             }
         }
 
         function addChatMessage(user, message) {
+            if (!chatBox) return;
             const msgDiv = document.createElement('div');
             msgDiv.className = 'chat-message';
             msgDiv.innerHTML = `<strong>${user}:</strong> ${message}`;
@@ -3109,13 +3203,13 @@
             switch(key) {
                 case ' ':
                     e.preventDefault();
-                    if (videoModal.classList.contains('active')) {
+                    if (videoModal && videoModal.classList.contains('active') && videoIframe) {
                         videoIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
                     }
                     break;
                 case 'f':
                     e.preventDefault();
-                    if (videoModal.classList.contains('active')) {
+                    if (videoModal && videoModal.classList.contains('active')) {
                         if (document.fullscreenElement) {
                             document.exitFullscreen();
                         } else {
@@ -3125,49 +3219,55 @@
                     break;
                 case 'arrowright':
                     e.preventDefault();
-                    if (videoModal.classList.contains('active')) {
+                    if (videoModal && videoModal.classList.contains('active') && videoIframe) {
                         videoIframe.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[' + (Date.now() + 10) + ']}', '*');
                     }
                     break;
                 case 'arrowleft':
                     e.preventDefault();
-                    if (videoModal.classList.contains('active')) {
+                    if (videoModal && videoModal.classList.contains('active') && videoIframe) {
                         videoIframe.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[' + (Date.now() - 10) + ']}', '*');
                     }
                     break;
                 case 'm':
                     e.preventDefault();
-                    if (videoModal.classList.contains('active')) {
+                    if (videoModal && videoModal.classList.contains('active') && videoIframe) {
                         videoIframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
                     }
                     break;
                 case 'escape':
-                    if (videoModal.classList.contains('active')) {
+                    if (videoModal && videoModal.classList.contains('active')) {
                         closeVideoPlayer();
                     }
-                    if (detailsModal.classList.contains('active')) {
+                    if (detailsModal && detailsModal.classList.contains('active')) {
                         closeDetailsModalFunc();
                     }
-                    if (ratingModal.classList.contains('active')) {
+                    if (ratingModal && ratingModal.classList.contains('active')) {
                         ratingModal.classList.remove('active');
                     }
-                    if (watchPartyModal.classList.contains('active')) {
+                    if (watchPartyModal && watchPartyModal.classList.contains('active')) {
                         watchPartyModal.classList.remove('active');
                     }
-                    if (shortcutsModal.classList.contains('active')) {
+                    if (shortcutsModal && shortcutsModal.classList.contains('active')) {
                         shortcutsModal.classList.remove('active');
+                    }
+                    if (profileModal && profileModal.style.display === 'flex') {
+                        profileModal.style.display = 'none';
+                    }
+                    if (switchUserModal && switchUserModal.style.display === 'flex') {
+                        switchUserModal.style.display = 'none';
                     }
                     closeMobileMenuFunc();
                     break;
                 case 'c':
                     e.preventDefault();
-                    if (detailsModal.classList.contains('active')) {
+                    if (detailsModal && detailsModal.classList.contains('active')) {
                         toggleCinemaMode();
                     }
                     break;
                 case 'p':
                     e.preventDefault();
-                    if (detailsModal.classList.contains('active') && currentMovie) {
+                    if (detailsModal && detailsModal.classList.contains('active') && currentMovie) {
                         createWatchParty();
                     }
                     break;
@@ -3205,10 +3305,10 @@
                 if (searchContainer) {
                     if (searchContainer.style.display === 'none') {
                         searchContainer.style.display = 'block';
-                        categoryFilter.value = '';
-                        yearFilter.value = '';
-                        sortFilter.value = 'default';
-                        searchInput.value = '';
+                        if (categoryFilter) categoryFilter.value = '';
+                        if (yearFilter) yearFilter.value = '';
+                        if (sortFilter) sortFilter.value = 'default';
+                        if (searchInput) searchInput.value = '';
                         applyFilters();
                     } else {
                         searchContainer.style.display = 'none';
@@ -3240,13 +3340,13 @@
                 closeVideoPlayer();
                 setActiveCategory('all');
                 document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex');
-                trendingRow.style.display = 'flex';
-                popularRow.style.display = 'flex';
-                recentRow.style.display = 'flex';
+                if (trendingRow) trendingRow.style.display = 'flex';
+                if (popularRow) popularRow.style.display = 'flex';
+                if (recentRow) recentRow.style.display = 'flex';
                 if (myList.length === 0) {
-                    myListSection.style.display = 'none';
+                    if (myListSection) myListSection.style.display = 'none';
                 } else {
-                    myListSection.style.display = 'block';
+                    if (myListSection) myListSection.style.display = 'block';
                 }
                 closeMobileMenuFunc();
             });
@@ -3259,13 +3359,15 @@
 
         if (profileIcon) {
             profileIcon.addEventListener('click', () => {
-                profileModal.style.display = 'flex';
+                if (profileModal) profileModal.style.display = 'flex';
             });
         }
 
         if (languageIcon) {
             languageIcon.addEventListener('click', () => {
-                languageSelector.style.display = languageSelector.style.display === 'none' ? 'block' : 'none';
+                if (languageSelector) {
+                    languageSelector.style.display = languageSelector.style.display === 'none' ? 'block' : 'none';
+                }
             });
         }
 
@@ -3273,7 +3375,7 @@
             languageSelect.addEventListener('change', (e) => {
                 currentLanguage = e.target.value;
                 updateUILanguage();
-                languageSelector.style.display = 'none';
+                if (languageSelector) languageSelector.style.display = 'none';
             });
         }
 
@@ -3291,22 +3393,22 @@
                             header.style.display = 'none';
                         }
                     });
-                    trendingRow.style.display = 'none';
-                    popularRow.style.display = 'none';
-                    recentRow.style.display = 'none';
-                    myListSection.style.display = myList.length ? 'block' : 'none';
+                    if (trendingRow) trendingRow.style.display = 'none';
+                    if (popularRow) popularRow.style.display = 'none';
+                    if (recentRow) recentRow.style.display = 'none';
+                    if (myListSection) myListSection.style.display = myList.length ? 'block' : 'none';
                 } else if (category === 'all') {
                     document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex');
-                    trendingRow.style.display = 'flex';
-                    popularRow.style.display = 'flex';
-                    recentRow.style.display = 'flex';
-                    myListSection.style.display = myList.length ? 'block' : 'none';
+                    if (trendingRow) trendingRow.style.display = 'flex';
+                    if (popularRow) popularRow.style.display = 'flex';
+                    if (recentRow) recentRow.style.display = 'flex';
+                    if (myListSection) myListSection.style.display = myList.length ? 'block' : 'none';
                 } else {
                     document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex');
-                    trendingRow.style.display = category === 'trending' ? 'flex' : 'none';
-                    popularRow.style.display = category === 'popular' ? 'flex' : 'none';
-                    recentRow.style.display = category === 'recent' ? 'flex' : 'none';
-                    myListSection.style.display = 'none';
+                    if (trendingRow) trendingRow.style.display = category === 'trending' ? 'flex' : 'none';
+                    if (popularRow) popularRow.style.display = category === 'popular' ? 'flex' : 'none';
+                    if (recentRow) recentRow.style.display = category === 'recent' ? 'flex' : 'none';
+                    if (myListSection) myListSection.style.display = 'none';
                 }
             });
         });
@@ -3341,9 +3443,11 @@
             videoModalAddBtn.addEventListener('click', () => {
                 if (currentMovie) {
                     toggleMyList(currentMovie.id);
-                    videoModalAddBtn.innerHTML = isInMyList(currentMovie.id) ? 
-                        '<i class="fas fa-check"></i> In My List' : 
-                        '<i class="fas fa-plus"></i> My List';
+                    if (videoModalAddBtn) {
+                        videoModalAddBtn.innerHTML = isInMyList(currentMovie.id) ? 
+                            '<i class="fas fa-check"></i> In My List' : 
+                            '<i class="fas fa-plus"></i> My List';
+                    }
                 }
             });
         }
@@ -3356,7 +3460,7 @@
 
         if (postCommentBtn) {
             postCommentBtn.addEventListener('click', () => {
-                if (currentMovie) addComment(currentMovie.id, commentInput.value);
+                if (currentMovie && commentInput) addComment(currentMovie.id, commentInput.value);
             });
         }
 
@@ -3384,8 +3488,8 @@
                 myList = [];
                 saveMyList();
                 showNotification('🗑️ My List cleared');
-                if (document.querySelector('[data-category="myList"]').classList.contains('active')) {
-                    myListSection.style.display = 'none';
+                if (document.querySelector('[data-category="myList"]')?.classList.contains('active')) {
+                    if (myListSection) myListSection.style.display = 'none';
                 }
             });
         }
@@ -3424,9 +3528,11 @@
             detailsListBtn.addEventListener('click', () => {
                 if (currentMovie) {
                     toggleMyList(currentMovie.id);
-                    detailsListBtn.innerHTML = isInMyList(currentMovie.id) ? 
-                        '<i class="fas fa-check"></i> In My List' : 
-                        '<i class="fas fa-plus"></i> My List';
+                    if (detailsListBtn) {
+                        detailsListBtn.innerHTML = isInMyList(currentMovie.id) ? 
+                            '<i class="fas fa-check"></i> In My List' : 
+                            '<i class="fas fa-plus"></i> My List';
+                    }
                 }
             });
         }
@@ -3437,15 +3543,17 @@
 
         if (copyPartyLink) {
             copyPartyLink.addEventListener('click', () => {
-                partyLinkInput.select();
-                document.execCommand('copy');
-                showNotification('✅ Link copied to clipboard');
+                if (partyLinkInput) {
+                    partyLinkInput.select();
+                    document.execCommand('copy');
+                    showNotification('✅ Link copied to clipboard');
+                }
             });
         }
 
         if (sendChat) {
             sendChat.addEventListener('click', () => {
-                sendChatMessage(chatInput.value);
+                if (chatInput) sendChatMessage(chatInput.value);
             });
         }
 
@@ -3459,37 +3567,37 @@
 
         if (closePartyModal) {
             closePartyModal.addEventListener('click', () => {
-                watchPartyModal.classList.remove('active');
+                if (watchPartyModal) watchPartyModal.classList.remove('active');
             });
         }
 
         if (shortcutsIcon) {
             shortcutsIcon.addEventListener('click', () => {
-                shortcutsModal.classList.add('active');
+                if (shortcutsModal) shortcutsModal.classList.add('active');
             });
         }
 
         if (closeShortcuts) {
             closeShortcuts.addEventListener('click', () => {
-                shortcutsModal.classList.remove('active');
+                if (shortcutsModal) shortcutsModal.classList.remove('active');
             });
         }
 
         if (closeProfileModal) {
             closeProfileModal.addEventListener('click', () => {
-                profileModal.style.display = 'none';
+                if (profileModal) profileModal.style.display = 'none';
             });
         }
 
         if (closeSwitchUserModal) {
             closeSwitchUserModal.addEventListener('click', () => {
-                switchUserModal.style.display = 'none';
+                if (switchUserModal) switchUserModal.style.display = 'none';
             });
         }
 
         if (rateMovieBtn) {
             rateMovieBtn.addEventListener('click', () => {
-                ratingModal.classList.add('active');
+                if (ratingModal) ratingModal.classList.add('active');
                 currentRating = 0;
                 document.querySelectorAll('.rating-stars i').forEach(star => {
                     star.className = 'far fa-star';
@@ -3531,28 +3639,28 @@
             submitRating.addEventListener('click', () => {
                 if (currentRating > 0 && currentMovie) {
                     addRating(currentMovie.id, currentRating);
-                    ratingModal.classList.remove('active');
+                    if (ratingModal) ratingModal.classList.remove('active');
                 }
             });
         }
 
         if (closeRatingModal) {
             closeRatingModal.addEventListener('click', () => {
-                ratingModal.classList.remove('active');
+                if (ratingModal) ratingModal.classList.remove('active');
             });
         }
 
         window.addEventListener('click', (e) => {
             if (e.target === detailsModal) closeDetailsModalFunc();
             if (e.target === videoModal) closeVideoPlayer();
-            if (e.target === ratingModal) ratingModal.classList.remove('active');
-            if (e.target === watchPartyModal) watchPartyModal.classList.remove('active');
-            if (e.target === shortcutsModal) shortcutsModal.classList.remove('active');
-            if (e.target === profileModal) profileModal.style.display = 'none';
-            if (e.target === switchUserModal) switchUserModal.style.display = 'none';
+            if (e.target === ratingModal && ratingModal) ratingModal.classList.remove('active');
+            if (e.target === watchPartyModal && watchPartyModal) watchPartyModal.classList.remove('active');
+            if (e.target === shortcutsModal && shortcutsModal) shortcutsModal.classList.remove('active');
+            if (e.target === profileModal && profileModal) profileModal.style.display = 'none';
+            if (e.target === switchUserModal && switchUserModal) switchUserModal.style.display = 'none';
             if (e.target === notificationsPanel) e.stopPropagation();
-            if (!e.target.closest('.notifications-panel') && e.target !== notificationIcon && notificationsPanel.style.display === 'block') {
-                notificationsPanel.style.display = 'none';
+            if (!e.target.closest('.notifications-panel') && e.target !== notificationIcon && notificationsPanel?.style.display === 'block') {
+                if (notificationsPanel) notificationsPanel.style.display = 'none';
             }
         });
 
@@ -3560,25 +3668,25 @@
 
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (detailsModal.classList.contains('active')) {
+                if (detailsModal && detailsModal.classList.contains('active')) {
                     closeDetailsModalFunc();
                 }
-                if (videoModal.classList.contains('active')) {
+                if (videoModal && videoModal.classList.contains('active')) {
                     closeVideoPlayer();
                 }
-                if (ratingModal.classList.contains('active')) {
+                if (ratingModal && ratingModal.classList.contains('active')) {
                     ratingModal.classList.remove('active');
                 }
-                if (watchPartyModal.classList.contains('active')) {
+                if (watchPartyModal && watchPartyModal.classList.contains('active')) {
                     watchPartyModal.classList.remove('active');
                 }
-                if (shortcutsModal.classList.contains('active')) {
+                if (shortcutsModal && shortcutsModal.classList.contains('active')) {
                     shortcutsModal.classList.remove('active');
                 }
-                if (profileModal.style.display === 'flex') {
+                if (profileModal && profileModal.style.display === 'flex') {
                     profileModal.style.display = 'none';
                 }
-                if (switchUserModal.style.display === 'flex') {
+                if (switchUserModal && switchUserModal.style.display === 'flex') {
                     switchUserModal.style.display = 'none';
                 }
                 closeMobileMenuFunc();
@@ -3600,24 +3708,21 @@
         if (partyParam) {
             partyId = partyParam;
             setTimeout(() => {
-                watchPartyModal.classList.add('active');
+                if (watchPartyModal) watchPartyModal.classList.add('active');
                 addChatMessage('System', 'You joined the watch party!');
                 startPartyPolling(partyId);
             }, 1000);
         }
 
         // Initialize user profile
-        setUser(currentUser);
+        setTimeout(() => {
+            window.setUser(currentUser);
+        }, 100);
 
         // Start
         fetchMovies();
         fetchContinueWatching();
         updateNotificationsBadge();
-
-        // Make functions available globally
-        window.findSimilarByMood = findSimilarByMood;
-        window.switchUser = setUser;
-        window.exitKidsMode = exitKidsMode;
     })();
 </script>
 </body>

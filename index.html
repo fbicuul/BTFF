@@ -1785,6 +1785,51 @@
         // ---------- CONFIGURATION ----------
         const APPS_SCRIPT_URL = '%%APPS_SCRIPT_URL%%';
         
+        // ===== SESSION MANAGEMENT FOR USERS =====
+        let currentSessionToken = localStorage.getItem('btff_session_token');
+
+        async function initSession() {
+            if (!currentSessionToken) {
+                // Create new anonymous session
+                currentSessionToken = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
+                localStorage.setItem('btff_session_token', currentSessionToken);
+            }
+            return currentSessionToken;
+        }
+
+        // Wrapper for API calls
+        async function apiCall(action, data = {}, method = 'GET') {
+            await initSession();
+            
+            let url = `/api/proxy?action=${action}&sessionToken=${currentSessionToken}&t=${Date.now()}`;
+            
+            if (method === 'GET') {
+                Object.keys(data).forEach(key => {
+                    url += `&${key}=${encodeURIComponent(data[key])}`;
+                });
+            }
+            
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+            
+            if (method === 'POST') {
+                options.body = JSON.stringify(data);
+            }
+            
+            try {
+                const response = await fetch(url, options);
+                const text = await response.text();
+                return JSON.parse(text);
+            } catch (error) {
+                console.error('API call failed:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
         // ---------- STATE ----------
         let movies = [];
         let myList = JSON.parse(localStorage.getItem('btffMyList')) || [];
@@ -2050,18 +2095,25 @@
             }
         }
 
-        function addComment(movieId, text) {
+        async function addComment(movieId, text) {
             if (!text.trim()) return;
             
-            if (!comments[movieId]) comments[movieId] = [];
-            comments[movieId].push({
-                user: currentUser,
-                text: text,
-                timestamp: new Date().toISOString()
-            });
-            localStorage.setItem('btffComments', JSON.stringify(comments));
-            loadComments(movieId);
-            if (commentInput) commentInput.value = '';
+            const data = await apiCall('addComment', {
+                movieId: movieId,
+                comment: text
+            }, 'POST');
+            
+            if (data.success) {
+                if (!comments[movieId]) comments[movieId] = [];
+                comments[movieId].push({
+                    user: currentUser,
+                    text: text,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('btffComments', JSON.stringify(comments));
+                loadComments(movieId);
+                if (commentInput) commentInput.value = '';
+            }
         }
 
         // ---------- NOTIFICATIONS ----------
@@ -2308,20 +2360,7 @@
                 showLoading(true);
                 hideError();
                 
-                const response = await fetch(APPS_SCRIPT_URL + '?action=getMovies&t=' + Date.now(), {
-                    method: 'GET',
-                    mode: 'cors'
-                });
-                
-                const text = await response.text();
-                
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    console.error('JSON parse error:', e);
-                    throw new Error('Invalid JSON response');
-                }
+                const data = await apiCall('getMovies');
                 
                 if (data.success && Array.isArray(data.movies)) {
                     movies = data.movies;
@@ -2360,87 +2399,63 @@
         }
 
         async function fetchAllRatings() {
-            try {
-                const response = await fetch(APPS_SCRIPT_URL + '?action=getRatings&t=' + Date.now(), {
-                    method: 'GET',
-                    mode: 'cors'
+            const data = await apiCall('getRatings');
+            
+            if (data.success && data.ratings) {
+                const ratingsMap = {};
+                const distributionsMap = {};
+                
+                data.ratings.forEach(r => {
+                    if (!ratingsMap[r.movieId]) {
+                        ratingsMap[r.movieId] = [];
+                    }
+                    ratingsMap[r.movieId].push(parseInt(r.rating));
                 });
                 
-                const data = await response.json();
-                if (data.success && data.ratings) {
-                    const ratingsMap = {};
-                    const distributionsMap = {};
-                    
-                    data.ratings.forEach(r => {
-                        if (!ratingsMap[r.movieId]) {
-                            ratingsMap[r.movieId] = [];
-                        }
-                        ratingsMap[r.movieId].push(parseInt(r.rating));
+                Object.keys(ratingsMap).forEach(movieId => {
+                    const movieRatings = ratingsMap[movieId];
+                    const distribution = [0, 0, 0, 0, 0];
+                    movieRatings.forEach(r => {
+                        if (r >= 1 && r <= 5) distribution[r-1]++;
                     });
-                    
-                    Object.keys(ratingsMap).forEach(movieId => {
-                        const movieRatings = ratingsMap[movieId];
-                        const distribution = [0, 0, 0, 0, 0];
-                        movieRatings.forEach(r => {
-                            if (r >= 1 && r <= 5) distribution[r-1]++;
-                        });
-                        distributionsMap[movieId] = distribution;
-                    });
-                    
-                    ratings = ratingsMap;
-                    ratingDistributions = distributionsMap;
-                    localStorage.setItem('btffRatings', JSON.stringify(ratings));
-                }
-            } catch (error) {
-                console.error('Error fetching ratings:', error);
+                    distributionsMap[movieId] = distribution;
+                });
+                
+                ratings = ratingsMap;
+                ratingDistributions = distributionsMap;
+                localStorage.setItem('btffRatings', JSON.stringify(ratings));
             }
         }
 
         async function fetchMovieRatings(movieId) {
-            try {
-                const response = await fetch(APPS_SCRIPT_URL + '?action=getMovieRatings&movieId=' + movieId + '&t=' + Date.now(), {
-                    method: 'GET',
-                    mode: 'cors'
-                });
+            const data = await apiCall('getMovieRatings', { movieId: movieId });
+            
+            if (data.success) {
+                ratings[movieId] = data.ratings || [];
                 
-                const data = await response.json();
-                if (data.success) {
-                    ratings[movieId] = data.ratings || [];
-                    
-                    const distribution = [0, 0, 0, 0, 0];
-                    (data.ratings || []).forEach(r => {
-                        if (r >= 1 && r <= 5) distribution[r-1]++;
-                    });
-                    ratingDistributions[movieId] = distribution;
-                    
-                    localStorage.setItem('btffRatings', JSON.stringify(ratings));
-                    return data;
-                }
-            } catch (error) {
-                console.error('Error fetching movie ratings:', error);
+                const distribution = [0, 0, 0, 0, 0];
+                (data.ratings || []).forEach(r => {
+                    if (r >= 1 && r <= 5) distribution[r-1]++;
+                });
+                ratingDistributions[movieId] = distribution;
+                
+                localStorage.setItem('btffRatings', JSON.stringify(ratings));
+                return data;
             }
             return null;
         }
 
         async function fetchContinueWatching() {
-            try {
-                const response = await fetch(APPS_SCRIPT_URL + '?action=getContinueWatching&userId=' + userId + '&t=' + Date.now(), {
-                    method: 'GET',
-                    mode: 'cors'
-                });
-                
-                const data = await response.json();
-                if (data.success && data.continueWatching) {
-                    continueWatching = data.continueWatching.map(item => ({
-                        id: item.movieId,
-                        progress: parseInt(item.progress),
-                        timestamp: new Date(item.lastWatched).getTime()
-                    }));
-                    localStorage.setItem('btffContinueWatching', JSON.stringify(continueWatching));
-                    renderContinueWatchingRow();
-                }
-            } catch (error) {
-                console.error('Error fetching continue watching:', error);
+            const data = await apiCall('getContinueWatching', { userId: userId });
+            
+            if (data.success && data.continueWatching) {
+                continueWatching = data.continueWatching.map(item => ({
+                    id: item.movieId,
+                    progress: parseInt(item.progress),
+                    timestamp: new Date(item.lastWatched).getTime()
+                }));
+                localStorage.setItem('btffContinueWatching', JSON.stringify(continueWatching));
+                renderContinueWatchingRow();
             }
         }
 
@@ -2529,43 +2544,40 @@
         }
 
         async function addRating(movieId, rating) {
-            try {
-                const response = await fetch(APPS_SCRIPT_URL + '?action=addRating&movieId=' + movieId + '&rating=' + rating + '&userId=' + userId + '&t=' + Date.now(), {
-                    method: 'GET',
-                    mode: 'cors'
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    await fetchAllRatings();
-                    if (currentMovie && currentMovie.id == movieId) {
-                        const ratingData = await fetchMovieRatings(movieId);
-                        if (ratingData) {
-                            updateDetailsModal(currentMovie);
-                        }
+            const data = await apiCall('addRating', { 
+                movieId: movieId, 
+                rating: rating 
+            }, 'POST');
+            
+            if (data.success) {
+                await fetchAllRatings();
+                if (currentMovie && currentMovie.id == movieId) {
+                    const ratingData = await fetchMovieRatings(movieId);
+                    if (ratingData) {
+                        updateDetailsModal(currentMovie);
                     }
-                    
-                    if (userProfiles[currentUser]) {
-                        userProfiles[currentUser].ratingCount = (userProfiles[currentUser].ratingCount || 0) + 1;
-                        localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
-                    }
-                    
-                    showNotification(`⭐ Rated ${rating} stars`);
-                    addNotification(`You rated "${currentMovie?.title}" ${rating} stars`);
                 }
-            } catch (error) {
-                console.error('Error adding rating:', error);
+                
+                if (userProfiles[currentUser]) {
+                    userProfiles[currentUser].ratingCount = (userProfiles[currentUser].ratingCount || 0) + 1;
+                    localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
+                }
+                
+                showNotification(`⭐ Rated ${rating} stars`);
+                addNotification(`You rated "${currentMovie?.title}" ${rating} stars`);
+            } else {
                 showNotification('Failed to submit rating');
             }
         }
 
         // ---------- CONTINUE WATCHING FUNCTIONS ----------
         async function updateProgress(movieId, progress) {
-            try {
-                await fetch(APPS_SCRIPT_URL + '?action=updateProgress&movieId=' + movieId + '&progress=' + progress + '&userId=' + userId + '&t=' + Date.now(), {
-                    method: 'GET',
-                    mode: 'cors'
-                });
+            const data = await apiCall('updateProgress', {
+                movieId: movieId,
+                progress: progress
+            }, 'POST');
+            
+            if (data.success) {
                 await fetchContinueWatching();
                 
                 if (!watchHistory.includes(movieId)) {
@@ -2580,8 +2592,6 @@
                     aiRecommendations = generateAIRecommendations(movieId);
                     renderRecommendations();
                 }
-            } catch (error) {
-                console.error('Error updating progress:', error);
             }
         }
 
@@ -3125,22 +3135,16 @@
         async function createWatchParty() {
             if (!currentMovie) return;
             
-            try {
-                const response = await fetch(APPS_SCRIPT_URL + '?action=createParty&movieId=' + currentMovie.id + '&userId=' + userId + '&t=' + Date.now(), {
-                    method: 'GET',
-                    mode: 'cors'
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    partyId = data.partyId;
-                    if (partyLinkInput) partyLinkInput.value = window.location.href + '?party=' + partyId;
-                    if (watchPartyModal) watchPartyModal.classList.add('active');
-                    addChatMessage('System', 'Party created! Share the link with friends.');
-                    startPartyPolling(partyId);
-                }
-            } catch (error) {
-                console.error('Error creating party:', error);
+            const data = await apiCall('createParty', {
+                movieId: currentMovie.id
+            }, 'POST');
+            
+            if (data.success) {
+                partyId = data.partyId;
+                if (partyLinkInput) partyLinkInput.value = window.location.href + '?party=' + partyId;
+                if (watchPartyModal) watchPartyModal.classList.add('active');
+                addChatMessage('System', 'Party created! Share the link with friends.');
+                startPartyPolling(partyId);
             }
         }
 
@@ -3151,35 +3155,26 @@
         }
 
         async function fetchMessages(partyId) {
-            try {
-                const response = await fetch(APPS_SCRIPT_URL + '?action=getMessages&partyId=' + partyId + '&t=' + Date.now(), {
-                    method: 'GET',
-                    mode: 'cors'
+            const data = await apiCall('getMessages', { partyId: partyId });
+            
+            if (data.success && data.messages && chatBox) {
+                chatBox.innerHTML = '';
+                data.messages.forEach(msg => {
+                    addChatMessage(msg.userId === userId ? 'You' : 'Friend', msg.message);
                 });
-                
-                const data = await response.json();
-                if (data.success && data.messages && chatBox) {
-                    chatBox.innerHTML = '';
-                    data.messages.forEach(msg => {
-                        addChatMessage(msg.userId === userId ? 'You' : 'Friend', msg.message);
-                    });
-                }
-            } catch (error) {
-                console.error('Error fetching messages:', error);
             }
         }
 
         async function sendChatMessage(message) {
             if (!partyId || !message.trim()) return;
             
-            try {
-                await fetch(APPS_SCRIPT_URL + '?action=sendMessage&partyId=' + partyId + '&userId=' + userId + '&message=' + encodeURIComponent(message) + '&t=' + Date.now(), {
-                    method: 'GET',
-                    mode: 'cors'
-                });
-                if (chatInput) chatInput.value = '';
-            } catch (error) {
-                console.error('Error sending message:', error);
+            const data = await apiCall('sendMessage', {
+                partyId: partyId,
+                message: message
+            }, 'POST');
+            
+            if (data.success && chatInput) {
+                chatInput.value = '';
             }
         }
 
@@ -3494,17 +3489,12 @@
 
         if (clearProgress) {
             clearProgress.addEventListener('click', async () => {
-                try {
-                    await fetch(APPS_SCRIPT_URL + '?action=clearProgress&userId=' + userId + '&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
+                const data = await apiCall('clearProgress', { userId: userId }, 'POST');
+                if (data.success) {
                     continueWatching = [];
                     localStorage.setItem('btffContinueWatching', JSON.stringify(continueWatching));
                     renderContinueWatchingRow();
                     showNotification('🗑️ Continue watching cleared');
-                } catch (error) {
-                    console.error('Error clearing progress:', error);
                 }
             });
         }
@@ -3717,10 +3707,12 @@
             window.setUser(currentUser);
         }, 100);
 
-        // Start
-        fetchMovies();
-        fetchContinueWatching();
-        updateNotificationsBadge();
+        // Initialize session and start
+        initSession().then(() => {
+            fetchMovies();
+            fetchContinueWatching();
+            updateNotificationsBadge();
+        });
     })();
 </script>
 </body>

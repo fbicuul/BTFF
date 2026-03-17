@@ -726,6 +726,18 @@
             transform: translateX(0);
         }
 
+        .notification.error {
+            background: var(--danger);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.warning {
+            background: var(--warning);
+        }
+
         /* ===== LOADING ===== */
         .loading-overlay {
             display: none;
@@ -1186,10 +1198,11 @@
 
     <script>
         (function() {
-            // ---------- CONFIGURATION ----------
+            // ========== CONFIGURATION ==========
+            // This will be replaced by environment variable
             const APPS_SCRIPT_URL = '%%APPS_SCRIPT_URL%%';
             
-            // ---------- STATE ----------
+            // ========== STATE ==========
             let movies = [];
             let ratings = [];
             let watchHistory = [];
@@ -1207,6 +1220,7 @@
             let charts = {};
             let isAuthenticated = false;
             let currentAdmin = null;
+            let sessionToken = null;
 
             // DOM elements
             const loginContainer = document.getElementById('loginContainer');
@@ -1242,45 +1256,173 @@
             const notification = document.getElementById('notification');
             const loadingOverlay = document.getElementById('loadingOverlay');
 
-            // ---------- SESSION MANAGEMENT ----------
-            function saveSession(admin, view) {
-                localStorage.setItem('btffAdminSession', JSON.stringify({
-                    isAuthenticated: true,
-                    admin: admin,
-                    currentView: view || 'dashboard',
-                    timestamp: new Date().getTime()
-                }));
+            // ========== SESSION MANAGEMENT ==========
+            function getSessionToken() {
+                return localStorage.getItem('btff_admin_session');
             }
 
-            function loadSession() {
-                const session = localStorage.getItem('btffAdminSession');
-                if (session) {
-                    try {
-                        const data = JSON.parse(session);
-                        const age = new Date().getTime() - data.timestamp;
-                        if (age < 24 * 60 * 60 * 1000) {
-                            isAuthenticated = data.isAuthenticated;
-                            currentAdmin = data.admin;
-                            currentView = data.currentView || 'dashboard';
-                            return true;
-                        } else {
-                            clearSession();
-                        }
-                    } catch (e) {
-                        console.error('Error loading session:', e);
-                    }
+            function setSessionToken(token) {
+                if (token) {
+                    localStorage.setItem('btff_admin_session', token);
+                } else {
+                    localStorage.removeItem('btff_admin_session');
                 }
-                return false;
+                sessionToken = token;
             }
 
-            function clearSession() {
-                localStorage.removeItem('btffAdminSession');
-                isAuthenticated = false;
-                currentAdmin = null;
-                currentView = 'dashboard';
+            function getAdminUser() {
+                const user = localStorage.getItem('btff_admin_user');
+                return user ? JSON.parse(user) : null;
             }
 
-            // ---------- UPDATE ACTIVE NAV ITEM ----------
+            function setAdminUser(user) {
+                if (user) {
+                    localStorage.setItem('btff_admin_user', JSON.stringify(user));
+                } else {
+                    localStorage.removeItem('btff_admin_user');
+                }
+                currentAdmin = user;
+            }
+
+            // ========== API HELPER ==========
+            async function apiCall(action, data = {}, method = 'GET') {
+                showLoading(true);
+                
+                try {
+                    let url = `/api/proxy?action=${action}&t=${Date.now()}`;
+                    
+                    // Add session token if available
+                    const token = getSessionToken();
+                    if (token) {
+                        url += `&sessionToken=${token}`;
+                    }
+                    
+                    // Add data params to URL for GET requests
+                    if (method === 'GET') {
+                        Object.keys(data).forEach(key => {
+                            url += `&${key}=${encodeURIComponent(data[key])}`;
+                        });
+                    }
+                    
+                    const options = {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    };
+                    
+                    if (method === 'POST') {
+                        options.body = JSON.stringify(data);
+                    }
+                    
+                    const response = await fetch(url, options);
+                    const text = await response.text();
+                    
+                    try {
+                        const result = JSON.parse(text);
+                        showLoading(false);
+                        return result;
+                    } catch (e) {
+                        console.error('Invalid JSON response:', text);
+                        showLoading(false);
+                        return { success: false, error: 'Invalid server response' };
+                    }
+                } catch (error) {
+                    console.error('API call failed:', error);
+                    showLoading(false);
+                    return { success: false, error: error.message };
+                }
+            }
+
+            // ========== AUTHENTICATION ==========
+            async function checkAuth() {
+                const token = getSessionToken();
+                if (!token) {
+                    showLogin();
+                    return false;
+                }
+                
+                const result = await apiCall('validateSession', { sessionToken: token });
+                
+                if (result.valid) {
+                    currentAdmin = getAdminUser();
+                    showDashboard();
+                    updateAdminProfile();
+                    updateActiveNavItem(currentView);
+                    await renderView(currentView);
+                    return true;
+                } else {
+                    logout();
+                    return false;
+                }
+            }
+
+            function showLogin() {
+                loginContainer.style.display = 'flex';
+                sidebar.style.display = 'none';
+                mainContent.style.display = 'none';
+            }
+
+            function showDashboard() {
+                loginContainer.style.display = 'none';
+                sidebar.style.display = 'block';
+                mainContent.style.display = 'block';
+            }
+
+            async function login(username, password) {
+                const result = await apiCall('adminLogin', {
+                    username: username,
+                    password: password,
+                    userAgent: navigator.userAgent
+                }, 'POST');
+                
+                if (result.success) {
+                    setSessionToken(result.sessionToken);
+                    setAdminUser(result.admin);
+                    currentView = 'dashboard';
+                    
+                    showDashboard();
+                    updateAdminProfile();
+                    updateActiveNavItem('dashboard');
+                    await renderView('dashboard');
+                    
+                    showNotification('Login successful!');
+                    return true;
+                } else {
+                    loginError.style.display = 'block';
+                    loginError.textContent = result.error || 'Invalid username or password';
+                    return false;
+                }
+            }
+
+            function logout() {
+                if (getSessionToken()) {
+                    apiCall('adminLogout', { sessionToken: getSessionToken() });
+                }
+                setSessionToken(null);
+                setAdminUser(null);
+                showLogin();
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                loginError.style.display = 'none';
+            }
+
+            // ========== UI HELPERS ==========
+            function showLoading(show) {
+                if (show) {
+                    loadingOverlay.classList.add('active');
+                } else {
+                    loadingOverlay.classList.remove('active');
+                }
+            }
+
+            function showNotification(msg, type = 'success') {
+                notification.textContent = msg;
+                notification.className = 'notification ' + type;
+                notification.classList.add('show');
+                setTimeout(() => notification.classList.remove('show'), 3000);
+            }
+
             function updateActiveNavItem(view) {
                 navItems.forEach(item => {
                     item.classList.remove('active');
@@ -1290,7 +1432,6 @@
                 });
             }
 
-            // ---------- UPDATE ADMIN PROFILE ----------
             function updateAdminProfile() {
                 setTimeout(() => {
                     const adminInfoName = document.querySelector('.admin-info h4');
@@ -1309,191 +1450,56 @@
                 }, 100);
             }
 
-            // ---------- AUTO-REFRESH AFTER LOGIN ----------
-            function refreshWithView(view) {
-                if (currentAdmin) {
-                    saveSession(currentAdmin, view);
-                }
-                window.location.reload();
-            }
-
-            // ---------- CHECK AUTHENTICATION ON LOAD ----------
-            async function checkAuth() {
-                if (loadSession()) {
-                    loginContainer.style.display = 'none';
-                    sidebar.style.display = 'block';
-                    mainContent.style.display = 'block';
-                    
-                    updateAdminProfile();
-                    updateActiveNavItem(currentView);
-                    
-                    await renderView(currentView);
-                } else {
-                    loginContainer.style.display = 'flex';
-                    sidebar.style.display = 'none';
-                    mainContent.style.display = 'none';
-                }
-            }
-
-            // ---------- AUTHENTICATION ----------
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                
-                showLoading(true);
-                
-                try {
-                    const response = await fetch(APPS_SCRIPT_URL + '?action=adminLogin&username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password) + '&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        saveSession(data.admin, 'dashboard');
-                        refreshWithView('dashboard');
-                    } else {
-                        loginError.style.display = 'block';
-                        showLoading(false);
-                    }
-                } catch (error) {
-                    console.error('Login error:', error);
-                    loginError.style.display = 'block';
-                    showLoading(false);
-                }
-            });
-
-            // ---------- UTILITY FUNCTIONS ----------
-            function showLoading(show) {
-                if (show) {
-                    loadingOverlay.classList.add('active');
-                } else {
-                    loadingOverlay.classList.remove('active');
-                }
-            }
-
-            function showNotification(msg, type = 'success') {
-                notification.textContent = msg;
-                notification.style.background = type === 'success' ? '#2f6bc6' : '#ef4444';
-                notification.classList.add('show');
-                setTimeout(() => notification.classList.remove('show'), 3000);
-            }
-
-            // ---------- API FUNCTIONS ----------
+            // ========== DATA FETCHING ==========
             async function fetchMovies() {
-                try {
-                    const response = await fetch(APPS_SCRIPT_URL + '?action=getMovies&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        movies = data.movies;
-                        return movies;
-                    }
-                } catch (error) {
-                    console.error('Error fetching movies:', error);
-                    showNotification('Failed to fetch movies', 'error');
+                const result = await apiCall('getMovies');
+                if (result.success) {
+                    movies = result.movies || [];
                 }
-                return [];
+                return movies;
             }
 
             async function fetchRatings() {
-                try {
-                    const response = await fetch(APPS_SCRIPT_URL + '?action=getRatings&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        ratings = data.ratings;
-                        return ratings;
-                    }
-                } catch (error) {
-                    console.error('Error fetching ratings:', error);
+                const result = await apiCall('getRatings');
+                if (result.success) {
+                    ratings = result.ratings || [];
                 }
-                return [];
+                return ratings;
             }
 
             async function fetchComments() {
-                try {
-                    const response = await fetch(APPS_SCRIPT_URL + '?action=getComments&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        comments = data.comments || [];
-                        return comments;
-                    }
-                } catch (error) {
-                    console.error('Error fetching comments:', error);
+                const result = await apiCall('getComments', { movieId: 'all' });
+                if (result.success) {
+                    comments = result.comments || [];
                 }
-                return [];
+                return comments;
             }
 
             async function fetchWatchHistory() {
-                try {
-                    const response = await fetch(APPS_SCRIPT_URL + '?action=getWatchHistory&userId=all&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        watchHistory = data.watchHistory || [];
-                        return watchHistory;
-                    }
-                } catch (error) {
-                    console.error('Error fetching watch history:', error);
+                const result = await apiCall('getWatchHistory', { userId: 'all' });
+                if (result.success) {
+                    watchHistory = result.watchHistory || [];
                 }
-                return [];
+                return watchHistory;
             }
 
             async function fetchComingSoon() {
-                try {
-                    const response = await fetch(APPS_SCRIPT_URL + '?action=getComingSoon&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        comingSoon = data.comingSoon || [];
-                        return comingSoon;
-                    }
-                } catch (error) {
-                    console.error('Error fetching coming soon:', error);
+                const result = await apiCall('getComingSoon');
+                if (result.success) {
+                    comingSoon = result.comingSoon || [];
                 }
-                return [];
+                return comingSoon;
             }
 
             async function fetchNotifications() {
-                try {
-                    const response = await fetch(APPS_SCRIPT_URL + '?action=getNotifications&userId=all&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        notifications = data.notifications || [];
-                        return notifications;
-                    }
-                } catch (error) {
-                    console.error('Error fetching notifications:', error);
+                const result = await apiCall('getNotifications', { userId: 'all' });
+                if (result.success) {
+                    notifications = result.notifications || [];
                 }
-                return [];
+                return notifications;
             }
 
             async function fetchUserProfiles() {
-                // In a real app, you'd have an API for this
                 profiles = [
                     { userId: 'guest', username: 'Guest User', email: 'guest@btff.com', avatar: '👤', language: 'en', kidFriendly: false, createdAt: '2024-01-01' },
                     { userId: 'admin', username: 'Admin', email: 'admin@btff.com', avatar: '👑', language: 'en', kidFriendly: false, createdAt: '2024-01-01' },
@@ -1503,42 +1509,44 @@
                 return profiles;
             }
 
+            // ========== CRUD OPERATIONS ==========
             async function addMovie(movieData) {
-                try {
-                    const params = new URLSearchParams({
-                        action: 'addMovie',
-                        title: movieData.title,
-                        youtubeId: movieData.youtubeId,
-                        category: movieData.category,
-                        genre: movieData.genre,
-                        year: movieData.year,
-                        duration: movieData.duration,
-                        description: movieData.description,
-                        releaseDate: movieData.releaseDate,
-                        type: movieData.type,
-                        seasons: movieData.seasons || '1',
-                        episodes: movieData.episodes || '10'
-                    }).toString();
-                    
-                    const response = await fetch(APPS_SCRIPT_URL + '?' + params + '&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        showNotification('Movie added successfully');
-                        return true;
-                    }
-                } catch (error) {
-                    console.error('Error adding movie:', error);
-                    showNotification('Failed to add movie', 'error');
+                const result = await apiCall('addMovie', movieData, 'POST');
+                if (result.success) {
+                    showNotification('Movie added successfully');
+                    await fetchMovies();
+                    await renderView(currentView);
                 }
-                return false;
+                return result.success;
+            }
+
+            async function updateMovie(movieId, updates) {
+                const result = await apiCall('updateMovie', {
+                    id: movieId,
+                    updates: JSON.stringify(updates)
+                }, 'POST');
+                
+                if (result.success) {
+                    showNotification('Movie updated successfully');
+                    await fetchMovies();
+                    await renderView(currentView);
+                }
+                return result.success;
+            }
+
+            async function deleteMovie(movieId) {
+                if (!confirm('Are you sure you want to delete this movie?')) return false;
+                
+                const result = await apiCall('deleteMovie', { id: movieId }, 'POST');
+                if (result.success) {
+                    showNotification('Movie deleted successfully');
+                    await fetchMovies();
+                    await renderView(currentView);
+                }
+                return result.success;
             }
 
             async function addUserProfile(profileData) {
-                // Simulate API call
                 showNotification('User profile created successfully');
                 return true;
             }
@@ -1558,95 +1566,25 @@
                 return true;
             }
 
-            async function updateMovie(movieId, updates) {
-                try {
-                    const params = new URLSearchParams({
-                        action: 'updateMovie',
-                        id: movieId,
-                        updates: JSON.stringify(updates)
-                    }).toString();
-                    
-                    const response = await fetch(APPS_SCRIPT_URL + '?' + params + '&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        showNotification('Movie updated successfully');
-                        return true;
-                    }
-                } catch (error) {
-                    console.error('Error updating movie:', error);
-                    showNotification('Failed to update movie', 'error');
-                }
-                return false;
-            }
-
-            async function deleteMovie(movieId) {
-                if (!confirm('Are you sure you want to delete this movie?')) return false;
-                
-                try {
-                    const params = new URLSearchParams({
-                        action: 'deleteMovie',
-                        id: movieId
-                    }).toString();
-                    
-                    const response = await fetch(APPS_SCRIPT_URL + '?' + params + '&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        showNotification('Movie deleted successfully');
-                        return true;
-                    }
-                } catch (error) {
-                    console.error('Error deleting movie:', error);
-                    showNotification('Failed to delete movie', 'error');
-                }
-                return false;
-            }
-
             async function updateAdminPassword(currentPassword, newPassword) {
-                try {
-                    const params = new URLSearchParams({
-                        action: 'updateAdminPassword',
-                        adminId: currentAdmin.id,
-                        currentPassword: currentPassword,
-                        newPassword: newPassword
-                    }).toString();
-                    
-                    const response = await fetch(APPS_SCRIPT_URL + '?' + params + '&t=' + Date.now(), {
-                        method: 'GET',
-                        mode: 'cors'
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        showNotification('Password updated successfully');
-                        return true;
-                    } else {
-                        showNotification(data.error || 'Failed to update password', 'error');
-                        return false;
-                    }
-                } catch (error) {
-                    console.error('Error updating password:', error);
-                    showNotification('Failed to update password', 'error');
+                const result = await apiCall('updateAdminPassword', {
+                    currentPassword: currentPassword,
+                    newPassword: newPassword
+                }, 'POST');
+                
+                if (result.success) {
+                    showNotification('Password updated successfully');
+                    return true;
+                } else {
+                    showNotification(result.error || 'Failed to update password', 'error');
+                    return false;
                 }
-                return false;
             }
 
-            // ---------- RENDERING FUNCTIONS ----------
+            // ========== RENDERING FUNCTIONS ==========
             async function renderView(view) {
-                if (!isAuthenticated) return;
-                
                 currentView = view;
-                
-                if (currentAdmin) {
-                    saveSession(currentAdmin, view);
-                }
+                localStorage.setItem('btff_admin_last_view', view);
                 
                 showLoading(true);
                 
@@ -2502,7 +2440,7 @@
                 `;
             }
 
-            // ---------- CHART FUNCTIONS ----------
+            // ========== CHART FUNCTIONS ==========
             function initializeCharts() {
                 Object.values(charts).forEach(chart => {
                     if (chart) {
@@ -2669,7 +2607,7 @@
                 }
             }
 
-            // ---------- MODAL FUNCTIONS ----------
+            // ========== MODAL FUNCTIONS ==========
             window.openAddMovieModal = (isSeries = false) => {
                 document.getElementById('movieModalTitle').textContent = 'Add New Movie';
                 document.getElementById('movieId').value = '';
@@ -2770,19 +2708,27 @@
                 }
             };
 
-            // ---------- EVENT LISTENERS ----------
+            // ========== EVENT LISTENERS ==========
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                await login(username, password);
+            });
+
             navItems.forEach(item => {
                 item.addEventListener('click', () => {
-                    if (!isAuthenticated) return;
-                    
                     const view = item.dataset.view;
                     if (view && view !== currentView) {
-                        navItems.forEach(n => n.classList.remove('active'));
-                        item.classList.add('active');
+                        updateActiveNavItem(view);
                         renderView(view);
                     }
                 });
             });
+
+            document.getElementById('logoutBtn').addEventListener('click', logout);
 
             // Modal close listeners
             closeMovieModal.addEventListener('click', () => {
@@ -2880,7 +2826,6 @@
                 if (success) {
                     movieModal.classList.remove('active');
                     document.body.style.overflow = 'auto';
-                    await renderView(currentView);
                 }
             });
 
@@ -2900,7 +2845,6 @@
                 if (success) {
                     userProfileModal.classList.remove('active');
                     document.body.style.overflow = 'auto';
-                    await renderView(currentView);
                 }
             });
 
@@ -2920,7 +2864,6 @@
                 if (success) {
                     comingSoonModal.classList.remove('active');
                     document.body.style.overflow = 'auto';
-                    await renderView(currentView);
                 }
             });
 
@@ -2938,7 +2881,6 @@
                 if (success) {
                     notificationModal.classList.remove('active');
                     document.body.style.overflow = 'auto';
-                    await renderView(currentView);
                 }
             });
 
@@ -2957,7 +2899,6 @@
                 if (success) {
                     languageModal.classList.remove('active');
                     document.body.style.overflow = 'auto';
-                    await renderView(currentView);
                 }
             });
 
@@ -2986,15 +2927,11 @@
                 }
             });
 
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                if (confirm('Are you sure you want to logout?')) {
-                    clearSession();
-                    loginContainer.style.display = 'flex';
-                    sidebar.style.display = 'none';
-                    mainContent.style.display = 'none';
-                    document.getElementById('username').value = '';
-                    document.getElementById('password').value = '';
-                    loginError.style.display = 'none';
+            document.addEventListener('change', (e) => {
+                if (e.target.id === 'movieType') {
+                    const isSeries = e.target.value === 'series';
+                    const seriesFields = document.getElementById('seriesFields');
+                    seriesFields.style.display = isSeries ? 'grid' : 'none';
                 }
             });
 
@@ -3025,15 +2962,7 @@
                 }
             });
 
-            document.addEventListener('change', (e) => {
-                if (e.target.id === 'movieType') {
-                    const isSeries = e.target.value === 'series';
-                    const seriesFields = document.getElementById('seriesFields');
-                    seriesFields.style.display = isSeries ? 'grid' : 'none';
-                }
-            });
-
-            // ---------- INITIAL LOAD ----------
+            // ========== INITIALIZATION ==========
             checkAuth();
         })();
     </script>

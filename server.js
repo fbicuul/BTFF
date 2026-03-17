@@ -9,38 +9,51 @@ require('dotenv').config();
 
 const app = express();
 
-// Security middleware - UPDATED CSP
+// Security middleware - UPDATED CSP with YouTube support
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            // Allow blob: and data: for scripts
+            // Allow all necessary sources
             scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "data:",
                         "https://cdnjs.cloudflare.com", 
-                        "https://cdn.jsdelivr.net"],
+                        "https://cdn.jsdelivr.net",
+                        "https://www.youtube.com",
+                        "https://s.ytimg.com",
+                        "https://www.youtube-nocookie.com",
+                        "https://*.youtube.com"],
             styleSrc: ["'self'", "'unsafe-inline'", "blob:", "data:",
-                      "https://cdnjs.cloudflare.com"],
-            imgSrc: ["'self'", "data:", "blob:", "https://img.youtube.com"],
-            frameSrc: ["'self'", "https://www.youtube.com", "https://www.youtube-nocookie.com"],
-            // Allow connections to CDN and your proxy
+                      "https://cdnjs.cloudflare.com",
+                      "https://www.youtube.com",
+                      "https://*.youtube.com"],
+            imgSrc: ["'self'", "data:", "blob:", 
+                    "https://img.youtube.com", 
+                    "https://i.ytimg.com",
+                    "https://*.ytimg.com"],
+            frameSrc: ["'self'", 
+                      "https://www.youtube.com", 
+                      "https://www.youtube-nocookie.com",
+                      "https://*.youtube.com"],
             connectSrc: ["'self'", 
                         "https://cdnjs.cloudflare.com",
                         "https://cdn.jsdelivr.net",
                         process.env.APPS_SCRIPT_URL,
-                        "https://script.google.com"],
-            // Allow fonts from CDN
+                        "https://script.google.com",
+                        "https://www.youtube.com",
+                        "https://*.youtube.com"],
             fontSrc: ["'self'", "data:", "https://cdnjs.cloudflare.com"],
-            // Allow object sources
             objectSrc: ["'none'"],
-            // Allow base URIs
             baseUri: ["'self'"],
-            // Allow form actions
             formAction: ["'self'"],
+            // Allow YouTube iframes
+            childSrc: ["'self'", "blob:", "https://www.youtube.com", "https://*.youtube.com"],
+            frameAncestors: ["'self'"],
+            // Allow media sources
+            mediaSrc: ["'self'", "https://www.youtube.com", "https://*.youtube.com"],
             // Upgrade insecure requests
             upgradeInsecureRequests: []
         }
     },
-    // Disable crossOriginEmbedderPolicy for YouTube embeds
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: { policy: "cross-origin" }
 }));

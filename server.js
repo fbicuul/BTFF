@@ -9,49 +9,77 @@ require('dotenv').config();
 
 const app = express();
 
-// Security middleware
+// Security middleware - UPDATED CSP
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 
+            // Allow blob: and data: for scripts
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "data:",
                         "https://cdnjs.cloudflare.com", 
                         "https://cdn.jsdelivr.net"],
-            styleSrc: ["'self'", "'unsafe-inline'", 
+            styleSrc: ["'self'", "'unsafe-inline'", "blob:", "data:",
                       "https://cdnjs.cloudflare.com"],
-            imgSrc: ["'self'", "data:", "https://img.youtube.com"],
-            frameSrc: ["'self'", "https://www.youtube.com"],
-            connectSrc: ["'self'", process.env.APPS_SCRIPT_URL]
+            imgSrc: ["'self'", "data:", "blob:", "https://img.youtube.com"],
+            frameSrc: ["'self'", "https://www.youtube.com", "https://www.youtube-nocookie.com"],
+            // Allow connections to CDN and your proxy
+            connectSrc: ["'self'", 
+                        "https://cdnjs.cloudflare.com",
+                        "https://cdn.jsdelivr.net",
+                        process.env.APPS_SCRIPT_URL,
+                        "https://script.google.com"],
+            // Allow fonts from CDN
+            fontSrc: ["'self'", "data:", "https://cdnjs.cloudflare.com"],
+            // Allow object sources
+            objectSrc: ["'none'"],
+            // Allow base URIs
+            baseUri: ["'self'"],
+            // Allow form actions
+            formAction: ["'self'"],
+            // Upgrade insecure requests
+            upgradeInsecureRequests: []
         }
-    }
+    },
+    // Disable crossOriginEmbedderPolicy for YouTube embeds
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
 // CORS configuration
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://btff.onrender.com']  // Fixed: removed trailing slash
-        : ['http://localhost:3000'],
+        ? ['https://btff.onrender.com'] 
+        : ['http://localhost:3000', 'http://127.0.0.1:3000'],
     credentials: true
 }));
 
 // Rate limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
+    max: 100,
+    message: 'Too many requests from this IP'
 });
 app.use(limiter);
 
 // Parse JSON bodies
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve static files from public directory (if you have any)
+// Serve static files
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // ===== PROXY ENDPOINT FOR APPS SCRIPT =====
-// This handles all API calls to Apps Script and avoids CORS issues
 app.all('/api/proxy', async (req, res) => {
     try {
         const targetUrl = process.env.APPS_SCRIPT_URL;
+        
+        if (!targetUrl) {
+            console.error('❌ APPS_SCRIPT_URL not configured');
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Server configuration error' 
+            });
+        }
         
         // Build the full URL with query parameters
         const url = new URL(targetUrl);
@@ -66,7 +94,9 @@ app.all('/api/proxy', async (req, res) => {
             method: req.method,
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            redirect: 'follow',
+            follow: 10
         };
         
         // Add body for POST requests
@@ -76,11 +106,39 @@ app.all('/api/proxy', async (req, res) => {
         
         // Make the request to Apps Script
         const response = await fetch(url.toString(), fetchOptions);
-        const data = await response.text();
+        const contentType = response.headers.get('content-type');
+        const responseText = await response.text();
         
-        // Forward the response
-        res.setHeader('Content-Type', 'application/json');
-        res.send(data);
+        // Log first 200 chars for debugging
+        console.log('📥 Response preview:', responseText.substring(0, 200));
+        
+        // Check if response is HTML (error page)
+        if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+            console.error('❌ Received HTML instead of JSON from Apps Script');
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Apps Script returned HTML. Check deployment settings.' 
+            });
+        }
+        
+        // Try to parse as JSON
+        try {
+            const jsonData = JSON.parse(responseText);
+            
+            // Add CORS headers
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+            res.setHeader('Access-Control-Allow-Credentials', 'true');
+            
+            return res.send(jsonData);
+        } catch (e) {
+            console.error('❌ Invalid JSON response:', responseText.substring(0, 500));
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Invalid JSON response from Apps Script',
+                preview: responseText.substring(0, 100)
+            });
+        }
         
     } catch (error) {
         console.error('❌ Proxy error:', error);
@@ -95,23 +153,27 @@ app.all('/api/proxy', async (req, res) => {
 function injectEnvVars(html) {
     return html.replace(
         '%%APPS_SCRIPT_URL%%', 
-        process.env.APPS_SCRIPT_URL
+        process.env.APPS_SCRIPT_URL || ''
+    ).replace(
+        '%%RENDER_URL%%',
+        process.env.RENDER_URL || 'https://btff.onrender.com'
     );
 }
 
 // Route for main page
 app.get('/', (req, res) => {
     try {
-        // Look for index.html in the same directory as server.js
         const templatePath = path.join(__dirname, 'index.html');
+        
+        if (!fs.existsSync(templatePath)) {
+            console.error('❌ index.html not found at:', templatePath);
+            return res.status(500).send('index.html not found');
+        }
+        
         let html = fs.readFileSync(templatePath, 'utf8');
+        html = injectEnvVars(html);
         
-        // Inject the environment variable
-        html = html.replace(
-            '%%APPS_SCRIPT_URL%%', 
-            process.env.APPS_SCRIPT_URL || ''
-        );
-        
+        res.setHeader('Content-Type', 'text/html');
         res.send(html);
     } catch (error) {
         console.error('Error serving index:', error);
@@ -122,16 +184,17 @@ app.get('/', (req, res) => {
 // Route for admin page
 app.get('/admin', (req, res) => {
     try {
-        // Look for admin.html in the same directory as server.js
         const templatePath = path.join(__dirname, 'admin.html');
+        
+        if (!fs.existsSync(templatePath)) {
+            console.error('❌ admin.html not found at:', templatePath);
+            return res.status(500).send('admin.html not found');
+        }
+        
         let html = fs.readFileSync(templatePath, 'utf8');
+        html = injectEnvVars(html);
         
-        // Inject the environment variable
-        html = html.replace(
-            '%%APPS_SCRIPT_URL%%', 
-            process.env.APPS_SCRIPT_URL || ''
-        );
-        
+        res.setHeader('Content-Type', 'text/html');
         res.send(html);
     } catch (error) {
         console.error('Error serving admin:', error);
@@ -139,21 +202,30 @@ app.get('/admin', (req, res) => {
     }
 });
 
-// Health check endpoint (Render uses this)
+// Health check endpoint
 app.get('/health', (req, res) => {
     res.status(200).json({ 
         status: 'healthy',
         timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV,
+        appsScriptConfigured: !!process.env.APPS_SCRIPT_URL
+    });
+});
+
+// API route to get config
+app.get('/api/config', (req, res) => {
+    res.json({
+        appsScriptUrl: process.env.APPS_SCRIPT_URL,
         environment: process.env.NODE_ENV
     });
 });
 
-// API route to get config (if needed)
-app.get('/api/config', (req, res) => {
-    // Only send public config, never secrets
-    res.json({
-        appsScriptUrl: process.env.APPS_SCRIPT_URL,
-        environment: process.env.NODE_ENV
+// Test endpoint to verify proxy is working
+app.get('/api/test', (req, res) => {
+    res.json({ 
+        success: true, 
+        message: 'Proxy server is running',
+        timestamp: new Date().toISOString()
     });
 });
 
@@ -167,15 +239,21 @@ app.use((err, req, res, next) => {
     });
 });
 
-// 404 handler
+// 404 handler - return JSON for API routes, HTML for others
 app.use((req, res) => {
-    res.status(404).send('Page not found');
+    if (req.path.startsWith('/api/')) {
+        res.status(404).json({ success: false, error: 'API endpoint not found' });
+    } else {
+        res.status(404).send('Page not found');
+    }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
+    console.log('🚀 ==================================');
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📝 Environment: ${process.env.NODE_ENV}`);
-    console.log(`🔗 Apps Script URL: ${process.env.APPS_SCRIPT_URL}`);
+    console.log(`🔗 Apps Script URL: ${process.env.APPS_SCRIPT_URL || '❌ NOT SET'}`);
     console.log(`🌍 CORS origin: ${process.env.NODE_ENV === 'production' ? 'https://btff.onrender.com' : 'http://localhost:3000'}`);
+    console.log('🚀 ==================================');
 });

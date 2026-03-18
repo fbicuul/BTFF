@@ -9,110 +9,21 @@ require('dotenv').config();
 
 const app = express();
 
-// Security middleware - PROPERLY CONFIGURED CSP
+// Replace your helmet middleware with this
 app.use(helmet({
     contentSecurityPolicy: {
+        useDefaults: false,
         directives: {
-            // Default fallback
             defaultSrc: ["'self'"],
-            
-            // Scripts - allow from CDNs and YouTube
-            scriptSrc: [
-                "'self'", 
-                "'unsafe-inline'",  // Needed for your inline scripts
-                "'unsafe-eval'",     // Needed for some JS features
-                "blob:", 
-                "data:",
-                "https://cdnjs.cloudflare.com", 
-                "https://cdn.jsdelivr.net",
-                "https://www.youtube.com",
-                "https://s.ytimg.com",
-                "https://www.youtube-nocookie.com",
-                "https://*.youtube.com"
-            ],
-            
-            // Styles
-            styleSrc: [
-                "'self'", 
-                "'unsafe-inline'", 
-                "blob:", 
-                "data:",
-                "https://cdnjs.cloudflare.com",
-                "https://www.youtube.com",
-                "https://*.youtube.com"
-            ],
-            
-            // Images - YouTube thumbnails
-            imgSrc: [
-                "'self'", 
-                "data:", 
-                "blob:", 
-                "https://img.youtube.com", 
-                "https://i.ytimg.com",
-                "https://*.ytimg.com",
-                "https://*.youtube.com"
-            ],
-            
-            // Frames - CRITICAL for YouTube embeds
-            frameSrc: [
-                "'self'", 
-                "https://www.youtube.com", 
-                "https://www.youtube-nocookie.com",
-                "https://*.youtube.com"
-            ],
-            
-            // Connections
-            connectSrc: [
-                "'self'", 
-                "https://cdnjs.cloudflare.com",
-                "https://cdn.jsdelivr.net",
-                process.env.APPS_SCRIPT_URL,
-                "https://script.google.com",
-                "https://www.youtube.com",
-                "https://*.youtube.com"
-            ],
-            
-            // Fonts
-            fontSrc: [
-                "'self'", 
-                "data:", 
-                "https://cdnjs.cloudflare.com"
-            ],
-            
-            // Objects
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://*.youtube.com", "https://*.ytimg.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://*.youtube.com", "https://cdnjs.cloudflare.com"],
+            imgSrc: ["'self'", "data:", "https://*.youtube.com", "https://*.ytimg.com", "https://img.youtube.com"],
+            frameSrc: ["'self'", "https://*.youtube.com", "https://www.youtube.com"],
+            connectSrc: ["'self'", process.env.APPS_SCRIPT_URL, "https://*.youtube.com"],
+            fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
             objectSrc: ["'none'"],
-            
-            // Base URI
-            baseUri: ["'self'"],
-            
-            // Form actions
-            formAction: ["'self'"],
-            
-            // Child sources (iframes, workers)
-            childSrc: [
-                "'self'", 
-                "blob:", 
-                "https://www.youtube.com", 
-                "https://*.youtube.com"
-            ],
-            
-            // Frame ancestors (who can embed your site)
+            mediaSrc: ["'self'", "https://*.youtube.com"],
             frameAncestors: ["'self'"],
-            
-            // Media
-            mediaSrc: [
-                "'self'", 
-                "https://www.youtube.com", 
-                "https://*.youtube.com"
-            ],
-            
-            // Workers
-            workerSrc: ["'self'", "blob:"],
-            
-            // Manifest
-            manifestSrc: ["'self'"],
-            
-            // Upgrade insecure requests
             upgradeInsecureRequests: []
         }
     },

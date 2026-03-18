@@ -853,6 +853,7 @@
         <div class="login-box">
             <div class="login-logo">BTFF</div>
             <div class="login-sub">admin dashboard</div>
+            
             <form class="login-form" id="loginForm">
                 <div class="form-group">
                     <label><i class="fas fa-user" style="margin-right: 8px;"></i>Username</label>
@@ -865,6 +866,7 @@
                 <button type="submit">Login to Dashboard</button>
                 <div class="login-error" id="loginError">Invalid username or password</div>
             </form>
+
             <div style="text-align: center; margin-top: 20px; color: var(--gray); font-size: 0.85rem;">
                 <i class="fas fa-shield-alt"></i> Secure Admin Access
             </div>
@@ -1373,31 +1375,58 @@
                 mainContent.style.display = 'block';
             }
 
+            // ========== AUTHENTICATION ==========
             async function login(username, password) {
-                showGlobalLoading('Logging in...');
-                const result = await apiCall('adminLogin', {
-                    username: username,
-                    password: password,
-                    userAgent: navigator.userAgent
-                }, 'POST', false);
+                console.log('🔐 Login function called');
+                console.log('Username:', username);
+                console.log('Password length:', password ? password.length : 0);
                 
-                if (result.success) {
-                    setSessionToken(result.sessionToken);
-                    setAdminUser(result.admin);
-                    currentView = 'dashboard';
+                showGlobalLoading('Logging in...');
+                
+                try {
+                    console.log('Making API call to adminLogin...');
+                    const result = await apiCall('adminLogin', {
+                        username: username,
+                        password: password,
+                        userAgent: navigator.userAgent
+                    }, 'POST', false);
                     
-                    showDashboard();
-                    updateAdminProfile();
-                    updateActiveNavItem('dashboard');
-                    await renderView('dashboard');
+                    console.log('📥 Login response:', result);
                     
-                    hideGlobalLoading();
-                    showNotification('Login successful!');
-                    return true;
-                } else {
+                    if (result && result.success) {
+                        console.log('✅ Login successful!');
+                        console.log('Session token:', result.sessionToken);
+                        console.log('Admin data:', result.admin);
+                        
+                        // Save session
+                        setSessionToken(result.sessionToken);
+                        setAdminUser(result.admin);
+                        
+                        console.log('Session saved to localStorage');
+                        console.log('Stored session:', localStorage.getItem('btff_admin_session'));
+                        
+                        currentView = 'dashboard';
+                        
+                        showDashboard();
+                        updateAdminProfile();
+                        updateActiveNavItem('dashboard');
+                        await renderView('dashboard');
+                        
+                        hideGlobalLoading();
+                        showNotification('Login successful!');
+                        return true;
+                    } else {
+                        console.error('❌ Login failed:', result ? result.error : 'No response');
+                        hideGlobalLoading();
+                        loginError.style.display = 'block';
+                        loginError.textContent = (result && result.error) || 'Invalid username or password';
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('❌ Login exception:', error);
                     hideGlobalLoading();
                     loginError.style.display = 'block';
-                    loginError.textContent = result.error || 'Invalid username or password';
+                    loginError.textContent = 'Connection error: ' + error.message;
                     return false;
                 }
             }
@@ -2655,10 +2684,14 @@
 
             // ========== EVENT LISTENERS ==========
             loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
+                e.preventDefault(); // This is crucial!
+                console.log('📝 Form submitted');
                 
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
+                
+                console.log('Username entered:', username);
+                console.log('Password entered:', password ? '****' : 'empty');
                 
                 await login(username, password);
             });

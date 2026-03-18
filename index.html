@@ -2663,8 +2663,6 @@
             }
         }
 
-        // Replace your openVideoPlayer function with this simpler version:
-
         // ---------- VIDEO PLAYER FUNCTIONS ----------
         function openVideoPlayer(movieId, episode = null) {
             const movie = movies.find(m => m.id == movieId);
@@ -2688,16 +2686,18 @@
                 videoModalTitle.textContent = episode ? `${movie.title} - ${episode}` : movie.title;
             }
             
-            // ULTRA SIMPLE YouTube embed - no extra parameters
-            const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
+            // Simple embed URL
+            const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
             
-            console.log('Playing video:', embedUrl); // Debug log
+            console.log('🎬 Playing video:', embedUrl);
             
             if (videoIframe) {
                 videoIframe.src = embedUrl;
             }
             
+            // FORCE the modal to be visible
             if (videoModal) {
+                videoModal.style.display = 'flex';  // Force display
                 videoModal.classList.add('active');
             }
             
@@ -2712,6 +2712,7 @@
 
         function closeVideoPlayer() {
             if (videoModal) {
+                videoModal.style.display = 'none';  // Force hide
                 videoModal.classList.remove('active');
             }
             if (videoIframe) {

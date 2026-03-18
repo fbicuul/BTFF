@@ -38,8 +38,8 @@
             overflow-x: hidden;
         }
 
-        /* ===== LOGIN PAGE ===== */
-        .login-container {
+        /* Simple Enter Page */
+        .enter-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -52,87 +52,54 @@
             z-index: 10000;
         }
 
-        .login-box {
+        .enter-box {
             background: var(--darker);
             border-radius: 30px;
-            padding: 50px;
+            padding: 60px;
             width: 450px;
             max-width: 90vw;
             border: 2px solid var(--primary);
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            text-align: center;
         }
 
-        .login-logo {
-            font-size: 3.5rem;
+        .enter-logo {
+            font-size: 4rem;
             font-weight: 800;
             background: linear-gradient(135deg, #fff, #aaccff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
-        .login-sub {
+        .enter-sub {
             color: var(--gray);
-            text-align: center;
             margin-bottom: 40px;
             font-size: 1.1rem;
         }
 
-        .login-form .form-group {
-            margin-bottom: 25px;
-        }
-
-        .login-form label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--gray);
-            font-size: 0.95rem;
-        }
-
-        .login-form input {
-            width: 100%;
-            padding: 15px 20px;
-            background: var(--dark);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-            color: white;
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        .login-form input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(47, 107, 198, 0.2);
-        }
-
-        .login-form button {
-            width: 100%;
-            padding: 16px;
+        .enter-btn {
             background: var(--primary);
-            border: none;
-            border-radius: 15px;
             color: white;
-            font-size: 1.1rem;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 1.5rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(47, 107, 198, 0.3);
+            width: 100%;
         }
 
-        .login-form button:hover {
+        .enter-btn:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(47, 107, 198, 0.3);
+            box-shadow: 0 15px 30px rgba(47, 107, 198, 0.4);
         }
 
-        .login-error {
-            color: var(--danger);
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.95rem;
-            display: none;
+        .enter-btn i {
+            margin-right: 10px;
         }
 
         /* ===== SIDEBAR ===== */
@@ -840,35 +807,16 @@
     </style>
 </head>
 <body>
-    <!-- GLOBAL LOADING OVERLAY -->
-    <div class="global-loading-overlay" id="globalLoadingOverlay">
-        <div class="global-loading-spinner"></div>
-        <div class="global-loading-text">
-            <i class="fas fa-cog fa-spin"></i> Loading... <i class="fas fa-cog fa-spin"></i>
-        </div>
-    </div>
-
-    <!-- LOGIN PAGE -->
-    <div class="login-container" id="loginContainer">
-        <div class="login-box">
-            <div class="login-logo">BTFF</div>
-            <div class="login-sub">admin dashboard</div>
-            
-            <form class="login-form" id="loginForm">
-                <div class="form-group">
-                    <label><i class="fas fa-user" style="margin-right: 8px;"></i>Username</label>
-                    <input type="text" id="username" placeholder="Enter username" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-lock" style="margin-right: 8px;"></i>Password</label>
-                    <input type="password" id="password" placeholder="Enter password">
-                </div>
-                <button type="submit">Login to Dashboard</button>
-                <div class="login-error" id="loginError">Invalid username or password</div>
-            </form>
-
+    <!-- SIMPLE ENTER PAGE (NO LOGIN REQUIRED) -->
+    <div class="enter-container" id="enterContainer">
+        <div class="enter-box">
+            <div class="enter-logo">BTFF</div>
+            <div class="enter-sub">admin dashboard</div>
+            <button class="enter-btn" onclick="enterDashboard()">
+                <i class="fas fa-sign-in-alt"></i> Enter Dashboard
+            </button>
             <div style="text-align: center; margin-top: 20px; color: var(--gray); font-size: 0.85rem;">
-                <i class="fas fa-shield-alt"></i> Secure Admin Access
+                <i class="fas fa-shield-alt"></i> Development Mode - No Authentication
             </div>
         </div>
     </div>
@@ -938,9 +886,9 @@
             
             <div class="nav-divider"></div>
             
-            <div class="nav-item" id="logoutBtn">
+            <div class="nav-item" id="logoutBtn" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
+                <span>Exit Admin</span>
             </div>
         </div>
     </div>
@@ -1147,35 +1095,16 @@
         </div>
     </div>
 
-    <!-- CHANGE PASSWORD MODAL -->
-    <div class="modal" id="passwordModal">
-        <div class="modal-content">
-            <span class="modal-close" id="closePasswordModal">&times;</span>
-            <h2>Change Password</h2>
-            <form id="passwordForm">
-                <input type="hidden" id="adminId">
-                <div class="form-group">
-                    <label>Current Password</label>
-                    <input type="password" id="currentPassword" required>
-                </div>
-                <div class="form-group">
-                    <label>New Password</label>
-                    <input type="password" id="newPassword" required>
-                </div>
-                <div class="form-group">
-                    <label>Confirm New Password</label>
-                    <input type="password" id="confirmPassword" required>
-                </div>
-                <div class="modal-buttons">
-                    <button type="submit" class="btn-primary">Update Password</button>
-                    <button type="button" class="btn-secondary" id="cancelPasswordBtn">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- NOTIFICATION -->
     <div class="notification" id="notification">Action completed successfully</div>
+
+    <!-- GLOBAL LOADING OVERLAY -->
+    <div class="global-loading-overlay" id="globalLoadingOverlay">
+        <div class="global-loading-spinner"></div>
+        <div class="global-loading-text">
+            <i class="fas fa-cog fa-spin"></i> Loading... <i class="fas fa-cog fa-spin"></i>
+        </div>
+    </div>
 
     <script>
         (function() {
@@ -1193,7 +1122,6 @@
                 }
                 globalLoadingOverlay.classList.add('active');
                 
-                // Safety timeout - hide after 30 seconds maximum
                 if (loadingTimeout) clearTimeout(loadingTimeout);
                 loadingTimeout = setTimeout(() => {
                     hideGlobalLoading();
@@ -1223,66 +1151,54 @@
             ];
             let currentView = 'dashboard';
             let charts = {};
-            let isAuthenticated = false;
-            let currentAdmin = null;
-            let sessionToken = null;
 
             // DOM elements
-            const loginContainer = document.getElementById('loginContainer');
+            const enterContainer = document.getElementById('enterContainer');
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
-            const loginForm = document.getElementById('loginForm');
-            const loginError = document.getElementById('loginError');
             const navItems = document.querySelectorAll('.nav-item');
             const movieModal = document.getElementById('movieModal');
             const userProfileModal = document.getElementById('userProfileModal');
             const notificationModal = document.getElementById('notificationModal');
             const languageModal = document.getElementById('languageModal');
-            const passwordModal = document.getElementById('passwordModal');
             const closeMovieModal = document.getElementById('closeMovieModal');
             const closeUserProfileModal = document.getElementById('closeUserProfileModal');
             const closeNotificationModal = document.getElementById('closeNotificationModal');
             const closeLanguageModal = document.getElementById('closeLanguageModal');
-            const closePasswordModal = document.getElementById('closePasswordModal');
             const cancelMovieBtn = document.getElementById('cancelMovieBtn');
             const cancelUserProfileBtn = document.getElementById('cancelUserProfileBtn');
             const cancelNotificationBtn = document.getElementById('cancelNotificationBtn');
             const cancelLanguageBtn = document.getElementById('cancelLanguageBtn');
-            const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
             const movieForm = document.getElementById('movieForm');
             const userProfileForm = document.getElementById('userProfileForm');
             const notificationForm = document.getElementById('notificationForm');
             const languageForm = document.getElementById('languageForm');
-            const passwordForm = document.getElementById('passwordForm');
             const notification = document.getElementById('notification');
 
-            // ========== SESSION MANAGEMENT ==========
-            function getSessionToken() {
-                return localStorage.getItem('btff_admin_session');
-            }
+            // ========== ENTER DASHBOARD (NO AUTH) ==========
+            window.enterDashboard = function() {
+                console.log('Entering dashboard...');
+                enterContainer.style.display = 'none';
+                sidebar.style.display = 'block';
+                mainContent.style.display = 'block';
+                
+                // Set a fake admin user for display
+                window.currentAdmin = {
+                    username: 'Admin',
+                    email: 'admin@btff.com'
+                };
+                
+                updateAdminProfile();
+                updateActiveNavItem('dashboard');
+                renderView('dashboard');
+                showNotification('Welcome to Admin Dashboard');
+            };
 
-            function setSessionToken(token) {
-                if (token) {
-                    localStorage.setItem('btff_admin_session', token);
-                } else {
-                    localStorage.removeItem('btff_admin_session');
-                }
-                sessionToken = token;
-            }
-
-            function getAdminUser() {
-                const user = localStorage.getItem('btff_admin_user');
-                return user ? JSON.parse(user) : null;
-            }
-
-            function setAdminUser(user) {
-                if (user) {
-                    localStorage.setItem('btff_admin_user', JSON.stringify(user));
-                } else {
-                    localStorage.removeItem('btff_admin_user');
-                }
-                currentAdmin = user;
-            }
+            window.logout = function() {
+                enterContainer.style.display = 'flex';
+                sidebar.style.display = 'none';
+                mainContent.style.display = 'none';
+            };
 
             // ========== API HELPER ==========
             async function apiCall(action, data = {}, method = 'GET', showLoading = true) {
@@ -1293,13 +1209,6 @@
                 try {
                     let url = `/api/proxy?action=${action}&t=${Date.now()}`;
                     
-                    // Add session token if available
-                    const token = getSessionToken();
-                    if (token) {
-                        url += `&sessionToken=${token}`;
-                    }
-                    
-                    // Add data params to URL for GET requests
                     if (method === 'GET') {
                         Object.keys(data).forEach(key => {
                             url += `&${key}=${encodeURIComponent(data[key])}`;
@@ -1340,109 +1249,6 @@
                 }
             }
 
-            // ========== AUTHENTICATION ==========
-            async function checkAuth() {
-                const token = getSessionToken();
-                if (!token) {
-                    showLogin();
-                    return false;
-                }
-                
-                const result = await apiCall('validateSession', { sessionToken: token }, 'GET', false);
-                
-                if (result.valid) {
-                    currentAdmin = getAdminUser();
-                    showDashboard();
-                    updateAdminProfile();
-                    updateActiveNavItem(currentView);
-                    await renderView(currentView);
-                    return true;
-                } else {
-                    logout();
-                    return false;
-                }
-            }
-
-            function showLogin() {
-                loginContainer.style.display = 'flex';
-                sidebar.style.display = 'none';
-                mainContent.style.display = 'none';
-            }
-
-            function showDashboard() {
-                loginContainer.style.display = 'none';
-                sidebar.style.display = 'block';
-                mainContent.style.display = 'block';
-            }
-
-            // ========== AUTHENTICATION ==========
-            async function login(username, password) {
-                console.log('🔐 Login function called');
-                console.log('Username:', username);
-                console.log('Password length:', password ? password.length : 0);
-                
-                showGlobalLoading('Logging in...');
-                
-                try {
-                    console.log('Making API call to adminLogin...');
-                    const result = await apiCall('adminLogin', {
-                        username: username,
-                        password: password,
-                        userAgent: navigator.userAgent
-                    }, 'POST', false);
-                    
-                    console.log('📥 Login response:', result);
-                    
-                    if (result && result.success) {
-                        console.log('✅ Login successful!');
-                        console.log('Session token:', result.sessionToken);
-                        console.log('Admin data:', result.admin);
-                        
-                        // Save session
-                        setSessionToken(result.sessionToken);
-                        setAdminUser(result.admin);
-                        
-                        console.log('Session saved to localStorage');
-                        console.log('Stored session:', localStorage.getItem('btff_admin_session'));
-                        
-                        currentView = 'dashboard';
-                        
-                        showDashboard();
-                        updateAdminProfile();
-                        updateActiveNavItem('dashboard');
-                        await renderView('dashboard');
-                        
-                        hideGlobalLoading();
-                        showNotification('Login successful!');
-                        return true;
-                    } else {
-                        console.error('❌ Login failed:', result ? result.error : 'No response');
-                        hideGlobalLoading();
-                        loginError.style.display = 'block';
-                        loginError.textContent = (result && result.error) || 'Invalid username or password';
-                        return false;
-                    }
-                } catch (error) {
-                    console.error('❌ Login exception:', error);
-                    hideGlobalLoading();
-                    loginError.style.display = 'block';
-                    loginError.textContent = 'Connection error: ' + error.message;
-                    return false;
-                }
-            }
-
-            function logout() {
-                if (getSessionToken()) {
-                    apiCall('adminLogout', { sessionToken: getSessionToken() }, 'POST', false);
-                }
-                setSessionToken(null);
-                setAdminUser(null);
-                showLogin();
-                document.getElementById('username').value = '';
-                document.getElementById('password').value = '';
-                loginError.style.display = 'none';
-            }
-
             // ========== UI HELPERS ==========
             function showNotification(msg, type = 'success') {
                 notification.textContent = msg;
@@ -1466,14 +1272,14 @@
                     const adminInfoEmail = document.querySelector('.admin-info p');
                     const adminAvatar = document.querySelector('.admin-avatar');
                     
-                    if (adminInfoName && currentAdmin) {
-                        adminInfoName.textContent = currentAdmin.username || 'Admin';
+                    if (adminInfoName) {
+                        adminInfoName.textContent = 'Admin';
                     }
-                    if (adminInfoEmail && currentAdmin) {
-                        adminInfoEmail.textContent = currentAdmin.email || 'Administrator';
+                    if (adminInfoEmail) {
+                        adminInfoEmail.textContent = 'Administrator';
                     }
-                    if (adminAvatar && currentAdmin) {
-                        adminAvatar.textContent = (currentAdmin.username || 'AD').substring(0,2).toUpperCase();
+                    if (adminAvatar) {
+                        adminAvatar.textContent = 'AD';
                     }
                 }, 100);
             }
@@ -1583,7 +1389,6 @@
 
             async function addUserProfile(profileData) {
                 showGlobalLoading('Creating profile...');
-                // Simulate API call
                 setTimeout(() => {
                     hideGlobalLoading();
                     showNotification('User profile created successfully');
@@ -1593,7 +1398,6 @@
 
             async function sendNotification(data) {
                 showGlobalLoading('Sending notification...');
-                // Simulate API call
                 setTimeout(() => {
                     hideGlobalLoading();
                     showNotification('Notification sent successfully');
@@ -1603,30 +1407,11 @@
 
             async function addLanguage(data) {
                 showGlobalLoading('Adding language...');
-                // Simulate API call
                 setTimeout(() => {
                     hideGlobalLoading();
                     showNotification('Language added successfully');
                 }, 1000);
                 return true;
-            }
-
-            async function updateAdminPassword(currentPassword, newPassword) {
-                showGlobalLoading('Updating password...');
-                const result = await apiCall('updateAdminPassword', {
-                    currentPassword: currentPassword,
-                    newPassword: newPassword
-                }, 'POST', false);
-                
-                hideGlobalLoading();
-                
-                if (result.success) {
-                    showNotification('Password updated successfully');
-                    return true;
-                } else {
-                    showNotification(result.error || 'Failed to update password', 'error');
-                    return false;
-                }
             }
 
             // ========== RENDERING FUNCTIONS ==========
@@ -1712,14 +1497,14 @@
                     <div class="top-bar">
                         <div class="page-title">
                             <h1>Dashboard</h1>
-                            <p>Welcome back, ${currentAdmin?.username || 'Admin'}</p>
+                            <p>Welcome back, Admin</p>
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
@@ -1830,10 +1615,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
@@ -1897,10 +1682,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
@@ -1964,10 +1749,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
@@ -1992,10 +1777,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
@@ -2059,10 +1844,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
@@ -2104,10 +1889,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
@@ -2154,10 +1939,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
@@ -2210,10 +1995,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
@@ -2266,10 +2051,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
@@ -2323,10 +2108,10 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
@@ -2373,26 +2158,22 @@
                         </div>
                         <div class="admin-profile">
                             <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
                             </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div class="admin-avatar">AD</div>
                         </div>
                     </div>
                     
                     <div class="table-container">
                         <h3 style="margin-bottom: 20px;">Admin Account</h3>
                         <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 30px;">
-                            <div style="width: 80px; height: 80px; background: var(--gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
+                            <div style="width: 80px; height: 80px; background: var(--gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">AD</div>
                             <div>
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p style="color: var(--gray); margin-top: 5px;">${currentAdmin?.email || 'admin@btff.com'}</p>
+                                <h4>Admin</h4>
+                                <p style="color: var(--gray); margin-top: 5px;">admin@btff.com</p>
                             </div>
                         </div>
-                        
-                        <button class="btn-primary" onclick="openPasswordModal()">
-                            <i class="fas fa-key"></i> Change Password
-                        </button>
                         
                         <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 40px 0;">
                         
@@ -2437,7 +2218,6 @@
                 });
                 charts = {};
                 
-                // Category Chart
                 const categoryCtx = document.getElementById('categoryChart')?.getContext('2d');
                 if (categoryCtx) {
                     const trendingCount = movies.filter(m => m.category === 'trending').length;
@@ -2506,7 +2286,6 @@
                     }
                 }
                 
-                // Rating Chart
                 const ratingCtx = document.getElementById('ratingChart')?.getContext('2d');
                 if (ratingCtx) {
                     const ratingDist = [0,0,0,0,0];
@@ -2548,7 +2327,6 @@
                     }
                 }
                 
-                // Ratings Distribution Chart
                 const ratingsDistCtx = document.getElementById('ratingsDistChart')?.getContext('2d');
                 if (ratingsDistCtx) {
                     const ratingDist = [0,0,0,0,0];
@@ -2641,15 +2419,6 @@
                 document.body.style.overflow = 'hidden';
             };
 
-            window.openPasswordModal = () => {
-                document.getElementById('currentPassword').value = '';
-                document.getElementById('newPassword').value = '';
-                document.getElementById('confirmPassword').value = '';
-                document.getElementById('adminId').value = currentAdmin?.id || '';
-                passwordModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            };
-
             window.editMovie = (movieId) => {
                 const movie = movies.find(m => m.id == movieId);
                 if (!movie) return;
@@ -2683,19 +2452,6 @@
             };
 
             // ========== EVENT LISTENERS ==========
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault(); // This is crucial!
-                console.log('📝 Form submitted');
-                
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                
-                console.log('Username entered:', username);
-                console.log('Password entered:', password ? '****' : 'empty');
-                
-                await login(username, password);
-            });
-
             navItems.forEach(item => {
                 item.addEventListener('click', () => {
                     const view = item.dataset.view;
@@ -2705,8 +2461,6 @@
                     }
                 });
             });
-
-            document.getElementById('logoutBtn').addEventListener('click', logout);
 
             // Modal close listeners
             closeMovieModal.addEventListener('click', () => {
@@ -2729,11 +2483,6 @@
                 document.body.style.overflow = 'auto';
             });
 
-            closePasswordModal.addEventListener('click', () => {
-                passwordModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            });
-
             // Cancel buttons
             cancelMovieBtn.addEventListener('click', () => {
                 movieModal.classList.remove('active');
@@ -2752,11 +2501,6 @@
 
             cancelLanguageBtn.addEventListener('click', () => {
                 languageModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            });
-
-            cancelPasswordBtn.addEventListener('click', () => {
-                passwordModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
             });
 
@@ -2851,31 +2595,6 @@
                 }
             });
 
-            passwordForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const current = document.getElementById('currentPassword').value;
-                const newPass = document.getElementById('newPassword').value;
-                const confirm = document.getElementById('confirmPassword').value;
-                
-                if (newPass !== confirm) {
-                    showNotification('New passwords do not match', 'error');
-                    return;
-                }
-                
-                if (newPass.length < 6) {
-                    showNotification('Password must be at least 6 characters', 'error');
-                    return;
-                }
-                
-                const success = await updateAdminPassword(current, newPass);
-                
-                if (success) {
-                    passwordModal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                }
-            });
-
             document.addEventListener('change', (e) => {
                 if (e.target.id === 'movieType') {
                     const isSeries = e.target.value === 'series';
@@ -2901,14 +2620,11 @@
                     languageModal.classList.remove('active');
                     document.body.style.overflow = 'auto';
                 }
-                if (e.target === passwordModal) {
-                    passwordModal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                }
             });
 
             // ========== INITIALIZATION ==========
-            checkAuth();
+            // Nothing to initialize - wait for user to click Enter
+            console.log('Admin panel ready - click Enter to continue');
         })();
     </script>
 </body>

@@ -1493,6 +1493,38 @@
         </div>
     </div>
 
+    <!-- Add this temporary test button -->
+    <div style="margin: 20px 0; text-align: center;">
+        <button onclick="testFirstVideo()" style="background: #ff6b6b; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+            🎥 Test First Video Directly
+        </button>
+    </div>
+
+    <script>
+    // Add this test function
+    function testFirstVideo() {
+        if (!movies || movies.length === 0) {
+            alert('No movies loaded yet');
+            return;
+        }
+        
+        const firstMovie = movies[0];
+        const youtubeId = firstMovie.youtubeId;
+        
+        console.log('Testing video:', {
+            title: firstMovie.title,
+            youtubeId: youtubeId,
+            fullUrl: `https://www.youtube.com/watch?v=${youtubeId}`
+        });
+        
+        // Open in new tab to test directly
+        window.open(`https://www.youtube.com/watch?v=${youtubeId}`, '_blank');
+        
+        // Also test embed
+        alert(`Testing YouTube ID: ${youtubeId}\nLength: ${youtubeId.length} characters\n\nCheck console for more info`);
+    }
+    </script>
+
     <div class="container">
         <!-- LOADING INDICATOR -->
         <div id="loadingIndicator" class="loading" style="display: block;">

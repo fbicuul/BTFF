@@ -2746,7 +2746,7 @@
             if (detailsMeta) {
                 detailsMeta.innerHTML = `
                     <span>${movie.year || '2024'}</span>
-                    <span>${movie.duration || '1h 30m'}</span>
+                    <span>${movie.duration || '0m'}</span>
                     <span>${movie.category}</span>
                     ${movie.genre ? `<span>${movie.genre}</span>` : ''}
                 `;
@@ -2977,7 +2977,7 @@
                     <div class="card-title">${movie.title}</div>
                     <div class="card-meta">
                         <span>${movie.year || '2024'}</span>
-                        <span>${movie.duration || '1h 30m'}</span>
+                        <span>${movie.duration || '0m'}</span>
                         <span>${movie.genre || movie.category}</span>
                     </div>
                     <div class="card-rating">

@@ -1494,36 +1494,11 @@
     </div>
 
     <!-- Add this temporary test button -->
-    <div style="margin: 20px 0; text-align: center;">
-        <button onclick="testFirstVideo()" style="background: #ff6b6b; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-            🎥 Test First Video Directly
+    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 10000;">
+        <button onclick="testVideoDirectly()" style="background: #ff6b6b; color: white; border: none; padding: 15px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+            🎥 TEST VIDEO PLAYER
         </button>
     </div>
-
-    <script>
-    // Add this test function
-    function testFirstVideo() {
-        if (!movies || movies.length === 0) {
-            alert('No movies loaded yet');
-            return;
-        }
-        
-        const firstMovie = movies[0];
-        const youtubeId = firstMovie.youtubeId;
-        
-        console.log('Testing video:', {
-            title: firstMovie.title,
-            youtubeId: youtubeId,
-            fullUrl: `https://www.youtube.com/watch?v=${youtubeId}`
-        });
-        
-        // Open in new tab to test directly
-        window.open(`https://www.youtube.com/watch?v=${youtubeId}`, '_blank');
-        
-        // Also test embed
-        alert(`Testing YouTube ID: ${youtubeId}\nLength: ${youtubeId.length} characters\n\nCheck console for more info`);
-    }
-    </script>
 
     <div class="container">
         <!-- LOADING INDICATOR -->
@@ -2426,6 +2401,39 @@
             }
         }
 
+        // Add this debug function
+        function testVideoDirectly() {
+            if (!movies || movies.length === 0) {
+                alert('No movies loaded yet');
+                return;
+            }
+            
+            const firstMovie = movies[0];
+            const youtubeId = firstMovie.youtubeId.split('?')[0].split('&')[0];
+            
+            console.log('===== VIDEO DEBUG =====');
+            console.log('Movie:', firstMovie.title);
+            console.log('YouTube ID:', youtubeId);
+            console.log('Embed URL:', `https://www.youtube.com/embed/${youtubeId}`);
+            console.log('Watch URL:', `https://www.youtube.com/watch?v=${youtubeId}`);
+            
+            // Test if YouTube allows embedding
+            fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${youtubeId}&format=json`)
+                .then(r => r.json())
+                .then(data => {
+                    console.log('✅ YouTube API says video exists and is embeddable!');
+                    console.log('Video title:', data.title);
+                })
+                .catch(err => {
+                    console.error('❌ YouTube API error - video might not exist or embedding disabled:', err);
+                });
+            
+            // Force open in new tab as last resort
+            if (confirm('Open video directly on YouTube?')) {
+                window.open(`https://www.youtube.com/watch?v=${youtubeId}`, '_blank');
+            }
+        }
+
         async function fetchAllRatings() {
             const data = await apiCall('getRatings');
             
@@ -2664,6 +2672,7 @@
 
         // Replace your openVideoPlayer function with this simpler version:
 
+        // ---------- VIDEO PLAYER FUNCTIONS ----------
         function openVideoPlayer(movieId, episode = null) {
             const movie = movies.find(m => m.id == movieId);
             if (!movie) {
@@ -2679,15 +2688,17 @@
             
             currentMovie = movie;
             
-            // Extract clean YouTube ID
+            // Get clean YouTube ID
             const youtubeId = movie.youtubeId.split('?')[0].split('&')[0];
             
             if (videoModalTitle) {
                 videoModalTitle.textContent = episode ? `${movie.title} - ${episode}` : movie.title;
             }
             
-            // Use the simplest possible YouTube embed URL
+            // ULTRA SIMPLE YouTube embed - no extra parameters
             const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
+            
+            console.log('Playing video:', embedUrl); // Debug log
             
             if (videoIframe) {
                 videoIframe.src = embedUrl;

@@ -279,6 +279,53 @@
             color: var(--gray);
         }
 
+        /* ===== GLOBAL LOADING OVERLAY ===== */
+        .global-loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 26, 0.95);
+            backdrop-filter: blur(5px);
+            z-index: 20000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .global-loading-overlay.active {
+            display: flex;
+        }
+
+        .global-loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 5px solid rgba(47, 107, 198, 0.2);
+            border-top: 5px solid #2f6bc6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .global-loading-text {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .global-loading-text i {
+            color: #ffc107;
+            margin: 0 5px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* ===== STATS CARDS ===== */
         .stats-grid {
             display: grid;
@@ -738,39 +785,6 @@
             background: var(--warning);
         }
 
-        /* ===== LOADING ===== */
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255,255,255,0.1);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
             .stats-grid {
@@ -826,6 +840,14 @@
     </style>
 </head>
 <body>
+    <!-- GLOBAL LOADING OVERLAY -->
+    <div class="global-loading-overlay" id="globalLoadingOverlay">
+        <div class="global-loading-spinner"></div>
+        <div class="global-loading-text">
+            <i class="fas fa-cog fa-spin"></i> Loading... <i class="fas fa-cog fa-spin"></i>
+        </div>
+    </div>
+
     <!-- LOGIN PAGE -->
     <div class="login-container" id="loginContainer">
         <div class="login-box">
@@ -870,10 +892,6 @@
             <div class="nav-item" data-view="series">
                 <i class="fas fa-tv"></i>
                 <span>Series</span>
-            </div>
-            <div class="nav-item" data-view="coming-soon">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Coming Soon</span>
             </div>
             <div class="nav-item" data-view="genres">
                 <i class="fas fa-tags"></i>
@@ -1060,40 +1078,6 @@
         </div>
     </div>
 
-    <!-- ADD COMING SOON MODAL -->
-    <div class="modal" id="comingSoonModal">
-        <div class="modal-content">
-            <span class="modal-close" id="closeComingSoonModal">&times;</span>
-            <h2>Add Coming Soon</h2>
-            <form id="comingSoonForm">
-                <div class="form-group">
-                    <label>Title</label>
-                    <input type="text" id="comingSoonTitle" required>
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="comingSoonDescription" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Genre</label>
-                    <input type="text" id="comingSoonGenre" required>
-                </div>
-                <div class="form-group">
-                    <label>Release Date</label>
-                    <input type="date" id="comingSoonReleaseDate" required>
-                </div>
-                <div class="form-group">
-                    <label>Poster URL</label>
-                    <input type="text" id="comingSoonPoster" placeholder="https://...">
-                </div>
-                <div class="modal-buttons">
-                    <button type="submit" class="btn-primary">Save</button>
-                    <button type="button" class="btn-secondary" id="cancelComingSoonBtn">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- ADD NOTIFICATION MODAL -->
     <div class="modal" id="notificationModal">
         <div class="modal-content">
@@ -1191,16 +1175,36 @@
     <!-- NOTIFICATION -->
     <div class="notification" id="notification">Action completed successfully</div>
 
-    <!-- LOADING OVERLAY -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-    </div>
-
     <script>
         (function() {
             // ========== CONFIGURATION ==========
-            // This will be replaced by environment variable
             const APPS_SCRIPT_URL = '%%APPS_SCRIPT_URL%%';
+            
+            // ========== GLOBAL LOADING ==========
+            const globalLoadingOverlay = document.getElementById('globalLoadingOverlay');
+            let loadingTimeout = null;
+
+            function showGlobalLoading(message = 'Loading...') {
+                const loadingText = document.querySelector('.global-loading-text');
+                if (loadingText) {
+                    loadingText.innerHTML = `<i class="fas fa-cog fa-spin"></i> ${message} <i class="fas fa-cog fa-spin"></i>`;
+                }
+                globalLoadingOverlay.classList.add('active');
+                
+                // Safety timeout - hide after 30 seconds maximum
+                if (loadingTimeout) clearTimeout(loadingTimeout);
+                loadingTimeout = setTimeout(() => {
+                    hideGlobalLoading();
+                }, 30000);
+            }
+
+            function hideGlobalLoading() {
+                globalLoadingOverlay.classList.remove('active');
+                if (loadingTimeout) {
+                    clearTimeout(loadingTimeout);
+                    loadingTimeout = null;
+                }
+            }
             
             // ========== STATE ==========
             let movies = [];
@@ -1210,7 +1214,6 @@
             let notifications = [];
             let users = [];
             let profiles = [];
-            let comingSoon = [];
             let languages = [
                 { code: 'en', name: 'English', native: 'English', translations: {} },
                 { code: 'es', name: 'Spanish', native: 'Español', translations: {} },
@@ -1231,30 +1234,25 @@
             const navItems = document.querySelectorAll('.nav-item');
             const movieModal = document.getElementById('movieModal');
             const userProfileModal = document.getElementById('userProfileModal');
-            const comingSoonModal = document.getElementById('comingSoonModal');
             const notificationModal = document.getElementById('notificationModal');
             const languageModal = document.getElementById('languageModal');
             const passwordModal = document.getElementById('passwordModal');
             const closeMovieModal = document.getElementById('closeMovieModal');
             const closeUserProfileModal = document.getElementById('closeUserProfileModal');
-            const closeComingSoonModal = document.getElementById('closeComingSoonModal');
             const closeNotificationModal = document.getElementById('closeNotificationModal');
             const closeLanguageModal = document.getElementById('closeLanguageModal');
             const closePasswordModal = document.getElementById('closePasswordModal');
             const cancelMovieBtn = document.getElementById('cancelMovieBtn');
             const cancelUserProfileBtn = document.getElementById('cancelUserProfileBtn');
-            const cancelComingSoonBtn = document.getElementById('cancelComingSoonBtn');
             const cancelNotificationBtn = document.getElementById('cancelNotificationBtn');
             const cancelLanguageBtn = document.getElementById('cancelLanguageBtn');
             const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
             const movieForm = document.getElementById('movieForm');
             const userProfileForm = document.getElementById('userProfileForm');
-            const comingSoonForm = document.getElementById('comingSoonForm');
             const notificationForm = document.getElementById('notificationForm');
             const languageForm = document.getElementById('languageForm');
             const passwordForm = document.getElementById('passwordForm');
             const notification = document.getElementById('notification');
-            const loadingOverlay = document.getElementById('loadingOverlay');
 
             // ========== SESSION MANAGEMENT ==========
             function getSessionToken() {
@@ -1285,8 +1283,10 @@
             }
 
             // ========== API HELPER ==========
-            async function apiCall(action, data = {}, method = 'GET') {
-                showLoading(true);
+            async function apiCall(action, data = {}, method = 'GET', showLoading = true) {
+                if (showLoading) {
+                    showGlobalLoading('Connecting...');
+                }
                 
                 try {
                     let url = `/api/proxy?action=${action}&t=${Date.now()}`;
@@ -1318,18 +1318,22 @@
                     const response = await fetch(url, options);
                     const text = await response.text();
                     
+                    if (showLoading) {
+                        hideGlobalLoading();
+                    }
+                    
                     try {
                         const result = JSON.parse(text);
-                        showLoading(false);
                         return result;
                     } catch (e) {
                         console.error('Invalid JSON response:', text);
-                        showLoading(false);
                         return { success: false, error: 'Invalid server response' };
                     }
                 } catch (error) {
                     console.error('API call failed:', error);
-                    showLoading(false);
+                    if (showLoading) {
+                        hideGlobalLoading();
+                    }
                     return { success: false, error: error.message };
                 }
             }
@@ -1342,7 +1346,7 @@
                     return false;
                 }
                 
-                const result = await apiCall('validateSession', { sessionToken: token });
+                const result = await apiCall('validateSession', { sessionToken: token }, 'GET', false);
                 
                 if (result.valid) {
                     currentAdmin = getAdminUser();
@@ -1370,11 +1374,12 @@
             }
 
             async function login(username, password) {
+                showGlobalLoading('Logging in...');
                 const result = await apiCall('adminLogin', {
                     username: username,
                     password: password,
                     userAgent: navigator.userAgent
-                }, 'POST');
+                }, 'POST', false);
                 
                 if (result.success) {
                     setSessionToken(result.sessionToken);
@@ -1386,9 +1391,11 @@
                     updateActiveNavItem('dashboard');
                     await renderView('dashboard');
                     
+                    hideGlobalLoading();
                     showNotification('Login successful!');
                     return true;
                 } else {
+                    hideGlobalLoading();
                     loginError.style.display = 'block';
                     loginError.textContent = result.error || 'Invalid username or password';
                     return false;
@@ -1397,7 +1404,7 @@
 
             function logout() {
                 if (getSessionToken()) {
-                    apiCall('adminLogout', { sessionToken: getSessionToken() });
+                    apiCall('adminLogout', { sessionToken: getSessionToken() }, 'POST', false);
                 }
                 setSessionToken(null);
                 setAdminUser(null);
@@ -1408,14 +1415,6 @@
             }
 
             // ========== UI HELPERS ==========
-            function showLoading(show) {
-                if (show) {
-                    loadingOverlay.classList.add('active');
-                } else {
-                    loadingOverlay.classList.remove('active');
-                }
-            }
-
             function showNotification(msg, type = 'success') {
                 notification.textContent = msg;
                 notification.className = 'notification ' + type;
@@ -1452,7 +1451,7 @@
 
             // ========== DATA FETCHING ==========
             async function fetchMovies() {
-                const result = await apiCall('getMovies');
+                const result = await apiCall('getMovies', {}, 'GET', false);
                 if (result.success) {
                     movies = result.movies || [];
                 }
@@ -1460,7 +1459,7 @@
             }
 
             async function fetchRatings() {
-                const result = await apiCall('getRatings');
+                const result = await apiCall('getRatings', {}, 'GET', false);
                 if (result.success) {
                     ratings = result.ratings || [];
                 }
@@ -1468,7 +1467,7 @@
             }
 
             async function fetchComments() {
-                const result = await apiCall('getComments', { movieId: 'all' });
+                const result = await apiCall('getComments', { movieId: 'all' }, 'GET', false);
                 if (result.success) {
                     comments = result.comments || [];
                 }
@@ -1476,23 +1475,15 @@
             }
 
             async function fetchWatchHistory() {
-                const result = await apiCall('getWatchHistory', { userId: 'all' });
+                const result = await apiCall('getWatchHistory', { userId: 'all' }, 'GET', false);
                 if (result.success) {
                     watchHistory = result.watchHistory || [];
                 }
                 return watchHistory;
             }
 
-            async function fetchComingSoon() {
-                const result = await apiCall('getComingSoon');
-                if (result.success) {
-                    comingSoon = result.comingSoon || [];
-                }
-                return comingSoon;
-            }
-
             async function fetchNotifications() {
-                const result = await apiCall('getNotifications', { userId: 'all' });
+                const result = await apiCall('getNotifications', { userId: 'all' }, 'GET', false);
                 if (result.success) {
                     notifications = result.notifications || [];
                 }
@@ -1511,25 +1502,35 @@
 
             // ========== CRUD OPERATIONS ==========
             async function addMovie(movieData) {
-                const result = await apiCall('addMovie', movieData, 'POST');
+                showGlobalLoading('Adding movie...');
+                const result = await apiCall('addMovie', movieData, 'POST', false);
                 if (result.success) {
-                    showNotification('Movie added successfully');
                     await fetchMovies();
                     await renderView(currentView);
+                    hideGlobalLoading();
+                    showNotification('Movie added successfully');
+                } else {
+                    hideGlobalLoading();
+                    showNotification('Failed to add movie', 'error');
                 }
                 return result.success;
             }
 
             async function updateMovie(movieId, updates) {
+                showGlobalLoading('Updating movie...');
                 const result = await apiCall('updateMovie', {
                     id: movieId,
                     updates: JSON.stringify(updates)
-                }, 'POST');
+                }, 'POST', false);
                 
                 if (result.success) {
-                    showNotification('Movie updated successfully');
                     await fetchMovies();
                     await renderView(currentView);
+                    hideGlobalLoading();
+                    showNotification('Movie updated successfully');
+                } else {
+                    hideGlobalLoading();
+                    showNotification('Failed to update movie', 'error');
                 }
                 return result.success;
             }
@@ -1537,40 +1538,58 @@
             async function deleteMovie(movieId) {
                 if (!confirm('Are you sure you want to delete this movie?')) return false;
                 
-                const result = await apiCall('deleteMovie', { id: movieId }, 'POST');
+                showGlobalLoading('Deleting movie...');
+                const result = await apiCall('deleteMovie', { id: movieId }, 'POST', false);
                 if (result.success) {
-                    showNotification('Movie deleted successfully');
                     await fetchMovies();
                     await renderView(currentView);
+                    hideGlobalLoading();
+                    showNotification('Movie deleted successfully');
+                } else {
+                    hideGlobalLoading();
+                    showNotification('Failed to delete movie', 'error');
                 }
                 return result.success;
             }
 
             async function addUserProfile(profileData) {
-                showNotification('User profile created successfully');
-                return true;
-            }
-
-            async function addComingSoon(data) {
-                showNotification('Coming soon added successfully');
+                showGlobalLoading('Creating profile...');
+                // Simulate API call
+                setTimeout(() => {
+                    hideGlobalLoading();
+                    showNotification('User profile created successfully');
+                }, 1000);
                 return true;
             }
 
             async function sendNotification(data) {
-                showNotification('Notification sent successfully');
+                showGlobalLoading('Sending notification...');
+                // Simulate API call
+                setTimeout(() => {
+                    hideGlobalLoading();
+                    showNotification('Notification sent successfully');
+                }, 1000);
                 return true;
             }
 
             async function addLanguage(data) {
-                showNotification('Language added successfully');
+                showGlobalLoading('Adding language...');
+                // Simulate API call
+                setTimeout(() => {
+                    hideGlobalLoading();
+                    showNotification('Language added successfully');
+                }, 1000);
                 return true;
             }
 
             async function updateAdminPassword(currentPassword, newPassword) {
+                showGlobalLoading('Updating password...');
                 const result = await apiCall('updateAdminPassword', {
                     currentPassword: currentPassword,
                     newPassword: newPassword
-                }, 'POST');
+                }, 'POST', false);
+                
+                hideGlobalLoading();
                 
                 if (result.success) {
                     showNotification('Password updated successfully');
@@ -1586,13 +1605,12 @@
                 currentView = view;
                 localStorage.setItem('btff_admin_last_view', view);
                 
-                showLoading(true);
+                showGlobalLoading('Loading dashboard...');
                 
                 await fetchMovies();
                 await fetchRatings();
                 await fetchComments();
                 await fetchWatchHistory();
-                await fetchComingSoon();
                 await fetchNotifications();
                 await fetchUserProfiles();
                 
@@ -1607,9 +1625,6 @@
                         break;
                     case 'series':
                         html = renderSeries();
-                        break;
-                    case 'coming-soon':
-                        html = renderComingSoon();
                         break;
                     case 'genres':
                         html = renderGenres();
@@ -1646,7 +1661,7 @@
                 
                 setTimeout(() => {
                     initializeCharts();
-                    showLoading(false);
+                    hideGlobalLoading();
                 }, 100);
             }
 
@@ -1897,66 +1912,6 @@
                                         </td>
                                     </tr>
                                 `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            }
-
-            function renderComingSoon() {
-                return `
-                    <div class="top-bar">
-                        <div class="page-title">
-                            <h1>Coming Soon</h1>
-                            <p>Schedule upcoming releases</p>
-                        </div>
-                        <div class="admin-profile">
-                            <div class="admin-info">
-                                <h4>${currentAdmin?.username || 'Admin'}</h4>
-                                <p>${currentAdmin?.email || 'Administrator'}</p>
-                            </div>
-                            <div class="admin-avatar">${(currentAdmin?.username || 'AD').substring(0,2).toUpperCase()}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="section-header">
-                        <h2>Upcoming Releases (${comingSoon.length})</h2>
-                        <button class="btn-primary" onclick="openAddComingSoonModal()">
-                            <i class="fas fa-plus"></i> Add Coming Soon
-                        </button>
-                    </div>
-                    
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Genre</th>
-                                    <th>Release Date</th>
-                                    <th>Days Left</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${comingSoon.map(item => {
-                                    const daysLeft = Math.ceil((new Date(item.releaseDate) - new Date()) / (1000 * 60 * 60 * 24));
-                                    return `
-                                        <tr>
-                                            <td>${item.title}</td>
-                                            <td>${item.genre}</td>
-                                            <td>${item.releaseDate}</td>
-                                            <td>${daysLeft > 0 ? daysLeft + ' days' : 'Today!'}</td>
-                                            <td><span class="status-badge warning">Coming Soon</span></td>
-                                            <td>
-                                                <div class="action-btns">
-                                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    `;
-                                }).join('')}
                             </tbody>
                         </table>
                     </div>
@@ -2433,7 +2388,7 @@
                             <input type="text" value="${APPS_SCRIPT_URL}" readonly style="width: 100%; padding: 15px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--gray);">
                         </div>
                         
-                        <button class="btn-primary" style="margin-top: 20px;">
+                        <button class="btn-primary" style="margin-top: 20px;" onclick="showNotification('Settings saved (demo)')">
                             <i class="fas fa-save"></i> Save Settings
                         </button>
                     </div>
@@ -2640,16 +2595,6 @@
                 document.body.style.overflow = 'hidden';
             };
 
-            window.openAddComingSoonModal = () => {
-                document.getElementById('comingSoonTitle').value = '';
-                document.getElementById('comingSoonDescription').value = '';
-                document.getElementById('comingSoonGenre').value = '';
-                document.getElementById('comingSoonReleaseDate').value = '';
-                document.getElementById('comingSoonPoster').value = '';
-                comingSoonModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            };
-
             window.openNotificationModal = () => {
                 document.getElementById('notificationUser').value = 'all';
                 document.getElementById('notificationMessage').value = '';
@@ -2741,11 +2686,6 @@
                 document.body.style.overflow = 'auto';
             });
 
-            closeComingSoonModal.addEventListener('click', () => {
-                comingSoonModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            });
-
             closeNotificationModal.addEventListener('click', () => {
                 notificationModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
@@ -2769,11 +2709,6 @@
 
             cancelUserProfileBtn.addEventListener('click', () => {
                 userProfileModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            });
-
-            cancelComingSoonBtn.addEventListener('click', () => {
-                comingSoonModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
             });
 
@@ -2844,25 +2779,6 @@
                 
                 if (success) {
                     userProfileModal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                }
-            });
-
-            comingSoonForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const data = {
-                    title: document.getElementById('comingSoonTitle').value,
-                    description: document.getElementById('comingSoonDescription').value,
-                    genre: document.getElementById('comingSoonGenre').value,
-                    releaseDate: document.getElementById('comingSoonReleaseDate').value,
-                    poster: document.getElementById('comingSoonPoster').value
-                };
-                
-                const success = await addComingSoon(data);
-                
-                if (success) {
-                    comingSoonModal.classList.remove('active');
                     document.body.style.overflow = 'auto';
                 }
             });
@@ -2942,10 +2858,6 @@
                 }
                 if (e.target === userProfileModal) {
                     userProfileModal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                }
-                if (e.target === comingSoonModal) {
-                    comingSoonModal.classList.remove('active');
                     document.body.style.overflow = 'auto';
                 }
                 if (e.target === notificationModal) {

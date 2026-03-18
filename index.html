@@ -2662,7 +2662,8 @@
             }
         }
 
-        // Video Player
+        // Replace your openVideoPlayer function with this simpler version:
+
         function openVideoPlayer(movieId, episode = null) {
             const movie = movies.find(m => m.id == movieId);
             if (!movie) {
@@ -2685,8 +2686,8 @@
                 videoModalTitle.textContent = episode ? `${movie.title} - ${episode}` : movie.title;
             }
             
-            // Simple YouTube embed URL
-            const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
+            // Use the simplest possible YouTube embed URL
+            const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
             
             if (videoIframe) {
                 videoIframe.src = embedUrl;
@@ -2697,11 +2698,6 @@
             }
             
             document.body.style.overflow = 'hidden';
-            
-            // Update progress after 30 seconds
-            setTimeout(() => {
-                updateProgress(movieId, 25);
-            }, 30000);
             
             if (videoModalAddBtn) {
                 videoModalAddBtn.innerHTML = isInMyList(movieId) ? 

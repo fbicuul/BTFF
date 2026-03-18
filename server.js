@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const app = express();
 
-// Security middleware - UPDATED CSP with YouTube support
+// Security middleware - UPDATED CSP
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -29,7 +29,8 @@ app.use(helmet({
             imgSrc: ["'self'", "data:", "blob:", 
                     "https://img.youtube.com", 
                     "https://i.ytimg.com",
-                    "https://*.ytimg.com"],
+                    "https://*.ytimg.com",
+                    "https://*.youtube.com"],
             frameSrc: ["'self'", 
                       "https://www.youtube.com", 
                       "https://www.youtube-nocookie.com",
@@ -45,11 +46,14 @@ app.use(helmet({
             objectSrc: ["'none'"],
             baseUri: ["'self'"],
             formAction: ["'self'"],
-            // Allow YouTube iframes
+            // Critical: Allow YouTube iframes
             childSrc: ["'self'", "blob:", "https://www.youtube.com", "https://*.youtube.com"],
             frameAncestors: ["'self'"],
             // Allow media sources
             mediaSrc: ["'self'", "https://www.youtube.com", "https://*.youtube.com"],
+            // This is important - allows YouTube to load properly
+            workerSrc: ["'self'", "blob:", "https://www.youtube.com"],
+            manifestSrc: ["'self'"],
             // Upgrade insecure requests
             upgradeInsecureRequests: []
         }

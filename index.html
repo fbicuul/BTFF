@@ -2008,13 +2008,9 @@
             }
         }
 
-        // API wrapper with global loading
-        async function apiCall(action, data = {}, method = 'GET', showLoading = true) {
+        // API wrapper - MUST BE DEFINED BEFORE ANYTHING ELSE THAT USES IT
+        async function apiCall(action, data = {}, method = 'GET') {
             await initSession();
-            
-            if (showLoading) {
-                showGlobalLoading('Connecting...');
-            }
             
             let url = `/api/proxy?action=${action}&sessionToken=${currentSessionToken}&t=${Date.now()}`;
             
@@ -2039,8 +2035,6 @@
                 const response = await fetch(url, options);
                 const text = await response.text();
                 
-                hideGlobalLoading();
-                
                 try {
                     return JSON.parse(text);
                 } catch (e) {
@@ -2048,7 +2042,6 @@
                     return { success: false, error: 'Invalid server response' };
                 }
             } catch (error) {
-                hideGlobalLoading();
                 console.error('API call failed:', error);
                 return { success: false, error: error.message };
             }

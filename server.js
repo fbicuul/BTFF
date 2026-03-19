@@ -82,6 +82,25 @@ app.get('/admin', (req, res) => {
     }
 });
 
+// Route for call center page
+app.get('/callcenter', (req, res) => {
+    try {
+        const templatePath = path.join(__dirname, 'callcenter.html');
+        
+        if (!fs.existsSync(templatePath)) {
+            console.error('❌ callcenter.html not found at:', templatePath);
+            return res.status(500).send('callcenter.html not found');
+        }
+        
+        let html = fs.readFileSync(templatePath, 'utf8');
+        res.setHeader('Content-Type', 'text/html');
+        res.send(html);
+    } catch (error) {
+        console.error('Error serving call center:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 // Health check
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'healthy' });

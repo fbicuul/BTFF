@@ -28,100 +28,6 @@
             min-height: 100vh;
         }
 
-        /* ===== ENHANCED PROFILE MODAL ===== */
-        .enhanced-profile-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            align-items: center;
-            justify-content: center;
-            z-index: 5000;
-        }
-
-        .enhanced-profile-modal.active {
-            display: flex;
-        }
-
-        .profile-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .profile-stat-item {
-            background: #0a0f1a;
-            border-radius: 16px;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .profile-stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #2f6bc6;
-        }
-
-        .profile-stat-label {
-            color: #6b7280;
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
-
-        .watch-history-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border-bottom: 1px solid #1f334a;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .watch-history-item:hover {
-            background: #1c2a3f;
-        }
-
-        .watch-history-item img {
-            width: 50px;
-            height: 30px;
-            border-radius: 6px;
-            object-fit: cover;
-        }
-
-        .watch-history-info {
-            flex: 1;
-        }
-
-        .watch-history-title {
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-
-        .watch-history-progress {
-            height: 4px;
-            background: #1f3d62;
-            border-radius: 2px;
-            overflow: hidden;
-            width: 100%;
-        }
-
-        .watch-history-progress-fill {
-            height: 100%;
-            background: #2f6bc6;
-            transition: width 0.3s;
-        }
-
-        .watch-history-time {
-            font-size: 0.8rem;
-            color: #88abdf;
-        }
-
         /* hero wrapper with video background */
         .hero-wrapper {
             position: relative;
@@ -1314,43 +1220,6 @@
             border-radius: 24px;
         }
         
-        /* Keyboard shortcuts modal */
-        .shortcuts-modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #1c2a3f;
-            padding: 30px;
-            border-radius: 20px;
-            border: 2px solid #3d6190;
-            z-index: 3500;
-            min-width: 300px;
-        }
-        .shortcuts-modal.active {
-            display: block;
-        }
-        .shortcuts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .shortcut-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .shortcut-key {
-            background: #0a0f1a;
-            padding: 5px 10px;
-            border-radius: 5px;
-            border: 1px solid #2f6bc6;
-            font-family: monospace;
-            font-weight: bold;
-        }
-
         /* notifications */
         .notification {
             position: fixed;
@@ -1555,7 +1424,6 @@
                     <i class="fas fa-bell" id="notificationIcon" title="Notifications"></i>
                     <i class="fas fa-user" id="profileIcon" title="Profile"></i>
                     <i class="fas fa-language" id="languageIcon" title="Language"></i>
-                    <i class="fas fa-keyboard" id="shortcutsIcon" title="Keyboard Shortcuts"></i>
                     <button class="mobile-menu-btn" id="mobileMenuBtn">
                         <i class="fas fa-bars"></i>
                     </button>
@@ -1679,7 +1547,7 @@
         <!-- BECAUSE YOU WATCHED (AI Recommendations) -->
         <div id="recommendationsSection" style="display: none;">
             <div class="section-header">
-                <h2 class="section-title">🤖 BECAUSE YOU WATCHED</h2>
+                <h2 class="section-title">🤖 RECOMMENDED FOR YOU</h2>
                 <span class="section-link" id="refreshRecommendations">Refresh</span>
             </div>
             <div class="movie-row" id="recommendationsRow"></div>
@@ -1764,17 +1632,6 @@
                     
                     <p class="details-description" id="detailsDescription"></p>
                     
-                    <!-- AI Mood Selector -->
-                    <div class="ai-mood-selector" style="margin-bottom: 20px;">
-                        <h4>Find Movies Like This</h4>
-                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <button class="btn-secondary" onclick="findSimilarByMood('happy')">😊 Happy</button>
-                            <button class="btn-secondary" onclick="findSimilarByMood('exciting')">⚡ Exciting</button>
-                            <button class="btn-secondary" onclick="findSimilarByMood('relaxing')">😌 Relaxing</button>
-                            <button class="btn-secondary" onclick="findSimilarByMood('thoughtful')">🤔 Thoughtful</button>
-                        </div>
-                    </div>
-                    
                     <div class="details-buttons">
                         <button class="btn-primary" id="detailsPlayBtn"><i class="fas fa-play"></i> Play Now</button>
                         <button class="btn-secondary" id="detailsListBtn"><i class="fas fa-plus"></i> My List</button>
@@ -1849,22 +1706,6 @@
     <button class="btn-secondary" id="closePartyModal" style="margin-top: 10px;">Close</button>
 </div>
 
-<!-- KEYBOARD SHORTCUTS MODAL -->
-<div class="shortcuts-modal" id="shortcutsModal">
-    <h2>⌨️ Keyboard Shortcuts</h2>
-    <div class="shortcuts-grid">
-        <div class="shortcut-item"><span class="shortcut-key">Space</span> Play/Pause</div>
-        <div class="shortcut-item"><span class="shortcut-key">F</span> Fullscreen</div>
-        <div class="shortcut-item"><span class="shortcut-key">→</span> Forward 10s</div>
-        <div class="shortcut-item"><span class="shortcut-key">←</span> Backward 10s</div>
-        <div class="shortcut-item"><span class="shortcut-key">M</span> Mute</div>
-        <div class="shortcut-item"><span class="shortcut-key">Esc</span> Close Modal</div>
-        <div class="shortcut-item"><span class="shortcut-key">C</span> Cinema Mode</div>
-        <div class="shortcut-item"><span class="shortcut-key">P</span> Party Mode</div>
-    </div>
-    <button class="btn-primary" id="closeShortcuts" style="margin-top: 20px;">Got it</button>
-</div>
-
 <!-- NOTIFICATION -->
 <div class="notification" id="notification">✅ Added to My List</div>
 
@@ -1875,7 +1716,7 @@
     <button class="btn-secondary" style="width: 100%; margin-top: 10px;" onclick="document.getElementById('notificationsPanel').style.display='none'">Close</button>
 </div>
 
-<!-- PROFILE MODAL -->
+<!-- PROFILE MODAL (Simplified) -->
 <div class="modal" id="profileModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); align-items: center; justify-content: center; z-index: 5000;">
     <div class="modal-content" style="background: #0c1727; border-radius: 30px; padding: 40px; width: 400px; max-width: 90vw; border: 2px solid #2f6bc6;">
         <span class="modal-close" id="closeProfileModal" style="position: absolute; top: 20px; right: 20px; font-size: 2rem; cursor: pointer;">&times;</span>
@@ -1922,50 +1763,6 @@
     </div>
 </div>
 
-<!-- ENHANCED PROFILE MODAL -->
-<div class="enhanced-profile-modal" id="enhancedProfileModal">
-    <div class="modal-content" style="background: #0c1727; border-radius: 30px; padding: 40px; width: 600px; max-width: 90vw; border: 2px solid #2f6bc6; position: relative;">
-        <span class="modal-close" onclick="closeEnhancedProfile()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem; cursor: pointer;">&times;</span>
-        <h2 style="margin-bottom: 30px;"><i class="fas fa-user-circle"></i> Your Profile</h2>
-        
-        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px;">
-            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #2f6bc6, #1e4a8c); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;" id="enhancedProfileAvatar">👤</div>
-            <div>
-                <h3 id="enhancedProfileName" style="font-size: 1.5rem;">Viewer</h3>
-                <p id="enhancedProfileEmail" style="color: #6b7280;">Not signed in</p>
-                <button class="btn-primary" style="margin-top: 10px; padding: 8px 15px;" onclick="syncProfile()">
-                    <i class="fas fa-sync"></i> Sync Profile
-                </button>
-            </div>
-        </div>
-        
-        <div class="profile-stats-grid">
-            <div class="profile-stat-item">
-                <div class="profile-stat-value" id="profileWatchedCount">0</div>
-                <div class="profile-stat-label">Watched</div>
-            </div>
-            <div class="profile-stat-item">
-                <div class="profile-stat-value" id="profileWatchLaterCount">0</div>
-                <div class="profile-stat-label">Watch Later</div>
-            </div>
-            <div class="profile-stat-item">
-                <div class="profile-stat-value" id="profileRatingsCount">0</div>
-                <div class="profile-stat-label">Ratings</div>
-            </div>
-        </div>
-        
-        <div style="margin-top: 30px;">
-            <h4 style="margin-bottom: 15px;"><i class="fas fa-history"></i> Continue Watching</h4>
-            <div id="profileContinueWatching" style="max-height: 300px; overflow-y: auto;"></div>
-        </div>
-        
-        <div style="margin-top: 30px;">
-            <h4 style="margin-bottom: 15px;"><i class="fas fa-clock"></i> Watch Later</h4>
-            <div id="profileWatchLater" style="max-height: 200px; overflow-y: auto;"></div>
-        </div>
-    </div>
-</div>
-
 <script>
     (function() {
         // ---------- CONFIGURATION ----------
@@ -1993,7 +1790,6 @@
             }
             globalLoadingOverlay.classList.add('active');
             
-            // Safety timeout - hide after 30 seconds maximum
             if (loadingTimeout) clearTimeout(loadingTimeout);
             loadingTimeout = setTimeout(() => {
                 hideGlobalLoading();
@@ -2008,9 +1804,13 @@
             }
         }
 
-        // API wrapper - MUST BE DEFINED BEFORE ANYTHING ELSE THAT USES IT
-        async function apiCall(action, data = {}, method = 'GET') {
+        // API wrapper
+        async function apiCall(action, data = {}, method = 'GET', showLoading = true) {
             await initSession();
+            
+            if (showLoading) {
+                showGlobalLoading('Connecting...');
+            }
             
             let url = `/api/proxy?action=${action}&sessionToken=${currentSessionToken}&t=${Date.now()}`;
             
@@ -2035,6 +1835,10 @@
                 const response = await fetch(url, options);
                 const text = await response.text();
                 
+                if (showLoading) {
+                    hideGlobalLoading();
+                }
+                
                 try {
                     return JSON.parse(text);
                 } catch (e) {
@@ -2042,6 +1846,9 @@
                     return { success: false, error: 'Invalid server response' };
                 }
             } catch (error) {
+                if (showLoading) {
+                    hideGlobalLoading();
+                }
                 console.error('API call failed:', error);
                 return { success: false, error: error.message };
             }
@@ -2096,7 +1903,7 @@
                 popular: 'POPULAR ON BTFF',
                 recent: 'RECENTLY ADDED',
                 continueWatching: 'CONTINUE WATCHING',
-                recommendations: 'BECAUSE YOU WATCHED'
+                recommendations: 'RECOMMENDED FOR YOU'
             },
             es: {
                 featured: 'DESTACADO',
@@ -2106,7 +1913,7 @@
                 popular: 'POPULAR EN BTFF',
                 recent: 'RECIENTES',
                 continueWatching: 'SEGUIR VIENDO',
-                recommendations: 'PORQUE VISTE'
+                recommendations: 'RECOMENDADO PARA TI'
             },
             fr: {
                 featured: 'À LA UNE',
@@ -2116,7 +1923,7 @@
                 popular: 'POPULAIRE SUR BTFF',
                 recent: 'RÉCENTS',
                 continueWatching: 'CONTINUER À REGARDER',
-                recommendations: 'PARCE QUE VOUS AVEZ VU'
+                recommendations: 'RECOMMANDÉ POUR VOUS'
             }
         };
 
@@ -2217,10 +2024,6 @@
         const chatInput = document.getElementById('chatInput');
         const sendChat = document.getElementById('sendChat');
         const closePartyModal = document.getElementById('closePartyModal');
-        
-        const shortcutsModal = document.getElementById('shortcutsModal');
-        const shortcutsIcon = document.getElementById('shortcutsIcon');
-        const closeShortcuts = document.getElementById('closeShortcuts');
 
         // Language functions
         function translate(key) {
@@ -2236,10 +2039,11 @@
                 if (el.textContent.includes('TRENDING')) el.textContent = `🔥 ${translate('trending')}`;
                 if (el.textContent.includes('POPULAR')) el.textContent = `⭐ ${translate('popular')}`;
                 if (el.textContent.includes('RECENTLY')) el.textContent = `🆕 ${translate('recent')}`;
+                if (el.textContent.includes('RECOMMENDED')) el.textContent = `🤖 ${translate('recommendations')}`;
             });
         }
 
-        // AI Recommendations
+        // AI Recommendations (simple version based on watch history)
         function generateAIRecommendations(movieId) {
             const movie = movies.find(m => m.id == movieId);
             if (!movie) return [];
@@ -2251,31 +2055,6 @@
             
             return similar;
         }
-
-        window.findSimilarByMood = function(mood) {
-            if (!currentMovie) return;
-            
-            let moodFilters = {
-                happy: ['Comedy', 'Adventure', 'Animation'],
-                exciting: ['Action', 'Thriller', 'Sci-Fi'],
-                relaxing: ['Documentary', 'Drama', 'Romance'],
-                thoughtful: ['Drama', 'Documentary', 'History']
-            };
-            
-            const genres = moodFilters[mood] || [];
-            const recommendations = movies.filter(m => 
-                m.id != currentMovie.id && 
-                genres.includes(m.genre)
-            ).slice(0, 10);
-            
-            if (recommendationsRow) {
-                recommendationsRow.innerHTML = '';
-                recommendations.forEach(m => {
-                    recommendationsRow.appendChild(createMovieCard(m, true));
-                });
-            }
-            if (recommendationsSection) recommendationsSection.style.display = 'block';
-        };
 
         // Comments
         function loadComments(movieId) {
@@ -2302,7 +2081,7 @@
             const data = await apiCall('addComment', {
                 movieId: movieId,
                 comment: text
-            }, 'POST', false); // Don't show loading again since we already showed it
+            }, 'POST', false);
             
             if (data.success) {
                 if (!comments[movieId]) comments[movieId] = [];
@@ -2379,7 +2158,7 @@
             if (notificationsPanel) notificationsPanel.style.display = 'block';
         }
 
-        // User Profiles
+        // User Profiles (simplified)
         window.switchUser = function() {
             if (switchUserModal) switchUserModal.style.display = 'flex';
         };
@@ -2496,7 +2275,7 @@
             }
         }
 
-        // Hero - Updated for 20 second autoplay
+        // Hero - 20 second autoplay
         function updateHero(movie) {
             if (!movie) return;
             
@@ -2528,7 +2307,6 @@
                 heroAddBtn.onclick = () => addToMyList(movie.id);
             }
             
-            // Clear previous timeout
             if (heroTimeout) clearTimeout(heroTimeout);
             
             // Stop video after 20 seconds
@@ -2543,7 +2321,7 @@
                         </iframe>
                     `;
                 }
-            }, 20000); // 20 seconds
+            }, 20000);
         }
 
         // API Functions
@@ -2551,7 +2329,7 @@
             try {
                 showGlobalLoading('Loading movies...');
                 
-                const data = await apiCall('getMovies', {}, 'GET', false); // Don't show loading again
+                const data = await apiCall('getMovies', {}, 'GET', false);
                 
                 if (data.success && Array.isArray(data.movies)) {
                     movies = data.movies;
@@ -2825,7 +2603,7 @@
             }
         }
 
-        // ---------- VIDEO PLAYER FUNCTIONS ----------
+        // Video Player
         function openVideoPlayer(movieId, episode = null) {
             const movie = movies.find(m => m.id == movieId);
             if (!movie) {
@@ -2841,14 +2619,12 @@
             
             currentMovie = movie;
             
-            // Get clean YouTube ID
             const youtubeId = movie.youtubeId.split('?')[0].split('&')[0];
             
             if (videoModalTitle) {
                 videoModalTitle.textContent = episode ? `${movie.title} - ${episode}` : movie.title;
             }
             
-            // Simple embed URL
             const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
             
             console.log('🎬 Playing video:', embedUrl);
@@ -2857,13 +2633,16 @@
                 videoIframe.src = embedUrl;
             }
             
-            // FORCE the modal to be visible
             if (videoModal) {
                 videoModal.style.display = 'flex';
                 videoModal.classList.add('active');
             }
             
             document.body.style.overflow = 'hidden';
+            
+            setTimeout(() => {
+                updateProgress(movieId, 25);
+            }, 30000);
             
             if (videoModalAddBtn) {
                 videoModalAddBtn.innerHTML = isInMyList(movieId) ? 
@@ -3403,65 +3182,6 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // Keyboard Shortcuts
-        function handleKeyboardShortcuts(e) {
-            const key = e.key.toLowerCase();
-            
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            
-            switch(key) {
-                case ' ':
-                    e.preventDefault();
-                    break;
-                case 'f':
-                    e.preventDefault();
-                    if (videoModal && videoModal.classList.contains('active')) {
-                        if (document.fullscreenElement) {
-                            document.exitFullscreen();
-                        } else {
-                            videoModal.requestFullscreen();
-                        }
-                    }
-                    break;
-                case 'escape':
-                    if (videoModal && videoModal.classList.contains('active')) {
-                        closeVideoPlayer();
-                    }
-                    if (detailsModal && detailsModal.classList.contains('active')) {
-                        closeDetailsModalFunc();
-                    }
-                    if (ratingModal && ratingModal.classList.contains('active')) {
-                        ratingModal.classList.remove('active');
-                    }
-                    if (watchPartyModal && watchPartyModal.classList.contains('active')) {
-                        watchPartyModal.classList.remove('active');
-                    }
-                    if (shortcutsModal && shortcutsModal.classList.contains('active')) {
-                        shortcutsModal.classList.remove('active');
-                    }
-                    if (profileModal && profileModal.style.display === 'flex') {
-                        profileModal.style.display = 'none';
-                    }
-                    if (switchUserModal && switchUserModal.style.display === 'flex') {
-                        switchUserModal.style.display = 'none';
-                    }
-                    closeMobileMenuFunc();
-                    break;
-                case 'c':
-                    e.preventDefault();
-                    if (detailsModal && detailsModal.classList.contains('active')) {
-                        toggleCinemaMode();
-                    }
-                    break;
-                case 'p':
-                    e.preventDefault();
-                    if (detailsModal && detailsModal.classList.contains('active') && currentMovie) {
-                        createWatchParty();
-                    }
-                    break;
-            }
-        }
-
         // Event Listeners
         if (mobileMenuBtn) {
             mobileMenuBtn.addEventListener('click', function(e) {
@@ -3750,18 +3470,6 @@
             });
         }
 
-        if (shortcutsIcon) {
-            shortcutsIcon.addEventListener('click', () => {
-                if (shortcutsModal) shortcutsModal.classList.add('active');
-            });
-        }
-
-        if (closeShortcuts) {
-            closeShortcuts.addEventListener('click', () => {
-                if (shortcutsModal) shortcutsModal.classList.remove('active');
-            });
-        }
-
         if (closeProfileModal) {
             closeProfileModal.addEventListener('click', () => {
                 if (profileModal) profileModal.style.display = 'none';
@@ -3834,7 +3542,6 @@
             if (e.target === videoModal) closeVideoPlayer();
             if (e.target === ratingModal && ratingModal) ratingModal.classList.remove('active');
             if (e.target === watchPartyModal && watchPartyModal) watchPartyModal.classList.remove('active');
-            if (e.target === shortcutsModal && shortcutsModal) shortcutsModal.classList.remove('active');
             if (e.target === profileModal && profileModal) profileModal.style.display = 'none';
             if (e.target === switchUserModal && switchUserModal) switchUserModal.style.display = 'none';
             if (e.target === notificationsPanel) e.stopPropagation();
@@ -3842,8 +3549,6 @@
                 if (notificationsPanel) notificationsPanel.style.display = 'none';
             }
         });
-
-        window.addEventListener('keydown', handleKeyboardShortcuts);
 
         const urlParams = new URLSearchParams(window.location.search);
         const partyParam = urlParams.get('party');
@@ -3871,281 +3576,6 @@
             updateNotificationsBadge();
         });
     })();
-
-    // ===== ENHANCED USER PROFILE FUNCTIONS =====
-
-        let currentUserProfile = null;
-
-        // Initialize or load user profile
-        async function initUserProfile() {
-            console.log('Initializing user profile...');
-            
-            const sessionToken = localStorage.getItem('btff_session_token') || 'anonymous_' + Date.now();
-            
-            // Try to get existing profile from localStorage
-            let userProfile = JSON.parse(localStorage.getItem('btff_user_profile'));
-            
-            if (!userProfile) {
-                // Ask for email
-                const email = prompt('Enter your email to sync your watch history across devices (optional):', '');
-                
-                if (email !== null) { // User didn't click cancel
-                    console.log('Creating new profile with email:', email);
-                    
-                    // Create new profile via API - FIXED PARAMETERS
-                    const result = await apiCall('getUserProfile', {
-                        userId: sessionToken,
-                        username: 'Viewer',
-                        email: email,
-                        avatar: '👤'
-                    }, 'POST');
-                    
-                    console.log('Profile creation result:', result);
-                    
-                    if (result && result.success) {
-                        userProfile = result.profile;
-                        localStorage.setItem('btff_user_profile', JSON.stringify(userProfile));
-                        currentUserProfile = userProfile;
-                        showNotification('Profile created successfully!');
-                    } else {
-                        console.error('Failed to create user profile:', result?.error);
-                        showNotification('Error creating user profile');
-                    }
-                }
-            } else {
-                console.log('Existing profile found:', userProfile);
-                currentUserProfile = userProfile;
-            }
-            
-            return userProfile;
-        }
-
-        // Update watch progress
-        async function updateWatchProgress(movieId, progress, completed = false) {
-            if (!currentUserProfile) return;
-            
-            const result = await apiCall('updateWatchHistory', {
-                userId: currentUserProfile.userId,
-                movieId: movieId,
-                progress: progress,
-                completed: completed
-            }, 'POST');
-            
-            if (result.success) {
-                // Update local storage
-                currentUserProfile.watchHistory = result.watchHistory;
-                localStorage.setItem('btff_user_profile', JSON.stringify(currentUserProfile));
-                
-                // Update UI
-                updateContinueWatching();
-            }
-        }
-
-        // Load personalized recommendations
-        async function loadRecommendations() {
-            const result = await apiCall('getRecommendations', {
-                userId: currentUserProfile ? currentUserProfile.userId : null,
-                limit: 10
-            }, 'GET');
-            
-            if (result.success && result.recommendations.length > 0) {
-                const recRow = document.getElementById('recommendationsRow');
-                if (recRow) {
-                    recRow.innerHTML = '';
-                    result.recommendations.forEach(movie => {
-                        recRow.appendChild(createMovieCard(movie, true));
-                    });
-                    document.getElementById('recommendationsSection').style.display = 'block';
-                    
-                    // Add recommendation type badge
-                    const recTitle = document.querySelector('#recommendationsSection .section-title');
-                    if (recTitle) {
-                        recTitle.innerHTML = result.type === 'personalized' ? 
-                            '🎯 RECOMMENDED FOR YOU' : '🔥 TRENDING NOW';
-                    }
-                }
-            }
-        }
-
-        // Add to watch later
-        async function addToWatchLater(movieId) {
-            if (!currentUserProfile) {
-                showNotification('Please create a profile first', 'warning');
-                return;
-            }
-            
-            const result = await apiCall('addToWatchLater', {
-                userId: currentUserProfile.userId,
-                movieId: movieId
-            }, 'POST');
-            
-            if (result.success) {
-                currentUserProfile.watchLater = result.watchLater;
-                localStorage.setItem('btff_user_profile', JSON.stringify(currentUserProfile));
-                showNotification('✅ Added to Watch Later');
-            }
-        }
-
-        // Update continue watching section
-        function updateContinueWatching() {
-            if (!currentUserProfile || !currentUserProfile.watchHistory) return;
-            
-            const inProgress = currentUserProfile.watchHistory
-                .filter(entry => !entry.completed && entry.progress > 0)
-                .sort((a, b) => new Date(b.lastWatched) - new Date(a.lastWatched))
-                .slice(0, 10);
-            
-            const row = document.getElementById('continueWatchingRow');
-            const section = document.getElementById('continueWatchingSection');
-            
-            if (!row || !section) return;
-            
-            if (inProgress.length === 0) {
-                section.style.display = 'none';
-                return;
-            }
-            
-            row.innerHTML = '';
-            inProgress.forEach(entry => {
-                const movie = movies.find(m => m.id == entry.movieId);
-                if (movie) {
-                    const card = createMovieCard(movie, true);
-                    // Add progress bar
-                    const progressBar = card.querySelector('.progress-fill');
-                    if (progressBar) {
-                        progressBar.style.width = entry.progress + '%';
-                    }
-                    row.appendChild(card);
-                }
-            });
-            section.style.display = 'block';
-        }
-
-        // Sync profile
-        async function syncProfile() {
-            if (!currentUserProfile) return;
-            
-            const email = prompt('Enter your email to sync your profile:', currentUserProfile.email || '');
-            if (!email) return;
-            
-            const result = await apiCall('syncProfile', {
-                userId: currentUserProfile.userId,
-                email: email
-            }, 'POST');
-            
-            if (result.success) {
-                currentUserProfile = result.profile;
-                localStorage.setItem('btff_user_profile', JSON.stringify(currentUserProfile));
-                showNotification('✅ Profile synced successfully');
-                updateProfileModal();
-            }
-        }
-
-        // Open enhanced profile modal
-        function openEnhancedProfile() {
-            updateProfileModal();
-            document.getElementById('enhancedProfileModal').classList.add('active');
-        }
-
-        function closeEnhancedProfile() {
-            document.getElementById('enhancedProfileModal').classList.remove('active');
-        }
-
-        // Update profile modal with current data
-        function updateProfileModal() {
-            if (!currentUserProfile) return;
-            
-            document.getElementById('enhancedProfileAvatar').textContent = currentUserProfile.avatar || '👤';
-            document.getElementById('enhancedProfileName').textContent = currentUserProfile.username || 'Viewer';
-            document.getElementById('enhancedProfileEmail').textContent = currentUserProfile.email || 'Not signed in';
-            
-            const watchedCount = currentUserProfile.watchHistory ? currentUserProfile.watchHistory.length : 0;
-            const watchLaterCount = currentUserProfile.watchLater ? currentUserProfile.watchLater.length : 0;
-            const ratingsCount = currentUserProfile.ratings ? currentUserProfile.ratings.length : 0;
-            
-            document.getElementById('profileWatchedCount').textContent = watchedCount;
-            document.getElementById('profileWatchLaterCount').textContent = watchLaterCount;
-            document.getElementById('profileRatingsCount').textContent = ratingsCount;
-            
-            // Continue watching
-            const continueWatching = document.getElementById('profileContinueWatching');
-            if (continueWatching && currentUserProfile.watchHistory) {
-                const inProgress = currentUserProfile.watchHistory
-                    .filter(entry => !entry.completed && entry.progress > 0)
-                    .sort((a, b) => new Date(b.lastWatched) - new Date(a.lastWatched))
-                    .slice(0, 5);
-                
-                continueWatching.innerHTML = '';
-                
-                if (inProgress.length === 0) {
-                    continueWatching.innerHTML = '<p style="color: #6b7280; text-align: center;">No videos in progress</p>';
-                } else {
-                    inProgress.forEach(entry => {
-                        const movie = movies.find(m => m.id == entry.movieId);
-                        if (movie) {
-                            const item = document.createElement('div');
-                            item.className = 'watch-history-item';
-                            item.onclick = () => openVideoPlayer(movie.id);
-                            item.innerHTML = `
-                                <img src="https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg" alt="${movie.title}">
-                                <div class="watch-history-info">
-                                    <div class="watch-history-title">${movie.title}</div>
-                                    <div class="watch-history-progress">
-                                        <div class="watch-history-progress-fill" style="width: ${entry.progress}%"></div>
-                                    </div>
-                                    <div class="watch-history-time">${Math.floor(entry.progress / 10)} min watched</div>
-                                </div>
-                            `;
-                            continueWatching.appendChild(item);
-                        }
-                    });
-                }
-            }
-            
-            // Watch later
-            const watchLater = document.getElementById('profileWatchLater');
-            if (watchLater && currentUserProfile.watchLater) {
-                watchLater.innerHTML = '';
-                
-                if (currentUserProfile.watchLater.length === 0) {
-                    watchLater.innerHTML = '<p style="color: #6b7280; text-align: center;">No videos saved</p>';
-                } else {
-                    currentUserProfile.watchLater.slice(0, 5).forEach(movieId => {
-                        const movie = movies.find(m => m.id == movieId);
-                        if (movie) {
-                            const item = document.createElement('div');
-                            item.className = 'watch-history-item';
-                            item.onclick = () => openVideoPlayer(movie.id);
-                            item.innerHTML = `
-                                <img src="https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg" alt="${movie.title}">
-                                <div class="watch-history-info">
-                                    <div class="watch-history-title">${movie.title}</div>
-                                    <div class="watch-history-time">Saved to watch later</div>
-                                </div>
-                            `;
-                            watchLater.appendChild(item);
-                        }
-                    });
-                }
-            }
-        }
-
-        // Override the existing profile icon click
-        const originalProfileIcon = document.getElementById('profileIcon');
-        if (originalProfileIcon) {
-            originalProfileIcon.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                openEnhancedProfile();
-            };
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', async function() {
-            await initUserProfile();
-            await loadRecommendations();
-            updateContinueWatching();
-        });
 </script>
 </body>
 </html>

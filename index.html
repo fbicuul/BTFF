@@ -3878,6 +3878,8 @@
 
         // Initialize or load user profile
         async function initUserProfile() {
+            console.log('Initializing user profile...');
+            
             const sessionToken = localStorage.getItem('btff_session_token') || 'anonymous_' + Date.now();
             
             // Try to get existing profile from localStorage
@@ -3887,31 +3889,32 @@
                 // Ask for email
                 const email = prompt('Enter your email to sync your watch history across devices (optional):', '');
                 
-                // Create new profile via API
-                const result = await apiCall('getUserProfile', {
-                    userId: sessionToken,
-                    username: 'Viewer',
-                    email: email || '',
-                    avatar: '👤'
-                }, 'POST');
-                
-                if (result.success) {
-                    userProfile = result.profile;
-                    localStorage.setItem('btff_user_profile', JSON.stringify(userProfile));
-                    currentUserProfile = userProfile;
+                if (email !== null) { // User didn't click cancel
+                    console.log('Creating new profile with email:', email);
                     
-                    if (result.isNew && !email) {
-                        showNotification('Profile created! You can add email later to sync');
-                    } else if (result.isNew && email) {
-                        showNotification('Profile created and synced!');
+                    // Create new profile via API - FIXED PARAMETERS
+                    const result = await apiCall('getUserProfile', {
+                        userId: sessionToken,
+                        username: 'Viewer',
+                        email: email,
+                        avatar: '👤'
+                    }, 'POST');
+                    
+                    console.log('Profile creation result:', result);
+                    
+                    if (result && result.success) {
+                        userProfile = result.profile;
+                        localStorage.setItem('btff_user_profile', JSON.stringify(userProfile));
+                        currentUserProfile = userProfile;
+                        showNotification('Profile created successfully!');
                     } else {
-                        showNotification('Welcome back!');
+                        console.error('Failed to create user profile:', result?.error);
+                        showNotification('Error creating user profile');
                     }
                 }
             } else {
+                console.log('Existing profile found:', userProfile);
                 currentUserProfile = userProfile;
-                // Sync in background
-                syncProfile();
             }
             
             return userProfile;

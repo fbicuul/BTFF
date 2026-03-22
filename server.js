@@ -222,17 +222,25 @@ app.get('/', (req, res) => {
     }
 });
 
+// Add this to your server.js - after your existing routes
+
 // Route for call center page
 app.get('/callcenter', (req, res) => {
     try {
         const templatePath = path.join(__dirname, 'callcenter.html');
+        
+        if (!fs.existsSync(templatePath)) {
+            console.error('❌ callcenter.html not found');
+            return res.status(500).send('callcenter.html not found');
+        }
+        
         let html = fs.readFileSync(templatePath, 'utf8');
         
-        // Inject the call center API URL
-        html = html.replace(
-            '%%CALL_CENTER_API_URL%%', 
-            process.env.CALL_CENTER_API_URL || ''
-        );
+        // Inject the call center API URL from environment variables
+        const callCenterApiUrl = process.env.CALL_CENTER_API_URL || '';
+        console.log('🔗 Call Center API URL:', callCenterApiUrl);
+        
+        html = html.replace('%%CALL_CENTER_API_URL%%', callCenterApiUrl);
         
         res.setHeader('Content-Type', 'text/html');
         res.send(html);

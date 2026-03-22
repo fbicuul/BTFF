@@ -1,4 +1,4 @@
-// server.js - VERCEL VERSION (ADD THESE NEW ROUTES)
+// server.js - VERCEL VERSION (UPDATED)
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -77,7 +77,7 @@ app.all('/api/proxy', async (req, res) => {
     }
 });
 
-// ===== NEW: PROXY FOR CALL CENTER API =====
+// ===== PROXY FOR CALL CENTER API =====
 app.all('/api/callcenter-proxy', async (req, res) => {
     try {
         const targetUrl = process.env.CALL_CENTER_API_URL;
@@ -86,7 +86,7 @@ app.all('/api/callcenter-proxy', async (req, res) => {
             console.error('❌ CALL_CENTER_API_URL not configured');
             return res.status(500).json({ 
                 success: false, 
-                error: 'Call Center API not configured' 
+                error: 'Call Center API not configured. Please add CALL_CENTER_API_URL environment variable.' 
             });
         }
         
@@ -111,16 +111,25 @@ app.all('/api/callcenter-proxy', async (req, res) => {
         const response = await fetch(url.toString(), fetchOptions);
         const responseText = await response.text();
         
+        // Set CORS headers
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        
+        // Handle OPTIONS preflight
+        if (req.method === 'OPTIONS') {
+            return res.status(200).end();
+        }
+        
         try {
             const jsonData = JSON.parse(responseText);
-            res.setHeader('Content-Type', 'application/json');
-            res.setHeader('Access-Control-Allow-Origin', '*');
             return res.send(jsonData);
         } catch (e) {
-            console.error('❌ Invalid JSON response:', responseText.substring(0, 200));
+            console.error('❌ Invalid JSON from Call Center API:', responseText.substring(0, 200));
             return res.status(500).json({ 
                 success: false, 
-                error: 'Invalid JSON response from Call Center API'
+                error: 'Invalid response from Call Center API',
+                details: responseText.substring(0, 200)
             });
         }
         
@@ -142,7 +151,6 @@ app.post('/api/ai/sentiment', async (req, res) => {
             return res.status(400).json({ error: 'Text is required' });
         }
         
-        // Simple rule-based sentiment analysis
         const text_lower = text.toLowerCase();
         let sentiment = 'neutral';
         
@@ -249,11 +257,12 @@ Would you be interested in learning more?`;
 
 // Helper function to inject environment variables
 function injectEnvVars(html) {
-    return html.replace(
-        '%%APPS_SCRIPT_URL%%', 
-        process.env.APPS_SCRIPT_URL || ''
-    );
+    const appsScriptUrl = process.env.APPS_SCRIPT_URL || '';
+    console.log('🔗 Injecting APPS_SCRIPT_URL:', appsScriptUrl ? 'Present' : 'MISSING');
+    return html.replace(/%%APPS_SCRIPT_URL%%/g, appsScriptUrl);
 }
+
+// ===== ROUTES =====
 
 // Route for main page
 app.get('/', (req, res) => {
@@ -282,19 +291,21 @@ app.get('/callcenter', (req, res) => {
         const templatePath = path.join(__dirname, 'callcenter.html');
         
         if (!fs.existsSync(templatePath)) {
-            console.error('❌ callcenter.html not found');
+            console.error('❌ callcenter.html not found at:', templatePath);
             return res.status(500).send('callcenter.html not found');
         }
         
         let html = fs.readFileSync(templatePath, 'utf8');
         
-        // Inject both the call center API URL AND the proxy URL
-        const callCenterApiUrl = process.env.CALL_CENTER_API_URL || '';
+        // Use the proxy endpoint for API calls
+        const callCenterApiUrl = process.env.CALL_CENTER_API_URL;
         const proxyUrl = '/api/callcenter-proxy';
         
-        console.log('🔗 Call Center API URL:', callCenterApiUrl);
+        console.log('🔗 Call Center API URL from env:', callCenterApiUrl ? 'Present' : 'MISSING');
+        console.log('🔗 Using proxy URL:', proxyUrl);
         
-        html = html.replace('%%CALL_CENTER_API_URL%%', proxyUrl);
+        // Replace the placeholder with the proxy URL
+        html = html.replace(/%%CALL_CENTER_API_URL%%/g, proxyUrl);
         
         res.setHeader('Content-Type', 'text/html');
         res.send(html);
@@ -325,14 +336,16 @@ app.get('/admin', (req, res) => {
     }
 });
 
-// Health check
+// Health check endpoint
 app.get('/health', (req, res) => {
     res.status(200).json({ 
         status: 'healthy',
         timestamp: new Date().toISOString(),
         env: process.env.NODE_ENV,
-        hasAppsScript: !!process.env.APPS_SCRIPT_URL,
-        hasCallCenterApi: !!process.env.CALL_CENTER_API_URL
+        hasAppsScriptUrl: !!process.env.APPS_SCRIPT_URL,
+        hasCallCenterApiUrl: !!process.env.CALL_CENTER_API_URL,
+        appsScriptUrlPreview: process.env.APPS_SCRIPT_URL ? process.env.APPS_SCRIPT_URL.substring(0, 50) + '...' : 'not set',
+        callCenterApiUrlPreview: process.env.CALL_CENTER_API_URL ? process.env.CALL_CENTER_API_URL.substring(0, 50) + '...' : 'not set'
     });
 });
 
@@ -358,9 +371,15 @@ app.use((err, req, res, next) => {
 if (require.main === module) {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
-        console.log(`🚀 Server running on port ${PORT}`);
-        console.log(`🔗 Apps Script URL: ${process.env.APPS_SCRIPT_URL || 'NOT SET'}`);
-        console.log(`🔗 Call Center API URL: ${process.env.CALL_CENTER_API_URL || 'NOT SET'}`);
+        console.log(`\n🚀 Server running on http://localhost:${PORT}`);
+        console.log('📋 Configuration:');
+        console.log(`   APPS_SCRIPT_URL: ${process.env.APPS_SCRIPT_URL ? '✅ Set' : '❌ Missing'}`);
+        console.log(`   CALL_CENTER_API_URL: ${process.env.CALL_CENTER_API_URL ? '✅ Set' : '❌ Missing'}`);
+        console.log(`\n🔗 Available routes:`);
+        console.log(`   - Home: http://localhost:${PORT}/`);
+        console.log(`   - Admin: http://localhost:${PORT}/admin`);
+        console.log(`   - Call Center: http://localhost:${PORT}/callcenter`);
+        console.log(`   - Health: http://localhost:${PORT}/health\n`);
     });
 }
 

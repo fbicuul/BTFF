@@ -240,10 +240,6 @@ app.get('/callcenter', (req, res) => {
         const callCenterApiUrl = process.env.CALL_CENTER_API_URL || '';
         console.log('🔗 Call Center API URL:', callCenterApiUrl);
         
-        // Add this line right after the callCenterApiUrl line
-        console.log('🔗 Call Center API URL from env:', process.env.CALL_CENTER_API_URL);
-        console.log('🔗 Call Center API URL injected:', callCenterApiUrl);
-        
         html = html.replace('%%CALL_CENTER_API_URL%%', callCenterApiUrl);
         
         res.setHeader('Content-Type', 'text/html');
@@ -254,14 +250,6 @@ app.get('/callcenter', (req, res) => {
     }
 });
 
-// Add this route right after your callcenter route
-app.get('/debug/callcenter-config', (req, res) => {
-    res.json({
-        envExists: !!process.env.CALL_CENTER_API_URL,
-        envValue: process.env.CALL_CENTER_API_URL,
-        message: process.env.CALL_CENTER_API_URL ? '✅ Environment variable found' : '❌ Environment variable not found'
-    });
-});
 
 // Route for admin page
 app.get('/admin', (req, res) => {

@@ -27,9 +27,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "APPS_SCRIPT_URL": "@apps_script_url",
-    "CALL_CENTER_API_URL": "@call_center_api_url"
-  }
+  ]
 }

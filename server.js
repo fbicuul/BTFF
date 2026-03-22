@@ -226,14 +226,13 @@ app.get('/', (req, res) => {
 app.get('/callcenter', (req, res) => {
     try {
         const templatePath = path.join(__dirname, 'callcenter.html');
-        
-        if (!fs.existsSync(templatePath)) {
-            console.error('❌ callcenter.html not found at:', templatePath);
-            return res.status(500).send('callcenter.html not found');
-        }
-        
         let html = fs.readFileSync(templatePath, 'utf8');
-        html = injectEnvVars(html);
+        
+        // Inject the call center API URL
+        html = html.replace(
+            '%%CALL_CENTER_API_URL%%', 
+            process.env.CALL_CENTER_API_URL || ''
+        );
         
         res.setHeader('Content-Type', 'text/html');
         res.send(html);
@@ -263,6 +262,7 @@ app.get('/admin', (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
 
 // Health check
 app.get('/health', (req, res) => {

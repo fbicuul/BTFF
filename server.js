@@ -1,4 +1,4 @@
-// server.js - VERCEL VERSION
+// server.js - VERCEL VERSION (ADD THESE NEW ROUTES)
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Serve static files
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// ===== PROXY ENDPOINT FOR APPS SCRIPT =====
+// ===== PROXY ENDPOINT FOR APPS SCRIPT (Main) =====
 app.all('/api/proxy', async (req, res) => {
     try {
         const targetUrl = process.env.APPS_SCRIPT_URL;
@@ -33,7 +33,6 @@ app.all('/api/proxy', async (req, res) => {
             });
         }
         
-        // Build the full URL with query parameters
         const url = new URL(targetUrl);
         Object.keys(req.query).forEach(key => {
             url.searchParams.append(key, req.query[key]);
@@ -55,7 +54,6 @@ app.all('/api/proxy', async (req, res) => {
         const response = await fetch(url.toString(), fetchOptions);
         const responseText = await response.text();
         
-        // Try to parse as JSON
         try {
             const jsonData = JSON.parse(responseText);
             res.setHeader('Content-Type', 'application/json');
@@ -72,6 +70,62 @@ app.all('/api/proxy', async (req, res) => {
         
     } catch (error) {
         console.error('❌ Proxy error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message 
+        });
+    }
+});
+
+// ===== NEW: PROXY FOR CALL CENTER API =====
+app.all('/api/callcenter-proxy', async (req, res) => {
+    try {
+        const targetUrl = process.env.CALL_CENTER_API_URL;
+        
+        if (!targetUrl) {
+            console.error('❌ CALL_CENTER_API_URL not configured');
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Call Center API not configured' 
+            });
+        }
+        
+        const url = new URL(targetUrl);
+        Object.keys(req.query).forEach(key => {
+            url.searchParams.append(key, req.query[key]);
+        });
+        
+        console.log('🔄 Call Center Proxy to:', url.toString());
+        
+        const fetchOptions = {
+            method: req.method,
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+        
+        if (req.method === 'POST') {
+            fetchOptions.body = JSON.stringify(req.body);
+        }
+        
+        const response = await fetch(url.toString(), fetchOptions);
+        const responseText = await response.text();
+        
+        try {
+            const jsonData = JSON.parse(responseText);
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            return res.send(jsonData);
+        } catch (e) {
+            console.error('❌ Invalid JSON response:', responseText.substring(0, 200));
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Invalid JSON response from Call Center API'
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Call Center proxy error:', error);
         res.status(500).json({ 
             success: false, 
             error: error.message 
@@ -131,57 +185,57 @@ app.post('/api/ai/generate-script', async (req, res) => {
         let script = '';
         
         if (type === 'lead') {
-            script = `Hello <span class="variable">${name}</span>, this is <span class="variable">[Your Name]</span> from BTFF.
+            script = `Hello ${name}, this is [Your Name] from BTFF.
             
-I'm calling because we noticed <span class="highlight">${comp}</span> might benefit from our services.
+I'm calling because we noticed ${comp} might benefit from our services.
 
-<span class="variable">[Pause for response]</span>
+[Pause for response]
 
 We've helped similar businesses increase efficiency by 40%. I'd love to share how we could do the same for you.
 
 Would you have 5 minutes for a quick chat?
 
-<span class="variable">[Listen to response]</span>
+[Listen to response]
 
 Great! Let me share some information about our solutions.`;
         } else if (type === 'customer') {
-            script = `Hello <span class="variable">${name}</span>, this is <span class="variable">[Your Name]</span> from BTFF.
+            script = `Hello ${name}, this is [Your Name] from BTFF.
             
 I'm calling to check in and see how things are going with our service.
 
-<span class="variable">[Pause for response]</span>
+[Pause for response]
 
 I'm glad to hear that! We actually have some new features that might interest you.
 
 Would you like to hear about them?
 
-<span class="variable">[Listen to response]</span>
+[Listen to response]
 
 Perfect! Let me walk you through what's new.`;
         } else if (type === 'vip') {
-            script = `Hello <span class="variable">${name}</span>, this is <span class="variable">[Your Name]</span> from BTFF.
+            script = `Hello ${name}, this is [Your Name] from BTFF.
             
 As one of our valued VIP customers, I wanted to personally reach out with an exclusive opportunity.
 
-<span class="variable">[Pause for response]</span>
+[Pause for response]
 
 We're launching a new premium service and wanted to offer you early access.
 
 Would you be interested in learning more?
 
-<span class="variable">[Listen to response]</span>
+[Listen to response]
 
 Excellent! Let me tell you about the special benefits you'll receive.`;
         } else {
-            script = `Hello <span class="variable">${name}</span>, this is <span class="variable">[Your Name]</span> from BTFF.
+            script = `Hello ${name}, this is [Your Name] from BTFF.
             
-I'm calling regarding <span class="highlight">${callReason}</span>.
+I'm calling regarding ${callReason}.
 
-<span class="variable">[Pause for response]</span>
+[Pause for response]
 
 I understand. Let me explain how we can help.
 
-<span class="variable">[Listen to response]</span>
+[Listen to response]
 
 Would you be interested in learning more?`;
         }
@@ -222,8 +276,6 @@ app.get('/', (req, res) => {
     }
 });
 
-// Add this to your server.js - after your existing routes
-
 // Route for call center page
 app.get('/callcenter', (req, res) => {
     try {
@@ -236,11 +288,13 @@ app.get('/callcenter', (req, res) => {
         
         let html = fs.readFileSync(templatePath, 'utf8');
         
-        // Inject the call center API URL from environment variables
+        // Inject both the call center API URL AND the proxy URL
         const callCenterApiUrl = process.env.CALL_CENTER_API_URL || '';
+        const proxyUrl = '/api/callcenter-proxy';
+        
         console.log('🔗 Call Center API URL:', callCenterApiUrl);
         
-        html = html.replace('%%CALL_CENTER_API_URL%%', callCenterApiUrl);
+        html = html.replace('%%CALL_CENTER_API_URL%%', proxyUrl);
         
         res.setHeader('Content-Type', 'text/html');
         res.send(html);
@@ -249,7 +303,6 @@ app.get('/callcenter', (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
-
 
 // Route for admin page
 app.get('/admin', (req, res) => {
@@ -272,13 +325,14 @@ app.get('/admin', (req, res) => {
     }
 });
 
-
 // Health check
 app.get('/health', (req, res) => {
     res.status(200).json({ 
         status: 'healthy',
         timestamp: new Date().toISOString(),
-        env: process.env.NODE_ENV
+        env: process.env.NODE_ENV,
+        hasAppsScript: !!process.env.APPS_SCRIPT_URL,
+        hasCallCenterApi: !!process.env.CALL_CENTER_API_URL
     });
 });
 
@@ -305,7 +359,8 @@ if (require.main === module) {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);
-        console.log(`🔗 Apps Script URL: ${process.env.APPS_SCRIPT_URL}`);
+        console.log(`🔗 Apps Script URL: ${process.env.APPS_SCRIPT_URL || 'NOT SET'}`);
+        console.log(`🔗 Call Center API URL: ${process.env.CALL_CENTER_API_URL || 'NOT SET'}`);
     });
 }
 

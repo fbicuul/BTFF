@@ -177,7 +177,13 @@
             display: block;
         }
 
-        .user-icon {
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-icon, .headset-icon {
             font-size: 1.4rem;
             color: #d0e0ff;
             cursor: pointer;
@@ -191,9 +197,142 @@
             transition: all 0.2s;
         }
 
-        .user-icon:hover {
+        .user-icon:hover, .headset-icon:hover {
             background: #2f6bc6;
             color: white;
+        }
+
+        /* Soft Phone Modal */
+        .softphone-modal {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            background: #0c1727;
+            border: 2px solid #2f6bc6;
+            border-radius: 20px;
+            z-index: 3000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        .softphone-modal.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .softphone-header {
+            padding: 15px 20px;
+            background: #0f1a2b;
+            border-bottom: 1px solid #2d4560;
+            border-radius: 18px 18px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .softphone-header h4 {
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .softphone-close {
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #88abdf;
+        }
+
+        .softphone-close:hover {
+            color: #ef4444;
+        }
+
+        .softphone-body {
+            padding: 20px;
+        }
+
+        .softphone-input {
+            width: 100%;
+            padding: 12px;
+            background: #0a0f1a;
+            border: 1px solid #3d6190;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .softphone-input:focus {
+            outline: none;
+            border-color: #2f6bc6;
+        }
+
+        .softphone-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .softphone-num {
+            padding: 12px;
+            background: #1c2a3f;
+            border: 1px solid #3d6190;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .softphone-num:hover {
+            background: #2f6bc6;
+            transform: scale(1.02);
+        }
+
+        .softphone-call-btn {
+            width: 100%;
+            padding: 12px;
+            background: #22c55e;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .softphone-call-btn:hover {
+            background: #16a34a;
+        }
+
+        .softphone-clear-btn {
+            width: 100%;
+            padding: 10px;
+            background: #ef4444;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .softphone-clear-btn:hover {
+            background: #dc2626;
         }
 
         .modal {
@@ -377,7 +516,7 @@
         }
 
         /* Loading Overlay */
-        .loading-overlay {
+        .global-loading-overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -392,7 +531,7 @@
             flex-direction: column;
         }
 
-        .loading-overlay.active {
+        .global-loading-overlay.active {
             display: flex;
         }
 
@@ -411,9 +550,24 @@
             100% { transform: rotate(360deg); }
         }
 
-        .loading-text {
-            color: white;
-            font-size: 1rem;
+        /* Call Details Loading Spinner */
+        .call-details-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .call-details-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(47,107,198,0.2);
+            border-top: 3px solid #2f6bc6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
         }
 
         .call-grid {
@@ -733,6 +887,7 @@
             .info-grid { grid-template-columns: 1fr; }
             .outcome-buttons { grid-template-columns: 1fr; }
             .footer { flex-direction: column; text-align: center; }
+            .softphone-modal { width: 300px; right: 10px; bottom: 80px; }
         }
     </style>
 </head>
@@ -744,7 +899,8 @@
                 <span onclick="window.location.href='/'">Home</span>
                 <span class="active">Call Center</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 20px;">
+            <div class="nav-icons">
+                <div class="headset-icon" id="headsetIcon"><i class="fas fa-headset"></i></div>
                 <div class="user-icon" id="userIcon"><i class="fas fa-user"></i></div>
                 <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
             </div>
@@ -759,8 +915,35 @@
         </div>
         <div class="menu-overlay" id="menuOverlay"></div>
 
-        <!-- Loading Overlay -->
-        <div class="loading-overlay" id="loadingOverlay">
+        <!-- Soft Phone Modal -->
+        <div class="softphone-modal" id="softphoneModal">
+            <div class="softphone-header">
+                <h4><i class="fas fa-phone-alt"></i> Quick Dial</h4>
+                <span class="softphone-close" id="closeSoftphone">&times;</span>
+            </div>
+            <div class="softphone-body">
+                <input type="text" class="softphone-input" id="softphoneNumber" placeholder="Enter phone number...">
+                <div class="softphone-buttons">
+                    <div class="softphone-num" data-num="1">1</div>
+                    <div class="softphone-num" data-num="2">2</div>
+                    <div class="softphone-num" data-num="3">3</div>
+                    <div class="softphone-num" data-num="4">4</div>
+                    <div class="softphone-num" data-num="5">5</div>
+                    <div class="softphone-num" data-num="6">6</div>
+                    <div class="softphone-num" data-num="7">7</div>
+                    <div class="softphone-num" data-num="8">8</div>
+                    <div class="softphone-num" data-num="9">9</div>
+                    <div class="softphone-num" data-num="*">*</div>
+                    <div class="softphone-num" data-num="0">0</div>
+                    <div class="softphone-num" data-num="#">#</div>
+                </div>
+                <button class="softphone-call-btn" id="softphoneCallBtn"><i class="fas fa-phone"></i> Call</button>
+                <button class="softphone-clear-btn" id="softphoneClearBtn">Clear</button>
+            </div>
+        </div>
+
+        <!-- Global Loading Overlay -->
+        <div class="global-loading-overlay" id="globalLoadingOverlay">
             <div class="loading-spinner"></div>
             <div class="loading-text">Loading...</div>
         </div>
@@ -775,7 +958,7 @@
                         <label>Email</label>
                         <input type="email" id="loginEmail" placeholder="your@email.com">
                     </div>
-                    <button class="btn-primary" onclick="login()">Login</button>
+                    <button class="btn-primary" id="loginBtn" onclick="login()">Login</button>
                     <div class="switch-link">New here? <span onclick="showRegister()">Join Workforce</span></div>
                 </div>
                 <div id="registerView" style="display: none;">
@@ -786,7 +969,7 @@
                     <div class="form-group"><label>Country</label><select id="regCountry"><option value="">Select Country</option><option value="Nigeria">Nigeria</option><option value="USA">USA</option><option value="UK">UK</option><option value="Canada">Canada</option></select></div>
                     <div class="form-group"><label>State/Province</label><input type="text" id="regState" placeholder="Enter state"></div>
                     <div class="form-group"><label>City</label><input type="text" id="regCity" placeholder="Enter city"></div>
-                    <button class="btn-primary" onclick="register()">Register</button>
+                    <button class="btn-primary" id="registerBtn" onclick="register()">Register</button>
                     <div class="switch-link">Already have an account? <span onclick="showLogin()">Login</span></div>
                 </div>
             </div>
@@ -810,24 +993,30 @@
                     <div class="call-details">
                         <div id="noCallSelected" class="empty-state"><i class="fas fa-phone" style="font-size: 3rem; color: #2f6bc6; margin-bottom: 20px; display: block;"></i><p>Select a client from the queue to start a call</p></div>
                         <div id="callDetailsContent" style="display: none;">
-                            <h2 id="clientName"></h2>
-                            <div class="info-grid">
-                                <div class="info-item"><i class="fas fa-phone"></i> <span id="clientPhone"></span></div>
-                                <div class="info-item"><i class="fas fa-map-marker-alt"></i> <span id="clientLocation"></span></div>
-                                <div class="info-item"><i class="fas fa-birthday-cake"></i> <span id="clientDOB"></span></div>
-                                <div class="info-item"><i class="fas fa-chart-line"></i> <span id="clientTotalCalls"></span></div>
+                            <div id="callDetailsLoading" class="call-details-loading" style="display: none;">
+                                <div class="call-details-spinner"></div>
+                                <p>Loading client details...</p>
                             </div>
-                            <label><i class="fas fa-file-alt"></i> Call Script</label>
-                            <textarea class="script-text" id="callScript" placeholder="Enter your call script..."></textarea>
-                            <div class="call-timer"><div class="timer-display" id="callTimer">00:00</div></div>
-                            <div class="outcome-buttons">
-                                <button class="outcome-btn connected" onclick="selectOutcome('Connected')"><i class="fas fa-check-circle"></i> Connected</button>
-                                <button class="outcome-btn missed" onclick="selectOutcome('Missed')"><i class="fas fa-phone-slash"></i> Missed</button>
-                                <button class="outcome-btn hanged" onclick="selectOutcome('Hanged Up')"><i class="fas fa-times-circle"></i> Hanged Up</button>
-                                <button class="outcome-btn voicemail" onclick="selectOutcome('Voicemail')"><i class="fas fa-voicemail"></i> Voicemail</button>
+                            <div id="callDetailsInfo" style="display: none;">
+                                <h2 id="clientName"></h2>
+                                <div class="info-grid">
+                                    <div class="info-item"><i class="fas fa-phone"></i> <span id="clientPhone"></span></div>
+                                    <div class="info-item"><i class="fas fa-map-marker-alt"></i> <span id="clientLocation"></span></div>
+                                    <div class="info-item"><i class="fas fa-birthday-cake"></i> <span id="clientDOB"></span></div>
+                                    <div class="info-item"><i class="fas fa-chart-line"></i> <span id="clientTotalCalls"></span></div>
+                                </div>
+                                <label><i class="fas fa-file-alt"></i> Call Script</label>
+                                <textarea class="script-text" id="callScript" placeholder="Enter your call script..."></textarea>
+                                <div class="call-timer"><div class="timer-display" id="callTimer">00:00</div></div>
+                                <div class="outcome-buttons">
+                                    <button class="outcome-btn connected" onclick="selectOutcome('Connected')"><i class="fas fa-check-circle"></i> Connected</button>
+                                    <button class="outcome-btn missed" onclick="selectOutcome('Missed')"><i class="fas fa-phone-slash"></i> Missed</button>
+                                    <button class="outcome-btn hanged" onclick="selectOutcome('Hanged Up')"><i class="fas fa-times-circle"></i> Hanged Up</button>
+                                    <button class="outcome-btn voicemail" onclick="selectOutcome('Voicemail')"><i class="fas fa-voicemail"></i> Voicemail</button>
+                                </div>
+                                <textarea class="remarks-input" id="callRemarks" placeholder="Add remarks about this call..."></textarea>
+                                <button class="save-call-btn" onclick="saveCall()"><i class="fas fa-save"></i> Save Call Record</button>
                             </div>
-                            <textarea class="remarks-input" id="callRemarks" placeholder="Add remarks about this call..."></textarea>
-                            <button class="save-call-btn" onclick="saveCall()"><i class="fas fa-save"></i> Save Call Record</button>
                         </div>
                     </div>
                 </div>
@@ -850,8 +1039,8 @@
                 <div class="table-container">
                     <table id="callsTable">
                         <thead>   <th>Date & Time</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th> </thead>
-                        <tbody id="callsTableBody">   <td colspan="6" class="empty-state">No calls recorded yet </tbody>
-                     </table>
+                        <tbody id="callsTableBody">   <td colspan="6" class="empty-state">No calls recorded yet</td> </tbody>
+                      </table>
                 </div>
             </div>
         </div>
@@ -873,19 +1062,28 @@
         let callStartTime = null;
         let callTimerInterval = null;
         let selectedOutcome = null;
-        let callHistory = [];
 
         // ==================== LOADING FUNCTIONS ====================
-        function showLoading(message = 'Loading...') {
-            const overlay = document.getElementById('loadingOverlay');
+        function showGlobalLoading(message = 'Loading...') {
+            const overlay = document.getElementById('globalLoadingOverlay');
             const text = overlay.querySelector('.loading-text');
             if (text) text.textContent = message;
             overlay.classList.add('active');
         }
 
-        function hideLoading() {
-            const overlay = document.getElementById('loadingOverlay');
+        function hideGlobalLoading() {
+            const overlay = document.getElementById('globalLoadingOverlay');
             overlay.classList.remove('active');
+        }
+
+        function showCallDetailsLoading() {
+            document.getElementById('callDetailsLoading').style.display = 'flex';
+            document.getElementById('callDetailsInfo').style.display = 'none';
+        }
+
+        function hideCallDetailsLoading() {
+            document.getElementById('callDetailsLoading').style.display = 'none';
+            document.getElementById('callDetailsInfo').style.display = 'block';
         }
 
         // ==================== API FUNCTIONS ====================
@@ -933,10 +1131,6 @@
 
         async function updateClientStatus(phoneNumber, callStatus, remarks) {
             return await apiCall('updateCallCenterClientStatus', { phoneNumber, callStatus, remarks }, 'POST');
-        }
-
-        async function addClient(phoneNumber, fullName, country, state, city, dateOfBirth, callScript) {
-            return await apiCall('addCallCenterClient', { phoneNumber, fullName, country, state, city, dateOfBirth, callScript }, 'POST');
         }
 
         // Call logging functions
@@ -992,9 +1186,9 @@
             const email = document.getElementById('loginEmail').value;
             if (!email) { showNotification('Please enter your email', 'error'); return; }
             
-            showLoading('Logging in...');
+            showGlobalLoading('Logging in...');
             const result = await getWorker(email);
-            hideLoading();
+            hideGlobalLoading();
             
             if (result.success && result.worker) {
                 currentWorker = result.worker;
@@ -1021,9 +1215,9 @@
             
             if (!fullName || !email || !phone) { showNotification('Please fill all required fields', 'error'); return; }
             
-            showLoading('Registering...');
+            showGlobalLoading('Registering...');
             const result = await registerWorker(fullName, email, phone, country, state, city);
-            hideLoading();
+            hideGlobalLoading();
             
             if (result.success) {
                 showNotification('Registration successful! Please login.');
@@ -1074,31 +1268,37 @@
         async function selectClient(phoneNumber) {
             console.log('Selecting client with phone:', phoneNumber);
             
-            showLoading('Loading client details...');
+            // Show loading in call details panel
+            document.getElementById('callDetailsContent').style.display = 'block';
+            document.getElementById('noCallSelected').style.display = 'none';
+            showCallDetailsLoading();
             
             const client = await getClientByPhone(phoneNumber);
             console.log('Client response:', client);
             
-            hideLoading();
-            
             if (client) {
                 console.log('Client found:', client.fullName);
                 currentClient = client;
-                document.getElementById('callDetailsContent').style.display = 'block';
-                document.getElementById('noCallSelected').style.display = 'none';
+                
+                // Populate all client information
                 document.getElementById('clientName').textContent = client.fullName || 'Unknown';
                 document.getElementById('clientPhone').textContent = client.phoneNumber;
-                document.getElementById('clientLocation').textContent = `${client.country || ''} ${client.state || ''} ${client.city || ''}`.trim() || 'Not specified';
-                document.getElementById('clientDOB').textContent = client.dateOfBirth || 'Not specified';
+                const location = [client.country, client.state, client.city].filter(l => l).join(', ');
+                document.getElementById('clientLocation').textContent = location || 'Not specified';
+                document.getElementById('clientDOB').textContent = client.dateOfBirth ? new Date(client.dateOfBirth).toLocaleDateString() : 'Not specified';
                 document.getElementById('clientTotalCalls').textContent = `${client.totalCalls || 0} previous calls`;
                 document.getElementById('callScript').value = client.callScript;
                 document.getElementById('aiContent').innerHTML = client.callScript;
+                
                 selectedOutcome = null;
                 document.getElementById('callRemarks').value = '';
                 document.querySelectorAll('.outcome-btn').forEach(btn => btn.classList.remove('selected'));
+                
+                hideCallDetailsLoading();
                 startCallTimer();
             } else {
                 console.log('Client not found for phone:', phoneNumber);
+                hideCallDetailsLoading();
                 showNotification('Client not found. Please add this client first.', 'error');
                 document.getElementById('noCallSelected').style.display = 'flex';
                 document.getElementById('callDetailsContent').style.display = 'none';
@@ -1141,21 +1341,21 @@
             const script = document.getElementById('callScript').value;
             const remarks = document.getElementById('callRemarks').value;
             
-            showLoading('Saving call record...');
+            showGlobalLoading('Saving call record...');
             
             // Update client status in database
             const updateResult = await updateClientStatus(currentClient.phoneNumber, selectedOutcome, remarks);
             if (!updateResult.success) { 
-                hideLoading();
-                showNotification('Failed to update call status', 'error'); 
+                hideGlobalLoading();
+                showNotification('Failed to update call status: ' + (updateResult.error || 'Unknown error'), 'error'); 
                 return; 
             }
             
             // Log the call
             const logResult = await logCall(currentWorker.email, currentClient.phoneNumber, currentClient.fullName, duration, selectedOutcome, remarks, script);
             if (!logResult.success) { 
-                hideLoading();
-                showNotification('Failed to save call log', 'error'); 
+                hideGlobalLoading();
+                showNotification('Failed to save call log: ' + (logResult.error || 'Unknown error'), 'error'); 
                 return; 
             }
             
@@ -1171,7 +1371,7 @@
             currentClient = null;
             callStartTime = null;
             
-            hideLoading();
+            hideGlobalLoading();
             showNotification(`Call saved - Outcome: ${selectedOutcome}`);
             await loadCallHistory();
             await renderQueue();
@@ -1205,6 +1405,34 @@
             return div.innerHTML;
         }
 
+        // ==================== SOFT PHONE FUNCTIONS ====================
+        function openSoftphone() {
+            document.getElementById('softphoneModal').classList.add('active');
+        }
+
+        function closeSoftphone() {
+            document.getElementById('softphoneModal').classList.remove('active');
+        }
+
+        async function makeManualCall() {
+            const phoneNumber = document.getElementById('softphoneNumber').value;
+            if (!phoneNumber) {
+                showNotification('Please enter a phone number', 'error');
+                return;
+            }
+            
+            closeSoftphone();
+            showGlobalLoading('Looking up client...');
+            const client = await getClientByPhone(phoneNumber);
+            hideGlobalLoading();
+            
+            if (client) {
+                await selectClient(phoneNumber);
+            } else {
+                showNotification('Client not found. Please add client first.', 'error');
+            }
+        }
+
         // ==================== MOBILE MENU ====================
         function openMobileMenu() {
             document.getElementById('mobileSlideMenu').classList.add('active');
@@ -1217,6 +1445,23 @@
             document.body.style.overflow = 'auto';
         }
 
+        // ==================== SOFT PHONE EVENT LISTENERS ====================
+        document.querySelectorAll('.softphone-num').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const num = btn.dataset.num;
+                const input = document.getElementById('softphoneNumber');
+                input.value += num;
+            });
+        });
+
+        document.getElementById('softphoneClearBtn').addEventListener('click', () => {
+            document.getElementById('softphoneNumber').value = '';
+        });
+
+        document.getElementById('softphoneCallBtn').addEventListener('click', makeManualCall);
+        document.getElementById('headsetIcon').addEventListener('click', openSoftphone);
+        document.getElementById('closeSoftphone').addEventListener('click', closeSoftphone);
+
         // ==================== EVENT LISTENERS ====================
         document.getElementById('userIcon').addEventListener('click', () => { currentWorker ? logout() : openModal('authModal'); });
         document.getElementById('searchClient').addEventListener('input', () => renderQueue());
@@ -1224,9 +1469,14 @@
         document.getElementById('mobileMenuBtn').addEventListener('click', openMobileMenu);
         document.getElementById('closeMobileMenu').addEventListener('click', closeMobileMenu);
         document.getElementById('menuOverlay').addEventListener('click', closeMobileMenu);
-        window.addEventListener('click', (e) => { if (e.target.classList.contains('modal')) closeModal(e.target.id); });
+        window.addEventListener('click', (e) => { 
+            if (e.target.classList.contains('modal')) closeModal(e.target.id);
+            if (e.target.classList.contains('softphone-modal')) closeSoftphone();
+        });
 
         // ==================== INITIALIZATION ====================
+        showGlobalLoading('Loading call center...');
+        
         const savedWorker = localStorage.getItem('btff_worker');
         if (savedWorker) {
             try {
@@ -1238,12 +1488,20 @@
                         await updateUI();
                         await renderQueue();
                         await loadCallHistory();
+                        hideGlobalLoading();
                     } else {
+                        hideGlobalLoading();
                         openModal('authModal');
                     }
                 });
-            } catch(e) { openModal('authModal'); }
-        } else { openModal('authModal'); }
+            } catch(e) { 
+                hideGlobalLoading();
+                openModal('authModal'); 
+            }
+        } else { 
+            hideGlobalLoading();
+            openModal('authModal'); 
+        }
         
         console.log('✅ Call Center Page Loaded - Real Data Mode');
     </script>

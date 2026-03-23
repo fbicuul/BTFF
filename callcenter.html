@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>BTFF · AI Call Center</title>
+    <title>BTFF · Call Center</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 40px;
         }
@@ -35,7 +35,7 @@
         }
 
         .logo {
-            font-size: 2.6rem;
+            font-size: 2.2rem;
             font-weight: 800;
             background: linear-gradient(135deg, #ffffff, #aaccff);
             -webkit-background-clip: text;
@@ -43,34 +43,35 @@
             cursor: pointer;
         }
 
-        .nav-links-desktop {
+        .nav-links {
             display: flex;
-            gap: 2.5rem;
-            font-weight: 500;
+            gap: 2rem;
         }
-        
-        .nav-links-desktop span {
+
+        .nav-links span {
             color: #b0c7e9;
             cursor: pointer;
             transition: color 0.2s;
         }
-        
-        .nav-links-desktop span:hover {
+
+        .nav-links span:hover, .nav-links span.active {
             color: white;
-        }
-        
-        .nav-links-desktop span.active {
-            color: white;
-            font-weight: 600;
         }
 
-        .nav-icons i {
+        .user-icon {
             font-size: 1.4rem;
             color: #d0e0ff;
             cursor: pointer;
+            background: #1c2a3f;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Modal Styles */
+        /* Modals */
         .modal {
             display: none;
             position: fixed;
@@ -78,11 +79,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             backdrop-filter: blur(10px);
             align-items: center;
             justify-content: center;
-            z-index: 10000;
+            z-index: 1000;
         }
 
         .modal.active {
@@ -91,7 +92,7 @@
 
         .modal-content {
             background: #0c1727;
-            border-radius: 30px;
+            border-radius: 24px;
             padding: 40px;
             width: 500px;
             max-width: 90vw;
@@ -103,7 +104,7 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            font-size: 2rem;
+            font-size: 1.8rem;
             cursor: pointer;
             color: #88abdf;
         }
@@ -120,14 +121,15 @@
             display: block;
             margin-bottom: 8px;
             color: #88abdf;
+            font-size: 0.9rem;
         }
 
-        .form-group input, .form-group select, .form-group textarea {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 12px;
             background: #0a0f1a;
             border: 1px solid #3d6190;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
             font-size: 1rem;
         }
@@ -137,20 +139,33 @@
             padding: 14px;
             background: #2f6bc6;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 20px;
+            font-size: 1rem;
+            transition: all 0.2s;
         }
 
         .btn-primary:hover {
             background: #3e7ed9;
+            transform: translateY(-1px);
         }
 
         .btn-secondary {
             background: #1c2a3f;
             border: 1px solid #3d6190;
+        }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #88abdf;
+        }
+
+        .switch-link span {
+            color: #2f6bc6;
+            cursor: pointer;
         }
 
         /* Worker Dashboard */
@@ -162,16 +177,18 @@
             display: block;
         }
 
+        /* Worker Header */
         .worker-header {
             background: linear-gradient(135deg, #0f1a2b, #1a2a40);
             border-radius: 20px;
-            padding: 20px 30px;
+            padding: 25px 30px;
             margin: 30px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 20px;
+            border: 1px solid rgba(47,107,198,0.3);
         }
 
         .worker-info h2 {
@@ -179,16 +196,31 @@
             margin-bottom: 5px;
         }
 
-        .worker-stats {
-            display: flex;
-            gap: 20px;
+        .worker-info p {
+            color: #88abdf;
         }
 
-        .stat-badge {
-            background: #2f6bc6;
-            padding: 8px 15px;
-            border-radius: 30px;
-            font-size: 0.9rem;
+        .worker-stats {
+            display: flex;
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: #0a0f1a;
+            padding: 10px 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2f6bc6;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #88abdf;
         }
 
         .logout-btn {
@@ -198,20 +230,21 @@
             border-radius: 30px;
             color: white;
             cursor: pointer;
+            font-weight: 600;
         }
 
         /* Call Center Grid */
-        .call-center-grid {
+        .call-grid {
             display: grid;
             grid-template-columns: 350px 1fr 350px;
             gap: 25px;
             margin: 30px 0;
         }
 
-        /* Queue Panel */
-        .queue-panel, .call-panel, .script-panel {
+        /* Panels */
+        .panel {
             background: #101c2c;
-            border-radius: 24px;
+            border-radius: 20px;
             border: 1px solid #2d4560;
             overflow: hidden;
         }
@@ -223,10 +256,20 @@
         }
 
         .panel-header h3 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background: #0a0f1a;
+            border: 1px solid #3d6190;
+            border-radius: 8px;
+            color: white;
         }
 
         .queue-list {
@@ -259,28 +302,35 @@
             color: #88abdf;
         }
 
+        .client-details {
+            font-size: 0.7rem;
+            color: #6a7f9f;
+            margin-top: 5px;
+        }
+
         /* Call Details */
         .call-details {
             padding: 25px;
         }
 
-        .client-info h2 {
-            font-size: 1.5rem;
+        .call-details h2 {
+            font-size: 1.3rem;
             margin-bottom: 15px;
         }
 
-        .client-details-grid {
+        .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             margin: 20px 0;
         }
 
-        .detail-item {
+        .info-item {
             display: flex;
             align-items: center;
             gap: 10px;
             color: #88abdf;
+            font-size: 0.9rem;
         }
 
         .script-text {
@@ -293,6 +343,7 @@
             color: white;
             margin: 15px 0;
             resize: vertical;
+            font-family: inherit;
         }
 
         .call-timer {
@@ -301,8 +352,12 @@
             border-radius: 12px;
             text-align: center;
             margin: 20px 0;
-            font-size: 2rem;
+        }
+
+        .timer-display {
+            font-size: 2.5rem;
             font-family: monospace;
+            font-weight: 700;
             color: #84b2ff;
         }
 
@@ -316,45 +371,48 @@
         .outcome-btn {
             padding: 12px;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: all 0.2s;
         }
 
         .outcome-btn.connected { background: #22c55e; color: white; }
         .outcome-btn.missed { background: #eab308; color: black; }
         .outcome-btn.hanged { background: #ef4444; color: white; }
         .outcome-btn.voicemail { background: #3b82f6; color: white; }
+        .outcome-btn.selected { transform: scale(1.02); box-shadow: 0 0 0 2px white; }
 
-        .remarks-area textarea {
+        .remarks-input {
             width: 100%;
             height: 80px;
             background: #0a0f1a;
             border: 1px solid #3d6190;
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 12px;
             color: white;
             resize: vertical;
+            margin: 15px 0;
         }
 
-        .call-action-btn {
+        .save-call-btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: #2f6bc6;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
-        /* Script Panel */
-        .script-content {
+        /* Right Panel */
+        .ai-content {
             padding: 20px;
             max-height: 400px;
             overflow-y: auto;
@@ -363,11 +421,17 @@
             margin: 20px;
             border-radius: 12px;
             white-space: pre-wrap;
+            font-size: 0.9rem;
         }
 
-        .ai-suggestions {
+        .suggestions {
             padding: 20px;
             border-top: 1px solid #2d4560;
+        }
+
+        .suggestions h4 {
+            margin-bottom: 15px;
+            color: #88abdf;
         }
 
         .suggestion-item {
@@ -376,7 +440,8 @@
             border-radius: 8px;
             margin-bottom: 8px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            transition: all 0.2s;
         }
 
         .suggestion-item:hover {
@@ -384,13 +449,13 @@
         }
 
         /* Recent Calls Table */
-        .recent-calls-section {
+        .recent-section {
             margin: 30px 0;
         }
 
-        .calls-table {
+        .table-container {
             background: #101c2c;
-            border-radius: 24px;
+            border-radius: 20px;
             padding: 20px;
             overflow-x: auto;
         }
@@ -408,12 +473,15 @@
 
         th {
             color: #88abdf;
+            font-weight: 500;
         }
 
         .badge {
             padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
         }
 
         .badge.connected { background: rgba(34,197,94,0.2); color: #22c55e; }
@@ -421,57 +489,10 @@
         .badge.hanged { background: rgba(239,68,68,0.2); color: #ef4444; }
         .badge.voicemail { background: rgba(59,130,246,0.2); color: #3b82f6; }
 
-        /* Loading & Notification */
-        .global-loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10,15,26,0.95);
-            backdrop-filter: blur(5px);
-            z-index: 20000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        .global-loading-overlay.active {
-            display: flex;
-        }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(47,107,198,0.2);
-            border-top: 4px solid #2f6bc6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .notification {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #1c2a3f;
-            border-left: 4px solid #2f6bc6;
-            padding: 15px 25px;
-            border-radius: 12px;
-            color: white;
-            transform: translateX(120%);
-            transition: transform 0.3s;
-            z-index: 2000;
-        }
-
-        .notification.show {
-            transform: translateX(0);
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #88abdf;
         }
 
         .footer {
@@ -482,8 +503,8 @@
             color: #88abdf;
         }
 
-        @media (max-width: 1200px) {
-            .call-center-grid {
+        @media (max-width: 1000px) {
+            .call-grid {
                 grid-template-columns: 1fr;
             }
             .container {
@@ -497,50 +518,44 @@
         <!-- Navbar -->
         <nav class="navbar">
             <div class="logo" onclick="window.location.href='/'">BTFF</div>
-            <div class="nav-links-desktop">
+            <div class="nav-links">
                 <span onclick="window.location.href='/'">Home</span>
                 <span onclick="window.location.href='/'">Movies</span>
-                <span onclick="window.location.href='/'">Series</span>
                 <span class="active">Call Center</span>
             </div>
-            <div class="nav-icons">
-                <i class="fas fa-user" id="userIcon"></i>
+            <div class="user-icon" id="userIcon">
+                <i class="fas fa-user"></i>
             </div>
         </nav>
 
-        <!-- Login/Register Modal -->
+        <!-- Auth Modal -->
         <div class="modal" id="authModal">
             <div class="modal-content">
-                <span class="modal-close" onclick="closeAuthModal()">&times;</span>
-                <div id="loginTab" style="display: block;">
+                <span class="modal-close" onclick="closeModal('authModal')">&times;</span>
+                <div id="loginView">
                     <h2 style="margin-bottom: 20px;">Welcome Back</h2>
                     <div class="form-group">
                         <label>Email</label>
                         <input type="email" id="loginEmail" placeholder="your@email.com">
                     </div>
-                    <button class="btn-primary" onclick="login()">Load My Data</button>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <span style="color: #88abdf;">New here? </span>
-                        <span onclick="showRegister()" style="color: #2f6bc6; cursor: pointer;">Join Workforce</span>
+                    <button class="btn-primary" onclick="login()">Login</button>
+                    <div class="switch-link">
+                        New here? <span onclick="showRegister()">Join Workforce</span>
                     </div>
                 </div>
-                <div id="registerTab" style="display: none;">
+                <div id="registerView" style="display: none;">
                     <h2 style="margin-bottom: 20px;">Join BTFF Workforce</h2>
                     <div class="form-group">
                         <label>Full Name *</label>
-                        <input type="text" id="regFullName">
+                        <input type="text" id="regFullName" placeholder="Enter your full name">
                     </div>
                     <div class="form-group">
                         <label>Email *</label>
-                        <input type="email" id="regEmail">
+                        <input type="email" id="regEmail" placeholder="your@email.com">
                     </div>
                     <div class="form-group">
                         <label>Phone Number *</label>
-                        <input type="tel" id="regPhone">
-                    </div>
-                    <div class="form-group">
-                        <label>Date of Birth</label>
-                        <input type="date" id="regDOB">
+                        <input type="tel" id="regPhone" placeholder="08012345678">
                     </div>
                     <div class="form-group">
                         <label>Country</label>
@@ -553,13 +568,12 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>State</label>
-                        <input type="text" id="regState" placeholder="State/Province">
+                        <label>State/Province</label>
+                        <input type="text" id="regState" placeholder="Enter state">
                     </div>
                     <button class="btn-primary" onclick="register()">Register</button>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <span style="color: #88abdf;">Already have an account? </span>
-                        <span onclick="showLogin()" style="color: #2f6bc6; cursor: pointer;">Login</span>
+                    <div class="switch-link">
+                        Already have an account? <span onclick="showLogin()">Login</span>
                     </div>
                 </div>
             </div>
@@ -567,98 +581,105 @@
 
         <!-- Worker Dashboard -->
         <div class="worker-dashboard" id="workerDashboard">
+            <!-- Worker Header -->
             <div class="worker-header">
                 <div class="worker-info">
                     <h2 id="workerName">Loading...</h2>
                     <p id="workerEmail">worker@btff.com</p>
                 </div>
                 <div class="worker-stats">
-                    <div class="stat-badge" id="totalCalls">0 Calls</div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalCalls">0</div>
+                        <div class="stat-label">Total Calls</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="todayCalls">0</div>
+                        <div class="stat-label">Today</div>
+                    </div>
                 </div>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
 
-            <div class="call-center-grid">
+            <!-- Call Center Grid -->
+            <div class="call-grid">
                 <!-- Left Panel - Clients Queue -->
-                <div class="queue-panel">
+                <div class="panel">
                     <div class="panel-header">
-                        <h3><i class="fas fa-phone-alt"></i> Clients to Call <span id="queueCount" class="badge" style="background:#2f6bc6;">0</span></h3>
-                        <input type="text" id="searchClient" placeholder="Search client..." style="margin-top: 15px; width: 100%; padding: 10px; background: #0a0f1a; border: 1px solid #3d6190; border-radius: 8px; color: white;">
+                        <h3><i class="fas fa-phone-alt"></i> Clients to Call <span id="queueCount" style="background:#2f6bc6; padding:2px 8px; border-radius:20px; font-size:0.8rem;">0</span></h3>
+                        <input type="text" class="search-input" id="searchClient" placeholder="Search by name or phone...">
                     </div>
                     <div class="queue-list" id="queueList">
-                        <div style="padding: 20px; text-align: center; color: #88abdf;">Loading clients...</div>
+                        <div class="empty-state">Loading clients...</div>
                     </div>
                 </div>
 
                 <!-- Center Panel - Call Details -->
-                <div class="call-panel">
+                <div class="panel">
                     <div class="call-details">
-                        <div id="noCallSelected" style="text-align: center; padding: 50px;">
-                            <i class="fas fa-phone" style="font-size: 3rem; color: #2f6bc6; margin-bottom: 20px;"></i>
+                        <div id="noCallSelected" class="empty-state">
+                            <i class="fas fa-phone" style="font-size: 3rem; color: #2f6bc6; margin-bottom: 20px; display: block;"></i>
                             <p>Select a client from the queue to start a call</p>
                         </div>
                         <div id="callDetailsContent" style="display: none;">
-                            <div class="client-info">
-                                <h2 id="clientName"></h2>
-                                <div class="client-details-grid">
-                                    <div class="detail-item"><i class="fas fa-phone"></i> <span id="clientPhone"></span></div>
-                                    <div class="detail-item"><i class="fas fa-map-marker-alt"></i> <span id="clientLocation"></span></div>
-                                </div>
+                            <h2 id="clientName"></h2>
+                            <div class="info-grid">
+                                <div class="info-item"><i class="fas fa-phone"></i> <span id="clientPhone"></span></div>
+                                <div class="info-item"><i class="fas fa-map-marker-alt"></i> <span id="clientLocation"></span></div>
                             </div>
 
                             <label><i class="fas fa-file-alt"></i> Call Script</label>
                             <textarea class="script-text" id="callScript" placeholder="Enter your call script..."></textarea>
 
-                            <div class="call-timer" id="callTimer">00:00</div>
+                            <div class="call-timer">
+                                <div class="timer-display" id="callTimer">00:00</div>
+                            </div>
 
                             <div class="outcome-buttons">
-                                <button class="outcome-btn connected" onclick="setCallOutcome('Connected')"><i class="fas fa-check-circle"></i> Connected</button>
-                                <button class="outcome-btn missed" onclick="setCallOutcome('Missed')"><i class="fas fa-phone-slash"></i> Missed</button>
-                                <button class="outcome-btn hanged" onclick="setCallOutcome('Hanged Up')"><i class="fas fa-times-circle"></i> Hanged Up</button>
-                                <button class="outcome-btn voicemail" onclick="setCallOutcome('Voicemail')"><i class="fas fa-voicemail"></i> Voicemail</button>
+                                <button class="outcome-btn connected" onclick="selectOutcome('Connected')"><i class="fas fa-check-circle"></i> Connected</button>
+                                <button class="outcome-btn missed" onclick="selectOutcome('Missed')"><i class="fas fa-phone-slash"></i> Missed</button>
+                                <button class="outcome-btn hanged" onclick="selectOutcome('Hanged Up')"><i class="fas fa-times-circle"></i> Hanged Up</button>
+                                <button class="outcome-btn voicemail" onclick="selectOutcome('Voicemail')"><i class="fas fa-voicemail"></i> Voicemail</button>
                             </div>
 
-                            <div class="remarks-area">
-                                <textarea id="callRemarks" placeholder="Add remarks about this call..."></textarea>
-                            </div>
+                            <textarea class="remarks-input" id="callRemarks" placeholder="Add remarks about this call..."></textarea>
 
-                            <button class="call-action-btn" id="saveCallBtn" onclick="saveCallRecord()">
+                            <button class="save-call-btn" onclick="saveCall()">
                                 <i class="fas fa-save"></i> Save Call Record
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Panel - AI Script Assistant -->
-                <div class="script-panel">
+                <!-- Right Panel - AI Assistant -->
+                <div class="panel">
                     <div class="panel-header">
                         <h3><i class="fas fa-robot"></i> AI Script Assistant</h3>
                     </div>
-                    <div class="script-content" id="aiScriptContent">
+                    <div class="ai-content" id="aiContent">
                         <p>Select a client to view or edit their call script.</p>
                     </div>
-                    <div class="ai-suggestions">
+                    <div class="suggestions">
                         <h4><i class="fas fa-lightbulb"></i> Quick Suggestions</h4>
                         <div class="suggestion-item" onclick="addSuggestion('How are you doing today?')">💬 How are you doing today?</div>
-                        <div class="suggestion-item" onclick="addSuggestion('I\'m calling to follow up on...')">📞 I'm calling to follow up on...</div>
+                        <div class="suggestion-item" onclick="addSuggestion('I\'m calling to follow up on our previous conversation')">📞 I'm calling to follow up...</div>
                         <div class="suggestion-item" onclick="addSuggestion('Would you be interested in learning more?')">🎯 Would you be interested in learning more?</div>
-                        <div class="suggestion-item" onclick="addSuggestion('Thank you for your time!')">🙏 Thank you for your time!</div>
+                        <div class="suggestion-item" onclick="addSuggestion('Thank you for your time! Have a great day!')">🙏 Thank you for your time!</div>
                     </div>
                 </div>
             </div>
 
             <!-- Recent Calls Section -->
-            <div class="recent-calls-section">
+            <div class="recent-section">
                 <div class="panel-header">
                     <h3><i class="fas fa-history"></i> Recent Calls</h3>
                 </div>
-                <div class="calls-table">
-                    <table id="recentCallsTable">
+                <div class="table-container">
+                    <table id="callsTable">
                         <thead>
-                            <tr><th>Date</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th></tr>
+                            <tr><th>Date & Time</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th></tr>
                         </thead>
-                        <tbody id="recentCallsBody">
-                            <tr><td colspan="6" style="text-align: center;">No calls recorded</td></tr>
+                        <tbody id="callsTableBody">
+                            <tr><td colspan="6" class="empty-state">No calls recorded yet</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -666,122 +687,120 @@
         </div>
 
         <footer class="footer">
-            <span>© 2026 BTFF · AI-Powered Call Center</span>
+            <span>© 2026 BTFF · Call Center System</span>
         </footer>
     </div>
 
-    <div class="global-loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-        <div>Loading...</div>
-    </div>
-
-    <div class="notification" id="notification">Action completed</div>
-
     <script>
-        // ==================== CONFIGURATION ====================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxrfdqeKNwKOj_6upNPOK1AcLV_CVjW_BMr5rmJPZdQ40FYn3_BpI_GuERPDjKBjVQW/exec';
-        
+        // ==================== FAKE DATA ====================
+        // Sample workers
+        const workers = [
+            { id: 1, fullName: 'Felix Bamson', email: 'felix@btff.com', phone: '07035255910', country: 'Nigeria', state: 'Rivers', totalCalls: 0, todayCalls: 0, calls: [] }
+        ];
+
+        // Sample clients
+        let clients = [
+            { id: 1, phoneNumber: '08012345678', clientName: 'John Doe', country: 'Nigeria', state: 'Lagos', city: 'Ikeja', callScript: 'Hello John, this is Felix from BTFF. How are you doing today?\n\nI\'m calling to connect with you and see how we can be of service.\n\n[Pause for response]\n\nGreat! Let me share some information about what we offer...' },
+            { id: 2, phoneNumber: '08098765432', clientName: 'Jane Smith', country: 'Nigeria', state: 'Abuja', city: 'Garki', callScript: 'Hello Jane, this is Felix from BTFF. Hope you\'re having a great day!\n\nI\'m reaching out because we have some exciting offers that might interest you.\n\n[Pause for response]\n\nWould you be open to learning more about this?' },
+            { id: 3, phoneNumber: '08123456789', clientName: 'Mike Johnson', country: 'Nigeria', state: 'Lagos', city: 'Victoria Island', callScript: 'Hello Mike, this is Felix from BTFF. How are things on your end?\n\nI\'m calling to follow up on your recent inquiry about our services.\n\n[Pause for response]\n\nI\'d be happy to answer any questions you might have.' },
+            { id: 4, phoneNumber: '09012345678', clientName: 'Sarah Williams', country: 'Nigeria', state: 'Rivers', city: 'Port Harcourt', callScript: 'Hello Sarah, this is Felix from BTFF. How are you today?\n\nI\'m reaching out because we value your feedback and wanted to check in.\n\n[Pause for response]\n\nIs there anything we can do to improve your experience?' },
+            { id: 5, phoneNumber: '07012345678', clientName: 'David Brown', country: 'Nigeria', state: 'Ogun', city: 'Abeokuta', callScript: 'Hello David, this is Felix from BTFF. Hope this message finds you well.\n\nI wanted to share some exciting news about our new offerings.\n\n[Pause for response]\n\nWould you have a few minutes to chat?' }
+        ];
+
         // State
         let currentWorker = null;
         let currentClient = null;
-        let currentCallStartTime = null;
+        let callStartTime = null;
         let callTimerInterval = null;
         let selectedOutcome = null;
-        let pendingClients = [];
-        
-        // Helper Functions
-        function showLoading(show) {
-            const overlay = document.getElementById('loadingOverlay');
-            if (show) overlay.classList.add('active');
-            else overlay.classList.remove('active');
-        }
-        
+        let callHistory = [];
+
+        // ==================== UI HELPERS ====================
         function showNotification(msg, type = 'success') {
-            const notif = document.getElementById('notification');
-            notif.textContent = msg;
-            notif.classList.add('show');
-            setTimeout(() => notif.classList.remove('show'), 3000);
+            // Create temporary notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                background: ${type === 'error' ? '#ef4444' : '#2f6bc6'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 10px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = msg;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
         }
-        
-        async function apiCall(action, data = {}, method = 'GET') {
-            if (!API_URL || API_URL === '%%CALL_CENTER_API_URL%%') {
-                console.error('API URL not configured');
-                showNotification('API not configured. Please check environment variables.', 'error');
-                return { success: false, error: 'API not configured' };
-            }
+
+        function formatDuration(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleString();
+        }
+
+        function updateUI() {
+            if (!currentWorker) return;
             
-            showLoading(true);
-            
-            try {
-                let url = `${API_URL}?action=${action}&t=${Date.now()}`;
-                
-                if (method === 'GET') {
-                    Object.keys(data).forEach(key => {
-                        url += `&${key}=${encodeURIComponent(data[key])}`;
-                    });
-                }
-                
-                const options = { method: method, headers: { 'Content-Type': 'application/json' } };
-                if (method === 'POST') options.body = JSON.stringify(data);
-                
-                const response = await fetch(url, options);
-                const text = await response.text();
-                const result = JSON.parse(text);
-                
-                showLoading(false);
-                return result;
-            } catch (error) {
-                console.error('API call failed:', error);
-                showLoading(false);
-                showNotification(error.message, 'error');
-                return { success: false, error: error.message };
-            }
+            document.getElementById('workerName').textContent = currentWorker.fullName;
+            document.getElementById('workerEmail').textContent = currentWorker.email;
+            document.getElementById('totalCalls').textContent = currentWorker.totalCalls || 0;
+            document.getElementById('todayCalls').textContent = currentWorker.todayCalls || 0;
         }
-        
-        // Auth Functions
-        function openAuthModal() {
-            document.getElementById('authModal').classList.add('active');
+
+        // ==================== AUTH FUNCTIONS ====================
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
         }
-        
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.remove('active');
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
         }
-        
+
         function showLogin() {
-            document.getElementById('loginTab').style.display = 'block';
-            document.getElementById('registerTab').style.display = 'none';
+            document.getElementById('loginView').style.display = 'block';
+            document.getElementById('registerView').style.display = 'none';
         }
-        
+
         function showRegister() {
-            document.getElementById('loginTab').style.display = 'none';
-            document.getElementById('registerTab').style.display = 'block';
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('registerView').style.display = 'block';
         }
-        
-        async function login() {
+
+        function login() {
             const email = document.getElementById('loginEmail').value;
+            
             if (!email) {
                 showNotification('Please enter your email', 'error');
                 return;
             }
             
-            const result = await apiCall('getWorkerProfile', { email });
+            // Find worker by email
+            const worker = workers.find(w => w.email === email);
             
-            if (result.success && result.worker) {
-                currentWorker = result.worker;
-                localStorage.setItem('btff_worker', JSON.stringify(currentWorker));
-                closeAuthModal();
-                loadWorkerDashboard();
-                showNotification(`Welcome back, ${currentWorker.fullName}!`);
+            if (worker) {
+                currentWorker = worker;
+                closeModal('authModal');
+                document.getElementById('workerDashboard').classList.add('active');
+                updateUI();
+                renderQueue();
+                renderCallHistory();
+                showNotification(`Welcome back, ${worker.fullName}!`);
             } else {
                 showNotification('Worker not found. Please register first.', 'error');
             }
         }
-        
-        async function register() {
+
+        function register() {
             const fullName = document.getElementById('regFullName').value;
             const email = document.getElementById('regEmail').value;
             const phone = document.getElementById('regPhone').value;
-            const dob = document.getElementById('regDOB').value;
             const country = document.getElementById('regCountry').value;
             const state = document.getElementById('regState').value;
             
@@ -790,84 +809,71 @@
                 return;
             }
             
-            const result = await apiCall('registerWorker', {
-                fullName, email, phoneNumber: phone, dateOfBirth: dob, country, state
-            }, 'POST');
-            
-            if (result.success) {
-                showNotification('Registration successful! Please login.');
-                showLogin();
-                document.getElementById('loginEmail').value = email;
-            } else {
-                showNotification(result.error || 'Registration failed', 'error');
-            }
-        }
-        
-        function logout() {
-            currentWorker = null;
-            localStorage.removeItem('btff_worker');
-            document.getElementById('workerDashboard').classList.remove('active');
-            openAuthModal();
-            showNotification('Logged out successfully');
-        }
-        
-        // Load Worker Dashboard
-        async function loadWorkerDashboard() {
-            if (!currentWorker) {
-                const saved = localStorage.getItem('btff_worker');
-                if (saved) currentWorker = JSON.parse(saved);
-            }
-            
-            if (!currentWorker) {
-                openAuthModal();
+            // Check if worker already exists
+            if (workers.find(w => w.email === email)) {
+                showNotification('Worker already exists with this email', 'error');
                 return;
             }
             
-            document.getElementById('workerName').textContent = currentWorker.fullName;
-            document.getElementById('workerEmail').textContent = currentWorker.email;
-            document.getElementById('totalCalls').textContent = `${currentWorker.totalCalls || 0} Calls`;
+            // Create new worker
+            const newWorker = {
+                id: workers.length + 1,
+                fullName,
+                email,
+                phone,
+                country,
+                state,
+                totalCalls: 0,
+                todayCalls: 0,
+                calls: []
+            };
+            
+            workers.push(newWorker);
+            currentWorker = newWorker;
+            
+            closeModal('authModal');
             document.getElementById('workerDashboard').classList.add('active');
-            
-            await loadUncalledClients();
-            await loadCallHistory();
+            updateUI();
+            renderQueue();
+            renderCallHistory();
+            showNotification(`Welcome to BTFF Workforce, ${fullName}!`);
         }
-        
-        // Load Uncalled Clients
-        async function loadUncalledClients() {
-            const result = await apiCall('getUncalledClients', { workerEmail: currentWorker.email });
-            
-            if (result.success) {
-                pendingClients = result.pendingCalls || [];
-                renderQueue();
-            }
+
+        function logout() {
+            currentWorker = null;
+            document.getElementById('workerDashboard').classList.remove('active');
+            openModal('authModal');
+            showLogin();
+            showNotification('Logged out successfully');
         }
-        
+
+        // ==================== QUEUE FUNCTIONS ====================
         function renderQueue() {
-            const searchTerm = document.getElementById('searchClient')?.value.toLowerCase() || '';
-            const filtered = pendingClients.filter(client => 
-                client.clientName?.toLowerCase().includes(searchTerm) || 
-                client.phoneNumber?.includes(searchTerm)
+            const searchTerm = document.getElementById('searchClient').value.toLowerCase();
+            const filtered = clients.filter(client => 
+                client.clientName.toLowerCase().includes(searchTerm) || 
+                client.phoneNumber.includes(searchTerm)
             );
             
             const queueList = document.getElementById('queueList');
             document.getElementById('queueCount').textContent = filtered.length;
             
             if (filtered.length === 0) {
-                queueList.innerHTML = '<div style="padding: 20px; text-align: center; color: #88abdf;">No pending clients</div>';
+                queueList.innerHTML = '<div class="empty-state">No clients found</div>';
                 return;
             }
             
             queueList.innerHTML = filtered.map(client => `
-                <div class="queue-item" onclick="selectClient('${client.phoneNumber}')">
+                <div class="queue-item" onclick="selectClient(${client.id})">
                     <div class="client-name">${escapeHtml(client.clientName)}</div>
                     <div class="client-phone">${client.phoneNumber}</div>
-                    <div style="font-size: 0.7rem; color: #88abdf;">${client.country || ''} ${client.state || ''}</div>
+                    <div class="client-details">${client.country || ''} ${client.state || ''}</div>
                 </div>
             `).join('');
         }
-        
-        async function selectClient(phoneNumber) {
-            const client = pendingClients.find(c => c.phoneNumber === phoneNumber);
+
+        function selectClient(clientId) {
+            const client = clients.find(c => c.id === clientId);
             if (!client) return;
             
             currentClient = client;
@@ -878,57 +884,59 @@
             document.getElementById('clientName').textContent = client.clientName;
             document.getElementById('clientPhone').textContent = client.phoneNumber;
             document.getElementById('clientLocation').textContent = `${client.country || ''} ${client.state || ''}`.trim() || 'Not specified';
-            document.getElementById('callScript').value = client.callScript || getDefaultScript();
-            document.getElementById('aiScriptContent').innerHTML = client.callScript || getDefaultScript();
+            document.getElementById('callScript').value = client.callScript;
+            document.getElementById('aiContent').innerHTML = client.callScript;
             
             selectedOutcome = null;
             document.getElementById('callRemarks').value = '';
             
-            // Auto-start call timer when client is selected
-            startCallTimer();
+            // Reset outcome button styles
+            document.querySelectorAll('.outcome-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
             
-            // Record call start
-            await apiCall('startCall', {
-                workerEmail: currentWorker.email,
-                clientPhone: client.phoneNumber,
-                clientName: client.clientName,
-                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-            }, 'POST');
+            // Start call timer
+            startCallTimer();
         }
-        
+
         function startCallTimer() {
             if (callTimerInterval) clearInterval(callTimerInterval);
-            currentCallStartTime = new Date();
+            callStartTime = new Date();
             callTimerInterval = setInterval(() => {
-                const now = new Date();
-                const diff = Math.floor((now - currentCallStartTime) / 1000);
-                const mins = Math.floor(diff / 60);
-                const secs = diff % 60;
-                document.getElementById('callTimer').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                const elapsed = Math.floor((new Date() - callStartTime) / 1000);
+                document.getElementById('callTimer').textContent = formatDuration(elapsed);
             }, 1000);
         }
-        
+
         function stopCallTimer() {
             if (callTimerInterval) {
                 clearInterval(callTimerInterval);
                 callTimerInterval = null;
             }
         }
-        
+
         function getCallDuration() {
-            if (!currentCallStartTime) return 0;
-            return Math.floor((new Date() - currentCallStartTime) / 1000);
+            if (!callStartTime) return 0;
+            return Math.floor((new Date() - callStartTime) / 1000);
         }
-        
-        function setCallOutcome(outcome) {
+
+        function selectOutcome(outcome) {
             selectedOutcome = outcome;
-            const buttons = document.querySelectorAll('.outcome-btn');
-            buttons.forEach(btn => btn.style.opacity = '0.6');
+            document.querySelectorAll('.outcome-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
             const selectedBtn = document.querySelector(`.outcome-btn.${outcome.toLowerCase().replace(' ', '')}`);
-            if (selectedBtn) selectedBtn.style.opacity = '1';
+            if (selectedBtn) selectedBtn.classList.add('selected');
         }
-        
-        async function saveCallRecord() {
+
+        function addSuggestion(suggestion) {
+            const scriptTextarea = document.getElementById('callScript');
+            const currentScript = scriptTextarea.value;
+            scriptTextarea.value = currentScript + '\n\n' + suggestion;
+            document.getElementById('aiContent').innerHTML = scriptTextarea.value;
+        }
+
+        function saveCall() {
             if (!currentClient) {
                 showNotification('No client selected', 'error');
                 return;
@@ -943,118 +951,140 @@
             const script = document.getElementById('callScript').value;
             const remarks = document.getElementById('callRemarks').value;
             
-            const result = await apiCall('saveCallRecord', {
-                workerEmail: currentWorker.email,
+            // Create call record
+            const callRecord = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                clientName: currentClient.clientName,
                 clientPhone: currentClient.phoneNumber,
-                callDuration: duration,
-                callOutcome: selectedOutcome,
+                duration: duration,
+                outcome: selectedOutcome,
                 remarks: remarks,
-                scriptUsed: script,
-                sentiment: 'neutral'
-            }, 'POST');
+                script: script
+            };
             
-            if (result.success) {
-                showNotification(`Call saved - Outcome: ${selectedOutcome}`);
-                stopCallTimer();
-                selectedOutcome = null;
-                document.getElementById('callRemarks').value = '';
-                
-                // Reset UI
-                document.getElementById('noCallSelected').style.display = 'flex';
-                document.getElementById('callDetailsContent').style.display = 'none';
-                currentClient = null;
-                currentCallStartTime = null;
-                
-                // Refresh data
-                await loadUncalledClients();
-                await loadCallHistory();
-                
-                // Update worker stats
-                if (currentWorker) {
-                    currentWorker.totalCalls = (currentWorker.totalCalls || 0) + 1;
-                    document.getElementById('totalCalls').textContent = `${currentWorker.totalCalls} Calls`;
-                }
-            } else {
-                showNotification(result.error || 'Failed to save call', 'error');
-            }
+            // Add to worker's call history
+            if (!currentWorker.calls) currentWorker.calls = [];
+            currentWorker.calls.unshift(callRecord);
+            currentWorker.totalCalls = (currentWorker.totalCalls || 0) + 1;
+            currentWorker.todayCalls = (currentWorker.todayCalls || 0) + 1;
+            
+            // Update the client's script if modified
+            currentClient.callScript = script;
+            
+            // Update UI
+            updateUI();
+            renderCallHistory();
+            
+            // Reset call state
+            stopCallTimer();
+            selectedOutcome = null;
+            document.getElementById('callRemarks').value = '';
+            document.getElementById('noCallSelected').style.display = 'flex';
+            document.getElementById('callDetailsContent').style.display = 'none';
+            currentClient = null;
+            callStartTime = null;
+            
+            showNotification(`Call saved - Outcome: ${selectedOutcome}`);
         }
-        
-        async function loadCallHistory() {
-            const result = await apiCall('getCallHistory', { workerEmail: currentWorker.email, limit: 20 });
+
+        function renderCallHistory() {
+            const tbody = document.getElementById('callsTableBody');
+            const calls = currentWorker?.calls || [];
             
-            const tbody = document.getElementById('recentCallsBody');
-            
-            if (!result.success || !result.calls || result.calls.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No calls recorded</td></tr>';
+            if (calls.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No calls recorded yet</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = result.calls.map(call => `
+            tbody.innerHTML = calls.map(call => `
                 <tr>
-                    <td>${new Date(call.timestamp).toLocaleString()}</td>
-                    <td>${escapeHtml(call.clientName || 'Unknown')}</td>
+                    <td>${formatDate(call.timestamp)}</td>
+                    <td>${escapeHtml(call.clientName)}</td>
                     <td>${call.clientPhone}</td>
-                    <td>${formatDuration(call.callDuration)}</td>
-                    <td><span class="badge ${call.callOutcome?.toLowerCase().replace(' ', '')}">${call.callOutcome}</span></td>
-                    <td>${escapeHtml((call.remarks || '').substring(0, 50))}${(call.remarks || '').length > 50 ? '...' : ''}</td>
+                    <td>${formatDuration(call.duration)}</td>
+                    <td><span class="badge ${call.outcome.toLowerCase().replace(' ', '')}">${call.outcome}</span></td>
+                    <td>${escapeHtml(call.remarks.substring(0, 50))}${call.remarks.length > 50 ? '...' : ''}</td>
                 </tr>
             `).join('');
         }
-        
-        function addSuggestion(suggestion) {
-            const scriptTextarea = document.getElementById('callScript');
-            const currentScript = scriptTextarea.value;
-            scriptTextarea.value = currentScript + '\n\n' + suggestion;
-            document.getElementById('aiScriptContent').innerHTML = scriptTextarea.value;
-        }
-        
-        function getDefaultScript() {
-            return `Hello, this is [Your Name] from BTFF. How are you doing today?
 
-I'm reaching out to connect with you and see how we can be of service.
-
-[Pause for response]
-
-Great! Let me share some information about what we offer...`;
-        }
-        
-        function formatDuration(seconds) {
-            if (!seconds) return '0:00';
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-        
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-        
-        // Event Listeners
+
+        // ==================== EVENT LISTENERS ====================
         document.getElementById('userIcon').addEventListener('click', () => {
             if (currentWorker) {
                 logout();
             } else {
-                openAuthModal();
+                openModal('authModal');
             }
         });
         
-        document.getElementById('searchClient')?.addEventListener('input', renderQueue);
+        document.getElementById('searchClient').addEventListener('input', renderQueue);
         
-        document.getElementById('callScript')?.addEventListener('input', (e) => {
-            document.getElementById('aiScriptContent').innerHTML = e.target.value;
+        document.getElementById('callScript').addEventListener('input', (e) => {
+            document.getElementById('aiContent').innerHTML = e.target.value;
         });
         
-        // Check for saved session
+        // Check for saved session (use localStorage)
         const savedWorker = localStorage.getItem('btff_worker');
         if (savedWorker) {
-            currentWorker = JSON.parse(savedWorker);
-            loadWorkerDashboard();
+            try {
+                const workerData = JSON.parse(savedWorker);
+                const found = workers.find(w => w.email === workerData.email);
+                if (found) {
+                    currentWorker = found;
+                    document.getElementById('workerDashboard').classList.add('active');
+                    updateUI();
+                    renderQueue();
+                    renderCallHistory();
+                } else {
+                    openModal('authModal');
+                }
+            } catch(e) {
+                openModal('authModal');
+            }
         } else {
-            openAuthModal();
+            openModal('authModal');
         }
+        
+        // Save worker to localStorage when updated
+        function saveWorkerToStorage() {
+            if (currentWorker) {
+                localStorage.setItem('btff_worker', JSON.stringify({
+                    email: currentWorker.email,
+                    fullName: currentWorker.fullName
+                }));
+            }
+        }
+        
+        // Override saveCall to also save to storage
+        const originalSaveCall = saveCall;
+        window.saveCall = function() {
+            originalSaveCall();
+            saveWorkerToStorage();
+        };
+        
+        // Override register to also save to storage
+        const originalRegister = register;
+        window.register = function() {
+            originalRegister();
+            saveWorkerToStorage();
+        };
+        
+        // Override login to also save to storage
+        const originalLogin = login;
+        window.login = function() {
+            originalLogin();
+            saveWorkerToStorage();
+        };
+        
+        console.log('✅ Call Center Page Loaded - Using Fake Data');
     </script>
 </body>
 </html>

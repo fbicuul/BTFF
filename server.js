@@ -1,4 +1,4 @@
-// server.js - VERCEL VERSION (UPDATED)
+// server.js - VERCEL VERSION (FIXED)
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -80,13 +80,13 @@ app.all('/api/proxy', async (req, res) => {
 // ===== PROXY FOR CALL CENTER API =====
 app.all('/api/callcenter-proxy', async (req, res) => {
     try {
-        const targetUrl = process.env.CALL_CENTER_API_URL;
+        const targetUrl = process.env.APPS_SCRIPT_URL;
         
         if (!targetUrl) {
-            console.error('❌ CALL_CENTER_API_URL not configured');
+            console.error('❌ APPS_SCRIPT_URL not configured');
             return res.status(500).json({ 
                 success: false, 
-                error: 'Call Center API not configured. Please add CALL_CENTER_API_URL environment variable.' 
+                error: 'Server configuration error. Please add APPS_SCRIPT_URL environment variable.' 
             });
         }
         
@@ -297,15 +297,14 @@ app.get('/callcenter', (req, res) => {
         
         let html = fs.readFileSync(templatePath, 'utf8');
         
-        // Use the proxy endpoint for API calls
-        const callCenterApiUrl = process.env.CALL_CENTER_API_URL;
+        // IMPORTANT: Replace the placeholder with the actual proxy URL
+        // The callcenter.html should use the proxy endpoint
         const proxyUrl = '/api/callcenter-proxy';
         
-        console.log('🔗 Call Center API URL from env:', callCenterApiUrl ? 'Present' : 'MISSING');
-        console.log('🔗 Using proxy URL:', proxyUrl);
+        console.log('🔗 Call Center: Using proxy URL:', proxyUrl);
         
         // Replace the placeholder with the proxy URL
-        html = html.replace(/%%CALL_CENTER_API_URL%%/g, proxyUrl);
+        html = html.replace(/%%APPS_SCRIPT_URL%%/g, proxyUrl);
         
         res.setHeader('Content-Type', 'text/html');
         res.send(html);
@@ -343,9 +342,7 @@ app.get('/health', (req, res) => {
         timestamp: new Date().toISOString(),
         env: process.env.NODE_ENV,
         hasAppsScriptUrl: !!process.env.APPS_SCRIPT_URL,
-        hasCallCenterApiUrl: !!process.env.CALL_CENTER_API_URL,
-        appsScriptUrlPreview: process.env.APPS_SCRIPT_URL ? process.env.APPS_SCRIPT_URL.substring(0, 50) + '...' : 'not set',
-        callCenterApiUrlPreview: process.env.CALL_CENTER_API_URL ? process.env.CALL_CENTER_API_URL.substring(0, 50) + '...' : 'not set'
+        appsScriptUrlPreview: process.env.APPS_SCRIPT_URL ? process.env.APPS_SCRIPT_URL.substring(0, 50) + '...' : 'not set'
     });
 });
 
@@ -374,7 +371,6 @@ if (require.main === module) {
         console.log(`\n🚀 Server running on http://localhost:${PORT}`);
         console.log('📋 Configuration:');
         console.log(`   APPS_SCRIPT_URL: ${process.env.APPS_SCRIPT_URL ? '✅ Set' : '❌ Missing'}`);
-        console.log(`   CALL_CENTER_API_URL: ${process.env.CALL_CENTER_API_URL ? '✅ Set' : '❌ Missing'}`);
         console.log(`\n🔗 Available routes:`);
         console.log(`   - Home: http://localhost:${PORT}/`);
         console.log(`   - Admin: http://localhost:${PORT}/admin`);

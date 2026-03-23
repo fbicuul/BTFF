@@ -177,7 +177,13 @@
             display: block;
         }
 
-        .user-icon {
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-icon, .headset-icon {
             font-size: 1.4rem;
             color: #d0e0ff;
             cursor: pointer;
@@ -191,9 +197,142 @@
             transition: all 0.2s;
         }
 
-        .user-icon:hover {
+        .user-icon:hover, .headset-icon:hover {
             background: #2f6bc6;
             color: white;
+        }
+
+        /* Soft Phone Modal */
+        .softphone-modal {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            background: #0c1727;
+            border: 2px solid #2f6bc6;
+            border-radius: 20px;
+            z-index: 3000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        .softphone-modal.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .softphone-header {
+            padding: 15px 20px;
+            background: #0f1a2b;
+            border-bottom: 1px solid #2d4560;
+            border-radius: 18px 18px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .softphone-header h4 {
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .softphone-close {
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #88abdf;
+        }
+
+        .softphone-close:hover {
+            color: #ef4444;
+        }
+
+        .softphone-body {
+            padding: 20px;
+        }
+
+        .softphone-input {
+            width: 100%;
+            padding: 12px;
+            background: #0a0f1a;
+            border: 1px solid #3d6190;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .softphone-input:focus {
+            outline: none;
+            border-color: #2f6bc6;
+        }
+
+        .softphone-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .softphone-num {
+            padding: 12px;
+            background: #1c2a3f;
+            border: 1px solid #3d6190;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .softphone-num:hover {
+            background: #2f6bc6;
+            transform: scale(1.02);
+        }
+
+        .softphone-call-btn {
+            width: 100%;
+            padding: 12px;
+            background: #22c55e;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .softphone-call-btn:hover {
+            background: #16a34a;
+        }
+
+        .softphone-clear-btn {
+            width: 100%;
+            padding: 10px;
+            background: #ef4444;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .softphone-clear-btn:hover {
+            background: #dc2626;
         }
 
         .modal {
@@ -273,6 +412,11 @@
             font-size: 1rem;
         }
 
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #2f6bc6;
+        }
+
         .btn-primary {
             width: 100%;
             padding: 14px;
@@ -289,6 +433,11 @@
         .btn-primary:hover {
             background: #3e7ed9;
             transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .switch-link {
@@ -640,6 +789,46 @@
             color: #88abdf;
         }
 
+        /* Loading Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10,15,26,0.95);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(47,107,198,0.2);
+            border-top: 4px solid #2f6bc6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 1rem;
+        }
+
         .footer {
             margin-top: 60px;
             padding: 40px 0;
@@ -693,6 +882,7 @@
             .info-grid { grid-template-columns: 1fr; }
             .outcome-buttons { grid-template-columns: 1fr; }
             .footer { flex-direction: column; text-align: center; }
+            .softphone-modal { width: 300px; right: 10px; bottom: 80px; }
         }
     </style>
 </head>
@@ -704,7 +894,8 @@
                 <span onclick="window.location.href='/'">Home</span>
                 <span class="active">Call Center</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 20px;">
+            <div class="nav-icons">
+                <div class="headset-icon" id="headsetIcon"><i class="fas fa-headset"></i></div>
                 <div class="user-icon" id="userIcon"><i class="fas fa-user"></i></div>
                 <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
             </div>
@@ -719,6 +910,33 @@
         </div>
         <div class="menu-overlay" id="menuOverlay"></div>
 
+        <!-- Soft Phone Modal -->
+        <div class="softphone-modal" id="softphoneModal">
+            <div class="softphone-header">
+                <h4><i class="fas fa-phone-alt"></i> Quick Dial</h4>
+                <span class="softphone-close" id="closeSoftphone">&times;</span>
+            </div>
+            <div class="softphone-body">
+                <input type="text" class="softphone-input" id="softphoneNumber" placeholder="Enter phone number...">
+                <div class="softphone-buttons">
+                    <div class="softphone-num" data-num="1">1</div>
+                    <div class="softphone-num" data-num="2">2</div>
+                    <div class="softphone-num" data-num="3">3</div>
+                    <div class="softphone-num" data-num="4">4</div>
+                    <div class="softphone-num" data-num="5">5</div>
+                    <div class="softphone-num" data-num="6">6</div>
+                    <div class="softphone-num" data-num="7">7</div>
+                    <div class="softphone-num" data-num="8">8</div>
+                    <div class="softphone-num" data-num="9">9</div>
+                    <div class="softphone-num" data-num="*">*</div>
+                    <div class="softphone-num" data-num="0">0</div>
+                    <div class="softphone-num" data-num="#">#</div>
+                </div>
+                <button class="softphone-call-btn" id="softphoneCallBtn"><i class="fas fa-phone"></i> Call</button>
+                <button class="softphone-clear-btn" id="softphoneClearBtn">Clear</button>
+            </div>
+        </div>
+
         <!-- Auth Modal -->
         <div class="modal" id="authModal">
             <div class="modal-content">
@@ -729,7 +947,7 @@
                         <label>Email</label>
                         <input type="email" id="loginEmail" placeholder="your@email.com">
                     </div>
-                    <button class="btn-primary" onclick="login()">Login</button>
+                    <button class="btn-primary" id="loginBtn" onclick="login()">Login</button>
                     <div class="switch-link">New here? <span onclick="showRegister()">Join Workforce</span></div>
                 </div>
                 <div id="registerView" style="display: none;">
@@ -740,10 +958,16 @@
                     <div class="form-group"><label>Country</label><select id="regCountry"><option value="">Select Country</option><option value="Nigeria">Nigeria</option><option value="USA">USA</option><option value="UK">UK</option><option value="Canada">Canada</option></select></div>
                     <div class="form-group"><label>State/Province</label><input type="text" id="regState" placeholder="Enter state"></div>
                     <div class="form-group"><label>City</label><input type="text" id="regCity" placeholder="Enter city"></div>
-                    <button class="btn-primary" onclick="register()">Register</button>
+                    <button class="btn-primary" id="registerBtn" onclick="register()">Register</button>
                     <div class="switch-link">Already have an account? <span onclick="showLogin()">Login</span></div>
                 </div>
             </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Processing...</div>
         </div>
 
         <!-- Worker Dashboard -->
@@ -827,7 +1051,19 @@
         let callStartTime = null;
         let callTimerInterval = null;
         let selectedOutcome = null;
-        let callHistory = [];
+
+        // ==================== LOADING FUNCTIONS ====================
+        function showLoading(message = 'Processing...') {
+            const overlay = document.getElementById('loadingOverlay');
+            const text = overlay.querySelector('.loading-text');
+            if (text) text.textContent = message;
+            overlay.classList.add('active');
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.remove('active');
+        }
 
         // ==================== API FUNCTIONS ====================
         async function apiCall(action, data = {}, method = 'GET') {
@@ -872,10 +1108,6 @@
 
         async function updateClientStatus(phoneNumber, callStatus, remarks) {
             return await apiCall('updateCallCenterClientStatus', { phoneNumber, callStatus, remarks }, 'POST');
-        }
-
-        async function addClient(phoneNumber, fullName, country, state, city, dateOfBirth, callScript) {
-            return await apiCall('addCallCenterClient', { phoneNumber, fullName, country, state, city, dateOfBirth, callScript }, 'POST');
         }
 
         // Call logging functions
@@ -931,7 +1163,10 @@
             const email = document.getElementById('loginEmail').value;
             if (!email) { showNotification('Please enter your email', 'error'); return; }
             
+            showLoading('Logging in...');
             const result = await getWorker(email);
+            hideLoading();
+            
             if (result.success && result.worker) {
                 currentWorker = result.worker;
                 await updateWorkerActivity(currentWorker.email);
@@ -957,7 +1192,10 @@
             
             if (!fullName || !email || !phone) { showNotification('Please fill all required fields', 'error'); return; }
             
+            showLoading('Registering...');
             const result = await registerWorker(fullName, email, phone, country, state, city);
+            hideLoading();
+            
             if (result.success) {
                 showNotification('Registration successful! Please login.');
                 showLogin();
@@ -984,7 +1222,7 @@
             
             const clients = await getClients();
             const filtered = clients.filter(client => 
-                client.fullName.toLowerCase().includes(searchTerm) || 
+                (client.fullName && client.fullName.toLowerCase().includes(searchTerm)) || 
                 client.phoneNumber.includes(searchTerm)
             );
             
@@ -1005,13 +1243,15 @@
         }
 
         async function selectClient(phoneNumber) {
-            document.getElementById('callDetailsContent').style.display = 'block';
-            document.getElementById('noCallSelected').style.display = 'none';
-            document.getElementById('clientName').textContent = 'Loading...';
+            showLoading('Loading client details...');
             
             const client = await getClientByPhone(phoneNumber);
+            hideLoading();
+            
             if (client) {
                 currentClient = client;
+                document.getElementById('callDetailsContent').style.display = 'block';
+                document.getElementById('noCallSelected').style.display = 'none';
                 document.getElementById('clientName').textContent = client.fullName || 'Unknown';
                 document.getElementById('clientPhone').textContent = client.phoneNumber;
                 document.getElementById('clientLocation').textContent = `${client.country || ''} ${client.state || ''} ${client.city || ''}`.trim() || 'Not specified';
@@ -1066,13 +1306,23 @@
             const script = document.getElementById('callScript').value;
             const remarks = document.getElementById('callRemarks').value;
             
+            showLoading('Saving call record...');
+            
             // Update client status in database
             const updateResult = await updateClientStatus(currentClient.phoneNumber, selectedOutcome, remarks);
-            if (!updateResult.success) { showNotification('Failed to update call status', 'error'); return; }
+            if (!updateResult.success) { 
+                hideLoading();
+                showNotification('Failed to update call status', 'error'); 
+                return; 
+            }
             
             // Log the call
             const logResult = await logCall(currentWorker.email, currentClient.phoneNumber, currentClient.fullName, duration, selectedOutcome, remarks, script);
-            if (!logResult.success) { showNotification('Failed to save call log', 'error'); return; }
+            if (!logResult.success) { 
+                hideLoading();
+                showNotification('Failed to save call log', 'error'); 
+                return; 
+            }
             
             // Update local stats
             const stats = await getWorkerStats(currentWorker.email);
@@ -1086,6 +1336,7 @@
             currentClient = null;
             callStartTime = null;
             
+            hideLoading();
             showNotification(`Call saved - Outcome: ${selectedOutcome}`);
             await loadCallHistory();
             await renderQueue();
@@ -1096,7 +1347,7 @@
             const tbody = document.getElementById('callsTableBody');
             
             if (calls.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No calls recorded yet</td></tr>';
+                tbody.innerHTML = '   <td colspan="6" class="empty-state">No calls recorded yet</td>   ';
                 return;
             }
             
@@ -1119,6 +1370,34 @@
             return div.innerHTML;
         }
 
+        // ==================== SOFT PHONE FUNCTIONS ====================
+        function openSoftphone() {
+            document.getElementById('softphoneModal').classList.add('active');
+        }
+
+        function closeSoftphone() {
+            document.getElementById('softphoneModal').classList.remove('active');
+        }
+
+        async function makeManualCall() {
+            const phoneNumber = document.getElementById('softphoneNumber').value;
+            if (!phoneNumber) {
+                showNotification('Please enter a phone number', 'error');
+                return;
+            }
+            
+            showLoading('Looking up client...');
+            const client = await getClientByPhone(phoneNumber);
+            hideLoading();
+            
+            if (client) {
+                closeSoftphone();
+                await selectClient(phoneNumber);
+            } else {
+                showNotification('Client not found. Please add client first.', 'error');
+            }
+        }
+
         // ==================== MOBILE MENU ====================
         function openMobileMenu() {
             document.getElementById('mobileSlideMenu').classList.add('active');
@@ -1131,6 +1410,23 @@
             document.body.style.overflow = 'auto';
         }
 
+        // ==================== SOFT PHONE EVENT LISTENERS ====================
+        document.querySelectorAll('.softphone-num').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const num = btn.dataset.num;
+                const input = document.getElementById('softphoneNumber');
+                input.value += num;
+            });
+        });
+
+        document.getElementById('softphoneClearBtn').addEventListener('click', () => {
+            document.getElementById('softphoneNumber').value = '';
+        });
+
+        document.getElementById('softphoneCallBtn').addEventListener('click', makeManualCall);
+        document.getElementById('headsetIcon').addEventListener('click', openSoftphone);
+        document.getElementById('closeSoftphone').addEventListener('click', closeSoftphone);
+
         // ==================== EVENT LISTENERS ====================
         document.getElementById('userIcon').addEventListener('click', () => { currentWorker ? logout() : openModal('authModal'); });
         document.getElementById('searchClient').addEventListener('input', () => renderQueue());
@@ -1138,7 +1434,10 @@
         document.getElementById('mobileMenuBtn').addEventListener('click', openMobileMenu);
         document.getElementById('closeMobileMenu').addEventListener('click', closeMobileMenu);
         document.getElementById('menuOverlay').addEventListener('click', closeMobileMenu);
-        window.addEventListener('click', (e) => { if (e.target.classList.contains('modal')) closeModal(e.target.id); });
+        window.addEventListener('click', (e) => { 
+            if (e.target.classList.contains('modal')) closeModal(e.target.id);
+            if (e.target.classList.contains('softphone-modal')) closeSoftphone();
+        });
 
         // ==================== INITIALIZATION ====================
         const savedWorker = localStorage.getItem('btff_worker');

@@ -26,14 +26,12 @@
             padding: 0 40px;
         }
 
-        /* Navbar */
         .navbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 20px 0;
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            position: relative;
         }
 
         .logo {
@@ -236,20 +234,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .modal-content::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .modal-content::-webkit-scrollbar-track {
-            background: #1f334a;
-            border-radius: 3px;
-        }
-        
-        .modal-content::-webkit-scrollbar-thumb {
-            background: #2f6bc6;
-            border-radius: 3px;
-        }
-
         .modal-close {
             position: sticky;
             top: 0;
@@ -287,12 +271,6 @@
             border-radius: 10px;
             color: white;
             font-size: 1rem;
-            transition: border 0.2s;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #2f6bc6;
         }
 
         .btn-primary {
@@ -392,12 +370,10 @@
             color: white;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.2s;
         }
 
         .logout-btn:hover {
             background: #dc2626;
-            transform: translateY(-1px);
         }
 
         .call-grid {
@@ -437,27 +413,9 @@
             color: white;
         }
 
-        .search-input:focus {
-            outline: none;
-            border-color: #2f6bc6;
-        }
-
         .queue-list {
             max-height: 500px;
             overflow-y: auto;
-        }
-
-        .queue-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .queue-list::-webkit-scrollbar-track {
-            background: #1f334a;
-        }
-        
-        .queue-list::-webkit-scrollbar-thumb {
-            background: #2f6bc6;
-            border-radius: 3px;
         }
 
         .queue-item {
@@ -592,12 +550,10 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 10px;
-            transition: all 0.2s;
         }
 
         .save-call-btn:hover {
             background: #3e7ed9;
-            transform: translateY(-1px);
         }
 
         .ai-content {
@@ -839,9 +795,9 @@
                 <div class="panel-header"><h3><i class="fas fa-history"></i> Recent Calls</h3></div>
                 <div class="table-container">
                     <table id="callsTable">
-                        <thead><tr><th>Date & Time</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th></tr></thead>
-                        <tbody id="callsTableBody"><tr><td colspan="6" class="empty-state">No calls recorded yet</td></tr></tbody>
-                    </table>
+                        <thead> <tr><th>Date & Time</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th> </thead>
+                        <tbody id="callsTableBody"> <tr><td colspan="6" class="empty-state">No calls recorded yet</td> </tbody>
+                     </table>
                 </div>
             </div>
         </div>
@@ -855,8 +811,7 @@
 
     <script>
         // ==================== CONFIGURATION ====================
-        // REPLACE THIS WITH YOUR ACTUAL DEPLOYED APPS SCRIPT URL
-        const CLIENT_API_URL = 'https://script.google.com/macros/s/AKfycbwUDjsW-keyZD9Y6ySq0EMdXkGz2tMptHz0h0Z4KM9wsEc7VHPILqf_0pIGF9-uPrYImg/exec';
+        const API_URL = '%%APPS_SCRIPT_URL%%';
         
         // ==================== STATE ====================
         let currentWorker = null;
@@ -864,87 +819,50 @@
         let callStartTime = null;
         let callTimerInterval = null;
         let selectedOutcome = null;
+        let callHistory = [];
 
-        // Sample workers
         const workers = [
             { id: 1, fullName: 'Felix Bamson', email: 'felix@btff.com', phone: '07035255910', country: 'Nigeria', state: 'Rivers', totalCalls: 0, todayCalls: 0, calls: [] }
         ];
 
         // ==================== API FUNCTIONS ====================
-        async function fetchClientsFromSheet(searchTerm = '') {
+        async function apiCall(action, data = {}, method = 'GET') {
             try {
-                const url = `${CLIENT_API_URL}?action=getClients&searchTerm=${encodeURIComponent(searchTerm)}&t=${Date.now()}`;
-                console.log('Fetching clients from:', url);
-                
-                const response = await fetch(url);
-                const text = await response.text();
-                console.log('Raw response:', text);
-                
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch(e) {
-                    console.error('Failed to parse JSON:', text);
-                    return [];
+                let url = `${API_URL}?action=${action}&t=${Date.now()}`;
+                if (method === 'GET') {
+                    Object.keys(data).forEach(key => url += `&${key}=${encodeURIComponent(data[key])}`);
                 }
-                
-                if (data.success) {
-                    console.log('Clients loaded:', data.clients.length);
-                    return data.clients;
-                } else {
-                    console.error('Error from API:', data.error);
-                    return [];
-                }
+                const options = { method: method, headers: { 'Content-Type': 'application/json' } };
+                if (method === 'POST') options.body = JSON.stringify(data);
+                const response = await fetch(url, options);
+                return await response.json();
             } catch (error) {
-                console.error('Network error:', error);
-                return [];
+                console.error('API error:', error);
+                return { success: false, error: error.message };
             }
         }
 
+        async function getClients() {
+            const result = await apiCall('getCallCenterClients');
+            return result.success ? result.clients : [];
+        }
+
         async function getClientByPhone(phoneNumber) {
-            try {
-                const url = `${CLIENT_API_URL}?action=getClientByPhone&phoneNumber=${encodeURIComponent(phoneNumber)}&t=${Date.now()}`;
-                console.log('Fetching client by phone:', url);
-                
-                const response = await fetch(url);
-                const text = await response.text();
-                console.log('Raw client response:', text);
-                
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch(e) {
-                    console.error('Failed to parse JSON:', text);
-                    return null;
-                }
-                
-                if (data.success) {
-                    return data.client;
-                }
-                return null;
-            } catch (error) {
-                console.error('Error fetching client:', error);
-                return null;
-            }
+            const result = await apiCall('getCallCenterClientByPhone', { phoneNumber });
+            return result.success ? result.client : null;
+        }
+
+        async function updateClientStatus(phoneNumber, callStatus, remarks) {
+            return await apiCall('updateCallCenterClientStatus', { phoneNumber, callStatus, remarks }, 'POST');
         }
 
         // ==================== UI HELPERS ====================
         function showNotification(msg, type = 'success') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                bottom: 30px;
-                right: 30px;
-                background: ${type === 'error' ? '#ef4444' : '#2f6bc6'};
-                color: white;
-                padding: 12px 24px;
-                border-radius: 10px;
-                z-index: 10000;
-                animation: slideIn 0.3s ease;
-            `;
-            notification.textContent = msg;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
+            const notif = document.createElement('div');
+            notif.style.cssText = `position:fixed;bottom:30px;right:30px;background:${type === 'error' ? '#ef4444' : '#2f6bc6'};color:white;padding:12px 24px;border-radius:10px;z-index:10000;animation:slideIn 0.3s ease;`;
+            notif.textContent = msg;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
         }
 
         function formatDuration(seconds) {
@@ -962,41 +880,17 @@
             document.getElementById('workerName').textContent = currentWorker.fullName;
             document.getElementById('workerEmail').textContent = currentWorker.email;
             document.getElementById('totalCalls').textContent = currentWorker.totalCalls || 0;
-            document.getElementById('todayCalls').textContent = currentWorker.todayCalls || 0;
-        }
-
-        function getDefaultScript() {
-            return `Hello, this is [Your Name] from BTFF. How are you doing today?\n\nI'm calling to connect with you and see how we can be of service.\n\n[Pause for response]\n\nGreat! Let me share some information about what we offer...`;
         }
 
         // ==================== AUTH FUNCTIONS ====================
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        function showLogin() {
-            document.getElementById('loginView').style.display = 'block';
-            document.getElementById('registerView').style.display = 'none';
-        }
-
-        function showRegister() {
-            document.getElementById('loginView').style.display = 'none';
-            document.getElementById('registerView').style.display = 'block';
-        }
+        function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = 'auto'; }
+        function showLogin() { document.getElementById('loginView').style.display = 'block'; document.getElementById('registerView').style.display = 'none'; }
+        function showRegister() { document.getElementById('loginView').style.display = 'none'; document.getElementById('registerView').style.display = 'block'; }
 
         function login() {
             const email = document.getElementById('loginEmail').value;
-            if (!email) {
-                showNotification('Please enter your email', 'error');
-                return;
-            }
-            
+            if (!email) { showNotification('Please enter your email', 'error'); return; }
             const worker = workers.find(w => w.email === email);
             if (worker) {
                 currentWorker = worker;
@@ -1006,7 +900,7 @@
                 renderQueue();
                 renderCallHistory();
                 showNotification(`Welcome back, ${worker.fullName}!`);
-                saveWorkerToStorage();
+                localStorage.setItem('btff_worker', JSON.stringify({ email: currentWorker.email, fullName: currentWorker.fullName }));
             } else {
                 showNotification('Worker not found. Please register first.', 'error');
             }
@@ -1018,29 +912,9 @@
             const phone = document.getElementById('regPhone').value;
             const country = document.getElementById('regCountry').value;
             const state = document.getElementById('regState').value;
-            
-            if (!fullName || !email || !phone) {
-                showNotification('Please fill all required fields', 'error');
-                return;
-            }
-            
-            if (workers.find(w => w.email === email)) {
-                showNotification('Worker already exists with this email', 'error');
-                return;
-            }
-            
-            const newWorker = {
-                id: workers.length + 1,
-                fullName,
-                email,
-                phone,
-                country,
-                state,
-                totalCalls: 0,
-                todayCalls: 0,
-                calls: []
-            };
-            
+            if (!fullName || !email || !phone) { showNotification('Please fill all required fields', 'error'); return; }
+            if (workers.find(w => w.email === email)) { showNotification('Worker already exists with this email', 'error'); return; }
+            const newWorker = { id: workers.length + 1, fullName, email, phone, country, state, totalCalls: 0, todayCalls: 0, calls: [] };
             workers.push(newWorker);
             currentWorker = newWorker;
             closeModal('authModal');
@@ -1049,7 +923,7 @@
             renderQueue();
             renderCallHistory();
             showNotification(`Welcome to BTFF Workforce, ${fullName}!`);
-            saveWorkerToStorage();
+            localStorage.setItem('btff_worker', JSON.stringify({ email: currentWorker.email, fullName: currentWorker.fullName }));
         }
 
         function logout() {
@@ -1061,30 +935,26 @@
             showNotification('Logged out successfully');
         }
 
-        function saveWorkerToStorage() {
-            if (currentWorker) {
-                localStorage.setItem('btff_worker', JSON.stringify({
-                    email: currentWorker.email,
-                    fullName: currentWorker.fullName
-                }));
-            }
-        }
-
         // ==================== QUEUE FUNCTIONS ====================
         async function renderQueue() {
-            const searchTerm = document.getElementById('searchClient').value;
+            const searchTerm = document.getElementById('searchClient').value.toLowerCase();
             const queueList = document.getElementById('queueList');
             queueList.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading clients...</div>';
             
-            const clients = await fetchClientsFromSheet(searchTerm);
-            document.getElementById('queueCount').textContent = clients.length;
+            const clients = await getClients();
+            const filtered = clients.filter(client => 
+                client.fullName.toLowerCase().includes(searchTerm) || 
+                client.phoneNumber.includes(searchTerm)
+            );
             
-            if (clients.length === 0) {
+            document.getElementById('queueCount').textContent = filtered.length;
+            
+            if (filtered.length === 0) {
                 queueList.innerHTML = '<div class="empty-state">No clients found</div>';
                 return;
             }
             
-            queueList.innerHTML = clients.map(client => `
+            queueList.innerHTML = filtered.map(client => `
                 <div class="queue-item" onclick="selectClient('${client.phoneNumber}')">
                     <div class="client-name">${escapeHtml(client.fullName || 'Unknown')}</div>
                     <div class="client-phone">${client.phoneNumber}</div>
@@ -1104,8 +974,8 @@
                 document.getElementById('clientName').textContent = client.fullName || 'Unknown';
                 document.getElementById('clientPhone').textContent = client.phoneNumber;
                 document.getElementById('clientLocation').textContent = `${client.country || ''} ${client.state || ''}`.trim() || 'Not specified';
-                document.getElementById('callScript').value = client.callScript || getDefaultScript();
-                document.getElementById('aiContent').innerHTML = client.callScript || getDefaultScript();
+                document.getElementById('callScript').value = client.callScript;
+                document.getElementById('aiContent').innerHTML = client.callScript;
                 selectedOutcome = null;
                 document.getElementById('callRemarks').value = '';
                 document.querySelectorAll('.outcome-btn').forEach(btn => btn.classList.remove('selected'));
@@ -1127,15 +997,10 @@
         }
 
         function stopCallTimer() {
-            if (callTimerInterval) {
-                clearInterval(callTimerInterval);
-                callTimerInterval = null;
-            }
+            if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
         }
 
-        function getCallDuration() {
-            return callStartTime ? Math.floor((new Date() - callStartTime) / 1000) : 0;
-        }
+        function getCallDuration() { return callStartTime ? Math.floor((new Date() - callStartTime) / 1000) : 0; }
 
         function selectOutcome(outcome) {
             selectedOutcome = outcome;
@@ -1150,20 +1015,16 @@
             document.getElementById('aiContent').innerHTML = scriptTextarea.value;
         }
 
-        function saveCall() {
-            if (!currentClient) {
-                showNotification('No client selected', 'error');
-                return;
-            }
-            
-            if (!selectedOutcome) {
-                showNotification('Please select a call outcome', 'error');
-                return;
-            }
+        async function saveCall() {
+            if (!currentClient) { showNotification('No client selected', 'error'); return; }
+            if (!selectedOutcome) { showNotification('Please select a call outcome', 'error'); return; }
             
             const duration = getCallDuration();
             const script = document.getElementById('callScript').value;
             const remarks = document.getElementById('callRemarks').value;
+            
+            const updateResult = await updateClientStatus(currentClient.phoneNumber, selectedOutcome, remarks);
+            if (!updateResult.success) { showNotification('Failed to update call status', 'error'); return; }
             
             const callRecord = {
                 id: Date.now(),
@@ -1179,11 +1040,9 @@
             if (!currentWorker.calls) currentWorker.calls = [];
             currentWorker.calls.unshift(callRecord);
             currentWorker.totalCalls = (currentWorker.totalCalls || 0) + 1;
-            currentWorker.todayCalls = (currentWorker.todayCalls || 0) + 1;
             
             updateUI();
             renderCallHistory();
-            
             stopCallTimer();
             selectedOutcome = null;
             document.getElementById('callRemarks').value = '';
@@ -1193,18 +1052,17 @@
             callStartTime = null;
             
             showNotification(`Call saved - Outcome: ${selectedOutcome}`);
-            saveWorkerToStorage();
+            localStorage.setItem('btff_worker', JSON.stringify({ email: currentWorker.email, fullName: currentWorker.fullName }));
+            renderQueue();
         }
 
         function renderCallHistory() {
             const tbody = document.getElementById('callsTableBody');
             const calls = currentWorker?.calls || [];
-            
             if (calls.length === 0) {
-                tbody.innerHTML = '.<td colspan="6" class="empty-state">No calls recorded yet</td>..';
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No calls recorded yet</td></tr>';
                 return;
             }
-            
             tbody.innerHTML = calls.map(call => `
                 <tr>
                     <td>${formatDate(call.timestamp)}</td>
@@ -1230,7 +1088,6 @@
             document.getElementById('menuOverlay').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-
         function closeMobileMenu() {
             document.getElementById('mobileSlideMenu').classList.remove('active');
             document.getElementById('menuOverlay').classList.remove('active');
@@ -1238,27 +1095,13 @@
         }
 
         // ==================== EVENT LISTENERS ====================
-        document.getElementById('userIcon').addEventListener('click', () => {
-            if (currentWorker) {
-                logout();
-            } else {
-                openModal('authModal');
-            }
-        });
-        
+        document.getElementById('userIcon').addEventListener('click', () => { currentWorker ? logout() : openModal('authModal'); });
         document.getElementById('searchClient').addEventListener('input', () => renderQueue());
-        document.getElementById('callScript').addEventListener('input', (e) => {
-            document.getElementById('aiContent').innerHTML = e.target.value;
-        });
+        document.getElementById('callScript').addEventListener('input', (e) => { document.getElementById('aiContent').innerHTML = e.target.value; });
         document.getElementById('mobileMenuBtn').addEventListener('click', openMobileMenu);
         document.getElementById('closeMobileMenu').addEventListener('click', closeMobileMenu);
         document.getElementById('menuOverlay').addEventListener('click', closeMobileMenu);
-        
-        window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                closeModal(e.target.id);
-            }
-        });
+        window.addEventListener('click', (e) => { if (e.target.classList.contains('modal')) closeModal(e.target.id); });
 
         // ==================== INITIALIZATION ====================
         const savedWorker = localStorage.getItem('btff_worker');
@@ -1272,18 +1115,11 @@
                     updateUI();
                     renderQueue();
                     renderCallHistory();
-                } else {
-                    openModal('authModal');
-                }
-            } catch(e) {
-                openModal('authModal');
-            }
-        } else {
-            openModal('authModal');
-        }
+                } else { openModal('authModal'); }
+            } catch(e) { openModal('authModal'); }
+        } else { openModal('authModal'); }
         
         console.log('✅ Call Center Page Loaded');
-        console.log('API URL:', CLIENT_API_URL);
     </script>
 </body>
 </html>

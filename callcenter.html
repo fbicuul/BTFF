@@ -795,9 +795,9 @@
                 <div class="panel-header"><h3><i class="fas fa-history"></i> Recent Calls</h3></div>
                 <div class="table-container">
                     <table id="callsTable">
-                        <thead> <tr><th>Date & Time</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th> </thead>
-                        <tbody id="callsTableBody"> <tr><td colspan="6" class="empty-state">No calls recorded yet</td> </tbody>
-                     </table>
+                        <thead>  <tr><th>Date & Time</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th></tr> </thead>
+                        <tbody id="callsTableBody">  <tr><td colspan="6" class="empty-state">No calls recorded yet</td></tr> </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -811,7 +811,8 @@
 
     <script>
         // ==================== CONFIGURATION ====================
-        const API_URL = '%%APPS_SCRIPT_URL%%';
+        // Use the proxy endpoint directly - no placeholder needed
+        const API_URL = '/api/callcenter-proxy';
         
         // ==================== STATE ====================
         let currentWorker = null;
@@ -832,10 +833,13 @@
                 if (method === 'GET') {
                     Object.keys(data).forEach(key => url += `&${key}=${encodeURIComponent(data[key])}`);
                 }
+                console.log('📡 API Call:', url);
                 const options = { method: method, headers: { 'Content-Type': 'application/json' } };
                 if (method === 'POST') options.body = JSON.stringify(data);
                 const response = await fetch(url, options);
-                return await response.json();
+                const result = await response.json();
+                console.log('📥 API Response:', result);
+                return result;
             } catch (error) {
                 console.error('API error:', error);
                 return { success: false, error: error.message };
@@ -1060,7 +1064,7 @@
             const tbody = document.getElementById('callsTableBody');
             const calls = currentWorker?.calls || [];
             if (calls.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No calls recorded yet</td></tr>';
+                tbody.innerHTML = '.<td colspan="6" class="empty-state">No calls recorded yet</td>..';
                 return;
             }
             tbody.innerHTML = calls.map(call => `
@@ -1120,6 +1124,7 @@
         } else { openModal('authModal'); }
         
         console.log('✅ Call Center Page Loaded');
+        console.log('API URL:', API_URL);
     </script>
 </body>
 </html>

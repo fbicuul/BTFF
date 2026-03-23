@@ -866,7 +866,9 @@
         }
 
         async function getClientByPhone(phoneNumber) {
+            console.log('API Call: getCallCenterClientByPhone with phone:', phoneNumber);
             const result = await apiCall('getCallCenterClientByPhone', { phoneNumber });
+            console.log('API Response:', result);
             return result.success ? result.client : null;
         }
 
@@ -1005,13 +1007,20 @@
         }
 
         async function selectClient(phoneNumber) {
-            document.getElementById('callDetailsContent').style.display = 'block';
-            document.getElementById('noCallSelected').style.display = 'none';
-            document.getElementById('clientName').textContent = 'Loading...';
+            console.log('Selecting client with phone:', phoneNumber);
+            
+            showLoading('Loading client details...');
             
             const client = await getClientByPhone(phoneNumber);
+            console.log('Client response:', client);
+            
+            hideLoading();
+            
             if (client) {
+                console.log('Client found:', client.fullName);
                 currentClient = client;
+                document.getElementById('callDetailsContent').style.display = 'block';
+                document.getElementById('noCallSelected').style.display = 'none';
                 document.getElementById('clientName').textContent = client.fullName || 'Unknown';
                 document.getElementById('clientPhone').textContent = client.phoneNumber;
                 document.getElementById('clientLocation').textContent = `${client.country || ''} ${client.state || ''} ${client.city || ''}`.trim() || 'Not specified';
@@ -1024,7 +1033,8 @@
                 document.querySelectorAll('.outcome-btn').forEach(btn => btn.classList.remove('selected'));
                 startCallTimer();
             } else {
-                showNotification('Error loading client data', 'error');
+                console.log('Client not found for phone:', phoneNumber);
+                showNotification('Client not found. Please add this client first.', 'error');
                 document.getElementById('noCallSelected').style.display = 'flex';
                 document.getElementById('callDetailsContent').style.display = 'none';
             }

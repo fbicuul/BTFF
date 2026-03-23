@@ -26,7 +26,6 @@
             padding: 0 40px;
         }
 
-        /* Navbar */
         .navbar {
             display: flex;
             align-items: center;
@@ -45,7 +44,6 @@
             cursor: pointer;
         }
 
-        /* Desktop Navigation */
         .nav-links-desktop {
             display: flex;
             gap: 2.5rem;
@@ -79,7 +77,6 @@
             border-radius: 2px;
         }
 
-        /* Mobile Menu Button */
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -94,7 +91,6 @@
             color: white;
         }
 
-        /* Mobile Slide Menu */
         .mobile-slide-menu {
             position: fixed;
             top: 0;
@@ -166,7 +162,6 @@
             border-left: 4px solid white;
         }
         
-        /* Overlay when menu is open */
         .menu-overlay {
             display: none;
             position: fixed;
@@ -202,7 +197,6 @@
             color: white;
         }
 
-        /* Modals - Scrollable */
         .modal {
             display: none;
             position: fixed;
@@ -237,14 +231,8 @@
         }
 
         @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .modal-content::-webkit-scrollbar {
@@ -324,11 +312,6 @@
             transform: translateY(-1px);
         }
 
-        .btn-secondary {
-            background: #1c2a3f;
-            border: 1px solid #3d6190;
-        }
-
         .switch-link {
             text-align: center;
             margin-top: 20px;
@@ -341,7 +324,6 @@
             text-decoration: underline;
         }
 
-        /* Worker Dashboard */
         .worker-dashboard {
             display: none;
         }
@@ -356,7 +338,6 @@
             to { opacity: 1; }
         }
 
-        /* Worker Header */
         .worker-header {
             background: linear-gradient(135deg, #0f1a2b, #1a2a40);
             border-radius: 20px;
@@ -418,7 +399,6 @@
             transform: translateY(-1px);
         }
 
-        /* Call Center Grid */
         .call-grid {
             display: grid;
             grid-template-columns: 350px 1fr 350px;
@@ -426,7 +406,6 @@
             margin: 30px 0;
         }
 
-        /* Panels */
         .panel {
             background: #101c2c;
             border-radius: 20px;
@@ -455,7 +434,6 @@
             border: 1px solid #3d6190;
             border-radius: 8px;
             color: white;
-            transition: border 0.2s;
         }
 
         .search-input:focus {
@@ -493,10 +471,6 @@
             transform: translateX(5px);
         }
 
-        .queue-item.selected {
-            background: #2f6bc6;
-        }
-
         .client-name {
             font-weight: 600;
             margin-bottom: 5px;
@@ -513,7 +487,6 @@
             margin-top: 5px;
         }
 
-        /* Call Details */
         .call-details {
             padding: 25px;
             max-height: 600px;
@@ -610,14 +583,8 @@
         .outcome-btn.missed { background: #eab308; color: black; }
         .outcome-btn.hanged { background: #ef4444; color: white; }
         .outcome-btn.voicemail { background: #3b82f6; color: white; }
-        .outcome-btn.selected { 
-            transform: scale(1.02); 
-            box-shadow: 0 0 0 2px white;
-        }
-        .outcome-btn:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.1);
-        }
+        .outcome-btn.selected { transform: scale(1.02); box-shadow: 0 0 0 2px white; }
+        .outcome-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
         .remarks-input {
             width: 100%;
@@ -655,7 +622,6 @@
             transform: translateY(-1px);
         }
 
-        /* Right Panel */
         .ai-content {
             padding: 20px;
             max-height: 400px;
@@ -666,19 +632,6 @@
             border-radius: 12px;
             white-space: pre-wrap;
             font-size: 0.9rem;
-        }
-
-        .ai-content::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .ai-content::-webkit-scrollbar-track {
-            background: #1f334a;
-        }
-        
-        .ai-content::-webkit-scrollbar-thumb {
-            background: #2f6bc6;
-            border-radius: 3px;
         }
 
         .suggestions {
@@ -706,7 +659,6 @@
             transform: translateX(5px);
         }
 
-        /* Recent Calls Table */
         .recent-section {
             margin: 30px 0;
         }
@@ -716,20 +668,6 @@
             border-radius: 20px;
             padding: 20px;
             overflow-x: auto;
-        }
-
-        .table-container::-webkit-scrollbar {
-            height: 6px;
-        }
-        
-        .table-container::-webkit-scrollbar-track {
-            background: #1f334a;
-            border-radius: 3px;
-        }
-        
-        .table-container::-webkit-scrollbar-thumb {
-            background: #2f6bc6;
-            border-radius: 3px;
         }
 
         table {
@@ -768,7 +706,6 @@
             color: #88abdf;
         }
 
-        /* Footer */
         .footer {
             margin-top: 60px;
             padding: 40px 0;
@@ -809,84 +746,43 @@
             color: white;
         }
 
-        /* Responsive */
         @media (max-width: 1000px) {
-            .call-grid {
-                grid-template-columns: 1fr;
-            }
-            .container {
-                padding: 0 20px;
-            }
+            .call-grid { grid-template-columns: 1fr; }
+            .container { padding: 0 20px; }
         }
 
         @media (max-width: 768px) {
-            .nav-links-desktop {
-                display: none;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .worker-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .worker-stats {
-                justify-content: center;
-            }
-            
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .outcome-buttons {
-                grid-template-columns: 1fr;
-            }
-            
-            .footer {
-                flex-direction: column;
-                text-align: center;
-            }
+            .nav-links-desktop { display: none; }
+            .mobile-menu-btn { display: block; }
+            .worker-header { flex-direction: column; text-align: center; }
+            .worker-stats { justify-content: center; }
+            .info-grid { grid-template-columns: 1fr; }
+            .outcome-buttons { grid-template-columns: 1fr; }
+            .footer { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Navbar -->
         <nav class="navbar">
             <div class="logo" onclick="window.location.href='/'">BTFF</div>
-            
-            <!-- Desktop Navigation -->
             <div class="nav-links-desktop">
                 <span onclick="window.location.href='/'">Home</span>
                 <span class="active">Call Center</span>
             </div>
-            
-            <!-- Right Side -->
             <div style="display: flex; align-items: center; gap: 20px;">
-                <div class="user-icon" id="userIcon">
-                    <i class="fas fa-user"></i>
-                </div>
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <div class="user-icon" id="userIcon"><i class="fas fa-user"></i></div>
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
             </div>
         </nav>
 
-        <!-- Mobile Slide Menu -->
         <div class="mobile-slide-menu" id="mobileSlideMenu">
-            <div class="mobile-menu-close" id="closeMobileMenu">
-                <i class="fas fa-times"></i>
-            </div>
+            <div class="mobile-menu-close" id="closeMobileMenu"><i class="fas fa-times"></i></div>
             <div class="mobile-slide-links">
                 <span onclick="window.location.href='/'">Home</span>
                 <span class="active">Call Center</span>
             </div>
         </div>
-        
-        <!-- Overlay when menu is open -->
         <div class="menu-overlay" id="menuOverlay"></div>
 
         <!-- Auth Modal -->
@@ -900,125 +796,59 @@
                         <input type="email" id="loginEmail" placeholder="your@email.com">
                     </div>
                     <button class="btn-primary" onclick="login()">Login</button>
-                    <div class="switch-link">
-                        New here? <span onclick="showRegister()">Join Workforce</span>
-                    </div>
+                    <div class="switch-link">New here? <span onclick="showRegister()">Join Workforce</span></div>
                 </div>
                 <div id="registerView" style="display: none;">
                     <h2 style="margin-bottom: 20px;">Join BTFF Workforce</h2>
-                    <div class="form-group">
-                        <label>Full Name *</label>
-                        <input type="text" id="regFullName" placeholder="Enter your full name">
-                    </div>
-                    <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="regEmail" placeholder="your@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number *</label>
-                        <input type="tel" id="regPhone" placeholder="08012345678">
-                    </div>
-                    <div class="form-group">
-                        <label>Country</label>
-                        <select id="regCountry">
-                            <option value="">Select Country</option>
-                            <option value="Nigeria">Nigeria</option>
-                            <option value="USA">USA</option>
-                            <option value="UK">UK</option>
-                            <option value="Canada">Canada</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>State/Province</label>
-                        <input type="text" id="regState" placeholder="Enter state">
-                    </div>
+                    <div class="form-group"><label>Full Name *</label><input type="text" id="regFullName" placeholder="Enter your full name"></div>
+                    <div class="form-group"><label>Email *</label><input type="email" id="regEmail" placeholder="your@email.com"></div>
+                    <div class="form-group"><label>Phone Number *</label><input type="tel" id="regPhone" placeholder="08012345678"></div>
+                    <div class="form-group"><label>Country</label><select id="regCountry"><option value="">Select Country</option><option value="Nigeria">Nigeria</option><option value="USA">USA</option><option value="UK">UK</option><option value="Canada">Canada</option></select></div>
+                    <div class="form-group"><label>State/Province</label><input type="text" id="regState" placeholder="Enter state"></div>
                     <button class="btn-primary" onclick="register()">Register</button>
-                    <div class="switch-link">
-                        Already have an account? <span onclick="showLogin()">Login</span>
-                    </div>
+                    <div class="switch-link">Already have an account? <span onclick="showLogin()">Login</span></div>
                 </div>
             </div>
         </div>
 
         <!-- Worker Dashboard -->
         <div class="worker-dashboard" id="workerDashboard">
-            <!-- Worker Header -->
             <div class="worker-header">
-                <div class="worker-info">
-                    <h2 id="workerName">Loading...</h2>
-                    <p id="workerEmail">worker@btff.com</p>
-                </div>
-                <div class="worker-stats">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalCalls">0</div>
-                        <div class="stat-label">Total Calls</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="todayCalls">0</div>
-                        <div class="stat-label">Today</div>
-                    </div>
-                </div>
+                <div class="worker-info"><h2 id="workerName">Loading...</h2><p id="workerEmail">worker@btff.com</p></div>
+                <div class="worker-stats"><div class="stat-card"><div class="stat-number" id="totalCalls">0</div><div class="stat-label">Total Calls</div></div><div class="stat-card"><div class="stat-number" id="todayCalls">0</div><div class="stat-label">Today</div></div></div>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
 
-            <!-- Call Center Grid -->
             <div class="call-grid">
-                <!-- Left Panel - Clients Queue -->
                 <div class="panel">
-                    <div class="panel-header">
-                        <h3><i class="fas fa-phone-alt"></i> Clients to Call <span id="queueCount" style="background:#2f6bc6; padding:2px 8px; border-radius:20px; font-size:0.8rem;">0</span></h3>
-                        <input type="text" class="search-input" id="searchClient" placeholder="Search by name or phone...">
-                    </div>
-                    <div class="queue-list" id="queueList">
-                        <div class="empty-state">Loading clients...</div>
-                    </div>
+                    <div class="panel-header"><h3><i class="fas fa-phone-alt"></i> Clients to Call <span id="queueCount" style="background:#2f6bc6; padding:2px 8px; border-radius:20px; font-size:0.8rem;">0</span></h3><input type="text" class="search-input" id="searchClient" placeholder="Search by name or phone..."></div>
+                    <div class="queue-list" id="queueList"><div class="empty-state">Loading clients...</div></div>
                 </div>
 
-                <!-- Center Panel - Call Details -->
                 <div class="panel">
                     <div class="call-details">
-                        <div id="noCallSelected" class="empty-state">
-                            <i class="fas fa-phone" style="font-size: 3rem; color: #2f6bc6; margin-bottom: 20px; display: block;"></i>
-                            <p>Select a client from the queue to start a call</p>
-                        </div>
+                        <div id="noCallSelected" class="empty-state"><i class="fas fa-phone" style="font-size: 3rem; color: #2f6bc6; margin-bottom: 20px; display: block;"></i><p>Select a client from the queue to start a call</p></div>
                         <div id="callDetailsContent" style="display: none;">
                             <h2 id="clientName"></h2>
-                            <div class="info-grid">
-                                <div class="info-item"><i class="fas fa-phone"></i> <span id="clientPhone"></span></div>
-                                <div class="info-item"><i class="fas fa-map-marker-alt"></i> <span id="clientLocation"></span></div>
-                            </div>
-
+                            <div class="info-grid"><div class="info-item"><i class="fas fa-phone"></i> <span id="clientPhone"></span></div><div class="info-item"><i class="fas fa-map-marker-alt"></i> <span id="clientLocation"></span></div></div>
                             <label><i class="fas fa-file-alt"></i> Call Script</label>
                             <textarea class="script-text" id="callScript" placeholder="Enter your call script..."></textarea>
-
-                            <div class="call-timer">
-                                <div class="timer-display" id="callTimer">00:00</div>
-                            </div>
-
+                            <div class="call-timer"><div class="timer-display" id="callTimer">00:00</div></div>
                             <div class="outcome-buttons">
                                 <button class="outcome-btn connected" onclick="selectOutcome('Connected')"><i class="fas fa-check-circle"></i> Connected</button>
                                 <button class="outcome-btn missed" onclick="selectOutcome('Missed')"><i class="fas fa-phone-slash"></i> Missed</button>
                                 <button class="outcome-btn hanged" onclick="selectOutcome('Hanged Up')"><i class="fas fa-times-circle"></i> Hanged Up</button>
                                 <button class="outcome-btn voicemail" onclick="selectOutcome('Voicemail')"><i class="fas fa-voicemail"></i> Voicemail</button>
                             </div>
-
                             <textarea class="remarks-input" id="callRemarks" placeholder="Add remarks about this call..."></textarea>
-
-                            <button class="save-call-btn" onclick="saveCall()">
-                                <i class="fas fa-save"></i> Save Call Record
-                            </button>
+                            <button class="save-call-btn" onclick="saveCall()"><i class="fas fa-save"></i> Save Call Record</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Panel - AI Assistant -->
                 <div class="panel">
-                    <div class="panel-header">
-                        <h3><i class="fas fa-robot"></i> AI Script Assistant</h3>
-                    </div>
-                    <div class="ai-content" id="aiContent">
-                        <p>Select a client to view or edit their call script.</p>
-                    </div>
+                    <div class="panel-header"><h3><i class="fas fa-robot"></i> AI Script Assistant</h3></div>
+                    <div class="ai-content" id="aiContent"><p>Select a client to view or edit their call script.</p></div>
                     <div class="suggestions">
                         <h4><i class="fas fa-lightbulb"></i> Quick Suggestions</h4>
                         <div class="suggestion-item" onclick="addSuggestion('How are you doing today?')">💬 How are you doing today?</div>
@@ -1029,96 +859,111 @@
                 </div>
             </div>
 
-            <!-- Recent Calls Section -->
             <div class="recent-section">
-                <div class="panel-header">
-                    <h3><i class="fas fa-history"></i> Recent Calls</h3>
-                </div>
+                <div class="panel-header"><h3><i class="fas fa-history"></i> Recent Calls</h3></div>
                 <div class="table-container">
                     <table id="callsTable">
                         <thead>
-                            <tr><th>Date & Time</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th>\
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Client</th>
+                                <th>Phone</th>
+                                <th>Duration</th>
+                                <th>Outcome</th>
+                                <th>Remarks</th>
+                            </tr>
                         </thead>
                         <tbody id="callsTableBody">
-                            <tr><td colspan="6" class="empty-state">No calls recorded yet</td>\\
+                            <tr>
+                                <td colspan="6" class="empty-state">No calls recorded yet</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
         <footer class="footer">
-            <div class="footer-left">
-                <div class="footer-logo">BTFF</div>
-                <span>before the first flight</span>
-            </div>
-            <div class="footer-center">
-                <span>© 2026 · powered by KRO Media</span>
-            </div>
-            <div class="footer-right">
-                <i class="fab fa-instagram"></i>
-                <i class="fab fa-twitter"></i>
-                <i class="fab fa-youtube"></i>
-                <i class="fab fa-facebook"></i>
-                <i class="fab fa-whatsapp"></i>
-            </div>
+            <div class="footer-left"><div class="footer-logo">BTFF</div><span>before the first flight</span></div>
+            <div class="footer-center"><span>© 2026 · powered by KRO Media</span></div>
+            <div class="footer-right"><i class="fab fa-instagram"></i><i class="fab fa-twitter"></i><i class="fab fa-youtube"></i><i class="fab fa-facebook"></i><i class="fab fa-whatsapp"></i></div>
         </footer>
     </div>
 
     <script>
-        // ==================== FAKE DATA ====================
-        // Sample workers
-        const workers = [
-            { id: 1, fullName: 'Felix Bamson', email: 'felix@btff.com', phone: '07035255910', country: 'Nigeria', state: 'Rivers', totalCalls: 0, todayCalls: 0, calls: [] }
-        ];
-
-        // Sample clients
-        let clients = [
-            { id: 1, phoneNumber: '08012345678', clientName: 'John Doe', country: 'Nigeria', state: 'Lagos', city: 'Ikeja', callScript: 'Hello John, this is Felix from BTFF. How are you doing today?\n\nI\'m calling to connect with you and see how we can be of service.\n\n[Pause for response]\n\nGreat! Let me share some information about what we offer...' },
-            { id: 2, phoneNumber: '08098765432', clientName: 'Jane Smith', country: 'Nigeria', state: 'Abuja', city: 'Garki', callScript: 'Hello Jane, this is Felix from BTFF. Hope you\'re having a great day!\n\nI\'m reaching out because we have some exciting offers that might interest you.\n\n[Pause for response]\n\nWould you be open to learning more about this?' },
-            { id: 3, phoneNumber: '08123456789', clientName: 'Mike Johnson', country: 'Nigeria', state: 'Lagos', city: 'Victoria Island', callScript: 'Hello Mike, this is Felix from BTFF. How are things on your end?\n\nI\'m calling to follow up on your recent inquiry about our services.\n\n[Pause for response]\n\nI\'d be happy to answer any questions you might have.' },
-            { id: 4, phoneNumber: '09012345678', clientName: 'Sarah Williams', country: 'Nigeria', state: 'Rivers', city: 'Port Harcourt', callScript: 'Hello Sarah, this is Felix from BTFF. How are you today?\n\nI\'m reaching out because we value your feedback and wanted to check in.\n\n[Pause for response]\n\nIs there anything we can do to improve your experience?' },
-            { id: 5, phoneNumber: '07012345678', clientName: 'David Brown', country: 'Nigeria', state: 'Ogun', city: 'Abeokuta', callScript: 'Hello David, this is Felix from BTFF. Hope this message finds you well.\n\nI wanted to share some exciting news about our new offerings.\n\n[Pause for response]\n\nWould you have a few minutes to chat?' }
-        ];
-
-        // State
+        // ==================== CONFIGURATION ====================
+        // Replace this with your actual Call Center Apps Script URL
+        const CLIENT_API_URL = 'https://script.google.com/macros/s/AKfycbymXTpsvYl4AE2pBBHvOCM8Vs3ihZM4-V0mvI-x73fs7rQTy2rfLTU9JJKL_VNsBSRJHg/exec';
+        
+        // ==================== STATE ====================
         let currentWorker = null;
         let currentClient = null;
         let callStartTime = null;
         let callTimerInterval = null;
         let selectedOutcome = null;
 
-        // ==================== MOBILE MENU FUNCTIONS ====================
-        function openMobileMenu() {
-            document.getElementById('mobileSlideMenu').classList.add('active');
-            document.getElementById('menuOverlay').classList.add('active');
-            document.body.style.overflow = 'hidden';
+        // ==================== API FUNCTIONS ====================
+        async function callApi(action, data = {}, method = 'GET') {
+            if (!CLIENT_API_URL || CLIENT_API_URL === '%%CALL_CENTER_API_URL%%') {
+                console.error('CLIENT_API_URL not configured');
+                showNotification('API not configured. Please contact support.', 'error');
+                return { success: false, error: 'API not configured' };
+            }
+            
+            try {
+                let url = `${CLIENT_API_URL}?action=${action}&t=${Date.now()}`;
+                if (method === 'GET') {
+                    Object.keys(data).forEach(key => url += `&${key}=${encodeURIComponent(data[key])}`);
+                }
+                const options = { method: method, headers: { 'Content-Type': 'application/json' } };
+                if (method === 'POST') options.body = JSON.stringify(data);
+                const response = await fetch(url, options);
+                return await response.json();
+            } catch (error) {
+                console.error('API error:', error);
+                return { success: false, error: error.message };
+            }
         }
 
-        function closeMobileMenu() {
-            document.getElementById('mobileSlideMenu').classList.remove('active');
-            document.getElementById('menuOverlay').classList.remove('active');
-            document.body.style.overflow = 'auto';
+        // Call Center specific API calls
+        async function getClients(searchTerm = '') {
+            const result = await callApi('getClients', { searchTerm });
+            return result.success ? result.clients : [];
+        }
+
+        async function getClientByPhone(phoneNumber) {
+            const result = await callApi('getClientByPhone', { phoneNumber });
+            return result.success ? result.client : null;
+        }
+
+        async function updateClientCallStatus(phoneNumber, callStatus) {
+            return await callApi('updateClientCallStatus', { phoneNumber, callStatus }, 'POST');
+        }
+
+        async function saveCallRecord(workerEmail, clientPhone, clientName, duration, outcome, remarks, script) {
+            return await callApi('saveCallRecord', { workerEmail, clientPhone, clientName, callDuration: duration, callOutcome: outcome, remarks, scriptUsed: script }, 'POST');
+        }
+
+        async function registerWorker(fullName, email, phone, country, state) {
+            return await callApi('registerWorker', { fullName, email, phoneNumber: phone, country, state }, 'POST');
+        }
+
+        async function getWorkerProfile(email) {
+            return await callApi('getWorkerProfile', { email });
+        }
+
+        async function getCallHistory(workerEmail) {
+            const result = await callApi('getCallHistory', { workerEmail });
+            return result.success ? result.calls : [];
         }
 
         // ==================== UI HELPERS ====================
         function showNotification(msg, type = 'success') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                bottom: 30px;
-                right: 30px;
-                background: ${type === 'error' ? '#ef4444' : '#2f6bc6'};
-                color: white;
-                padding: 12px 24px;
-                border-radius: 10px;
-                z-index: 10000;
-                animation: slideIn 0.3s ease;
-            `;
-            notification.textContent = msg;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
+            const notif = document.createElement('div');
+            notif.style.cssText = `position:fixed;bottom:30px;right:30px;background:${type === 'error' ? '#ef4444' : '#2f6bc6'};color:white;padding:12px 24px;border-radius:10px;z-index:10000;animation:slideIn 0.3s ease;`;
+            notif.textContent = msg;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
         }
 
         function formatDuration(seconds) {
@@ -1131,99 +976,75 @@
             return new Date(date).toLocaleString();
         }
 
-        function updateUI() {
-            if (!currentWorker) return;
-            
-            document.getElementById('workerName').textContent = currentWorker.fullName;
-            document.getElementById('workerEmail').textContent = currentWorker.email;
-            document.getElementById('totalCalls').textContent = currentWorker.totalCalls || 0;
-            document.getElementById('todayCalls').textContent = currentWorker.todayCalls || 0;
+        function getDefaultScript() {
+            return `Hello, this is [Your Name] from BTFF. How are you doing today?\n\nI'm calling to connect with you and see how we can be of service.\n\n[Pause for response]\n\nGreat! Let me share some information about what we offer...`;
         }
 
         // ==================== AUTH FUNCTIONS ====================
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            document.body.style.overflow = 'hidden';
+        function openModal(id) { 
+            document.getElementById(id).classList.add('active'); 
+            document.body.style.overflow = 'hidden'; 
+        }
+        
+        function closeModal(id) { 
+            document.getElementById(id).classList.remove('active'); 
+            document.body.style.overflow = 'auto'; 
+        }
+        
+        function showLogin() { 
+            document.getElementById('loginView').style.display = 'block'; 
+            document.getElementById('registerView').style.display = 'none'; 
+        }
+        
+        function showRegister() { 
+            document.getElementById('loginView').style.display = 'none'; 
+            document.getElementById('registerView').style.display = 'block'; 
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        function showLogin() {
-            document.getElementById('loginView').style.display = 'block';
-            document.getElementById('registerView').style.display = 'none';
-        }
-
-        function showRegister() {
-            document.getElementById('loginView').style.display = 'none';
-            document.getElementById('registerView').style.display = 'block';
-        }
-
-        function login() {
+        async function login() {
             const email = document.getElementById('loginEmail').value;
-            
-            if (!email) {
-                showNotification('Please enter your email', 'error');
-                return;
+            if (!email) { 
+                showNotification('Please enter your email', 'error'); 
+                return; 
             }
             
-            const worker = workers.find(w => w.email === email);
-            
-            if (worker) {
-                currentWorker = worker;
+            const result = await getWorkerProfile(email);
+            if (result.success && result.worker) {
+                currentWorker = result.worker;
                 closeModal('authModal');
                 document.getElementById('workerDashboard').classList.add('active');
-                updateUI();
+                document.getElementById('workerName').textContent = currentWorker.fullName;
+                document.getElementById('workerEmail').textContent = currentWorker.email;
+                document.getElementById('totalCalls').textContent = currentWorker.totalCalls || 0;
                 renderQueue();
-                renderCallHistory();
-                showNotification(`Welcome back, ${worker.fullName}!`);
-                saveWorkerToStorage();
+                await loadCallHistory();
+                showNotification(`Welcome back, ${currentWorker.fullName}!`);
+                localStorage.setItem('btff_worker', JSON.stringify({ email: currentWorker.email, fullName: currentWorker.fullName }));
             } else {
                 showNotification('Worker not found. Please register first.', 'error');
             }
         }
 
-        function register() {
+        async function register() {
             const fullName = document.getElementById('regFullName').value;
             const email = document.getElementById('regEmail').value;
             const phone = document.getElementById('regPhone').value;
             const country = document.getElementById('regCountry').value;
             const state = document.getElementById('regState').value;
             
-            if (!fullName || !email || !phone) {
-                showNotification('Please fill all required fields', 'error');
-                return;
+            if (!fullName || !email || !phone) { 
+                showNotification('Please fill all required fields', 'error'); 
+                return; 
             }
             
-            if (workers.find(w => w.email === email)) {
-                showNotification('Worker already exists with this email', 'error');
-                return;
+            const result = await registerWorker(fullName, email, phone, country, state);
+            if (result.success) {
+                showNotification('Registration successful! Please login.');
+                showLogin();
+                document.getElementById('loginEmail').value = email;
+            } else {
+                showNotification(result.error || 'Registration failed', 'error');
             }
-            
-            const newWorker = {
-                id: workers.length + 1,
-                fullName,
-                email,
-                phone,
-                country,
-                state,
-                totalCalls: 0,
-                todayCalls: 0,
-                calls: []
-            };
-            
-            workers.push(newWorker);
-            currentWorker = newWorker;
-            
-            closeModal('authModal');
-            document.getElementById('workerDashboard').classList.add('active');
-            updateUI();
-            renderQueue();
-            renderCallHistory();
-            showNotification(`Welcome to BTFF Workforce, ${fullName}!`);
-            saveWorkerToStorage();
         }
 
         function logout() {
@@ -1235,63 +1056,51 @@
             showNotification('Logged out successfully');
         }
 
-        function saveWorkerToStorage() {
-            if (currentWorker) {
-                localStorage.setItem('btff_worker', JSON.stringify({
-                    email: currentWorker.email,
-                    fullName: currentWorker.fullName
-                }));
-            }
-        }
-
         // ==================== QUEUE FUNCTIONS ====================
-        function renderQueue() {
-            const searchTerm = document.getElementById('searchClient').value.toLowerCase();
-            const filtered = clients.filter(client => 
-                client.clientName.toLowerCase().includes(searchTerm) || 
-                client.phoneNumber.includes(searchTerm)
-            );
-            
+        async function renderQueue() {
+            const searchTerm = document.getElementById('searchClient').value;
             const queueList = document.getElementById('queueList');
-            document.getElementById('queueCount').textContent = filtered.length;
+            queueList.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading clients...</div>';
             
-            if (filtered.length === 0) {
+            const clients = await getClients(searchTerm);
+            document.getElementById('queueCount').textContent = clients.length;
+            
+            if (clients.length === 0) {
                 queueList.innerHTML = '<div class="empty-state">No clients found</div>';
                 return;
             }
             
-            queueList.innerHTML = filtered.map(client => `
-                <div class="queue-item" onclick="selectClient(${client.id})">
-                    <div class="client-name">${escapeHtml(client.clientName)}</div>
+            queueList.innerHTML = clients.map(client => `
+                <div class="queue-item" onclick="selectClient('${client.phoneNumber}')">
+                    <div class="client-name">${escapeHtml(client.fullName || 'Unknown')}</div>
                     <div class="client-phone">${client.phoneNumber}</div>
                     <div class="client-details">${client.country || ''} ${client.state || ''}</div>
                 </div>
             `).join('');
         }
 
-        function selectClient(clientId) {
-            const client = clients.find(c => c.id === clientId);
-            if (!client) return;
-            
-            currentClient = client;
-            
-            document.getElementById('noCallSelected').style.display = 'none';
+        async function selectClient(phoneNumber) {
             document.getElementById('callDetailsContent').style.display = 'block';
+            document.getElementById('noCallSelected').style.display = 'none';
+            document.getElementById('clientName').textContent = 'Loading...';
             
-            document.getElementById('clientName').textContent = client.clientName;
-            document.getElementById('clientPhone').textContent = client.phoneNumber;
-            document.getElementById('clientLocation').textContent = `${client.country || ''} ${client.state || ''}`.trim() || 'Not specified';
-            document.getElementById('callScript').value = client.callScript;
-            document.getElementById('aiContent').innerHTML = client.callScript;
-            
-            selectedOutcome = null;
-            document.getElementById('callRemarks').value = '';
-            
-            document.querySelectorAll('.outcome-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            
-            startCallTimer();
+            const client = await getClientByPhone(phoneNumber);
+            if (client) {
+                currentClient = client;
+                document.getElementById('clientName').textContent = client.fullName || 'Unknown';
+                document.getElementById('clientPhone').textContent = client.phoneNumber;
+                document.getElementById('clientLocation').textContent = `${client.country || ''} ${client.state || ''}`.trim() || 'Not specified';
+                document.getElementById('callScript').value = client.callScript || getDefaultScript();
+                document.getElementById('aiContent').innerHTML = client.callScript || getDefaultScript();
+                selectedOutcome = null;
+                document.getElementById('callRemarks').value = '';
+                document.querySelectorAll('.outcome-btn').forEach(btn => btn.classList.remove('selected'));
+                startCallTimer();
+            } else {
+                showNotification('Error loading client data', 'error');
+                document.getElementById('noCallSelected').style.display = 'flex';
+                document.getElementById('callDetailsContent').style.display = 'none';
+            }
         }
 
         function startCallTimer() {
@@ -1304,84 +1113,82 @@
         }
 
         function stopCallTimer() {
-            if (callTimerInterval) {
-                clearInterval(callTimerInterval);
-                callTimerInterval = null;
+            if (callTimerInterval) { 
+                clearInterval(callTimerInterval); 
+                callTimerInterval = null; 
             }
         }
 
-        function getCallDuration() {
-            if (!callStartTime) return 0;
-            return Math.floor((new Date() - callStartTime) / 1000);
+        function getCallDuration() { 
+            return callStartTime ? Math.floor((new Date() - callStartTime) / 1000) : 0; 
         }
 
         function selectOutcome(outcome) {
             selectedOutcome = outcome;
-            document.querySelectorAll('.outcome-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
+            document.querySelectorAll('.outcome-btn').forEach(btn => btn.classList.remove('selected'));
             const selectedBtn = document.querySelector(`.outcome-btn.${outcome.toLowerCase().replace(' ', '')}`);
             if (selectedBtn) selectedBtn.classList.add('selected');
         }
 
         function addSuggestion(suggestion) {
             const scriptTextarea = document.getElementById('callScript');
-            const currentScript = scriptTextarea.value;
-            scriptTextarea.value = currentScript + '\n\n' + suggestion;
+            scriptTextarea.value += '\n\n' + suggestion;
             document.getElementById('aiContent').innerHTML = scriptTextarea.value;
         }
 
-        function saveCall() {
-            if (!currentClient) {
-                showNotification('No client selected', 'error');
-                return;
+        async function saveCall() {
+            if (!currentClient) { 
+                showNotification('No client selected', 'error'); 
+                return; 
             }
-            
-            if (!selectedOutcome) {
-                showNotification('Please select a call outcome', 'error');
-                return;
+            if (!selectedOutcome) { 
+                showNotification('Please select a call outcome', 'error'); 
+                return; 
             }
             
             const duration = getCallDuration();
             const script = document.getElementById('callScript').value;
             const remarks = document.getElementById('callRemarks').value;
             
-            const callRecord = {
-                id: Date.now(),
-                timestamp: new Date().toISOString(),
-                clientName: currentClient.clientName,
-                clientPhone: currentClient.phoneNumber,
-                duration: duration,
-                outcome: selectedOutcome,
-                remarks: remarks,
-                script: script
-            };
+            const updateResult = await updateClientCallStatus(currentClient.phoneNumber, selectedOutcome);
+            if (!updateResult.success) { 
+                showNotification('Failed to update call status', 'error'); 
+                return; 
+            }
             
-            if (!currentWorker.calls) currentWorker.calls = [];
-            currentWorker.calls.unshift(callRecord);
-            currentWorker.totalCalls = (currentWorker.totalCalls || 0) + 1;
-            currentWorker.todayCalls = (currentWorker.todayCalls || 0) + 1;
+            const saveResult = await saveCallRecord(
+                currentWorker.email, 
+                currentClient.phoneNumber, 
+                currentClient.fullName, 
+                duration, 
+                selectedOutcome, 
+                remarks, 
+                script
+            );
             
-            currentClient.callScript = script;
-            
-            updateUI();
-            renderCallHistory();
-            
-            stopCallTimer();
-            selectedOutcome = null;
-            document.getElementById('callRemarks').value = '';
-            document.getElementById('noCallSelected').style.display = 'flex';
-            document.getElementById('callDetailsContent').style.display = 'none';
-            currentClient = null;
-            callStartTime = null;
-            
-            showNotification(`Call saved - Outcome: ${selectedOutcome}`);
-            saveWorkerToStorage();
+            if (saveResult.success) {
+                currentWorker.totalCalls = (currentWorker.totalCalls || 0) + 1;
+                document.getElementById('totalCalls').textContent = currentWorker.totalCalls;
+                
+                stopCallTimer();
+                selectedOutcome = null;
+                document.getElementById('callRemarks').value = '';
+                document.getElementById('noCallSelected').style.display = 'flex';
+                document.getElementById('callDetailsContent').style.display = 'none';
+                currentClient = null;
+                callStartTime = null;
+                
+                showNotification(`Call saved - Outcome: ${selectedOutcome}`);
+                await loadCallHistory();
+                renderQueue();
+            } else {
+                showNotification('Failed to save call', 'error');
+            }
         }
 
-        function renderCallHistory() {
+        async function loadCallHistory() {
+            const calls = await getCallHistory(currentWorker.email);
             const tbody = document.getElementById('callsTableBody');
-            const calls = currentWorker?.calls || [];
             
             if (calls.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No calls recorded yet</td></tr>';
@@ -1391,11 +1198,11 @@
             tbody.innerHTML = calls.map(call => `
                 <tr>
                     <td>${formatDate(call.timestamp)}</td>
-                    <td>${escapeHtml(call.clientName)}</td>
+                    <td>${escapeHtml(call.clientName || 'Unknown')}</td>
                     <td>${call.clientPhone}</td>
-                    <td>${formatDuration(call.duration)}</td>
-                    <td><span class="badge ${call.outcome.toLowerCase().replace(' ', '')}">${call.outcome}</span></td>
-                    <td>${escapeHtml(call.remarks.substring(0, 50))}${call.remarks.length > 50 ? '...' : ''}</td>
+                    <td>${formatDuration(call.callDuration)}</td>
+                    <td><span class="badge ${call.callOutcome.toLowerCase().replace(' ', '')}">${call.callOutcome}</span></td>
+                    <td>${escapeHtml((call.remarks || '').substring(0, 50))}${(call.remarks || '').length > 50 ? '...' : ''}</td>
                 </tr>
             `).join('');
         }
@@ -1407,6 +1214,19 @@
             return div.innerHTML;
         }
 
+        // ==================== MOBILE MENU ====================
+        function openMobileMenu() {
+            document.getElementById('mobileSlideMenu').classList.add('active');
+            document.getElementById('menuOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMobileMenu() {
+            document.getElementById('mobileSlideMenu').classList.remove('active');
+            document.getElementById('menuOverlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
         // ==================== EVENT LISTENERS ====================
         document.getElementById('userIcon').addEventListener('click', () => {
             if (currentWorker) {
@@ -1416,36 +1236,39 @@
             }
         });
         
-        document.getElementById('searchClient').addEventListener('input', renderQueue);
-        
+        document.getElementById('searchClient').addEventListener('input', () => renderQueue());
         document.getElementById('callScript').addEventListener('input', (e) => {
             document.getElementById('aiContent').innerHTML = e.target.value;
         });
-        
-        // Mobile menu event listeners
         document.getElementById('mobileMenuBtn').addEventListener('click', openMobileMenu);
         document.getElementById('closeMobileMenu').addEventListener('click', closeMobileMenu);
         document.getElementById('menuOverlay').addEventListener('click', closeMobileMenu);
         
-        // Close modals when clicking outside
         window.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
                 closeModal(e.target.id);
             }
         });
-        
-        // Check for saved session
+
+        // ==================== INITIALIZATION ====================
         const savedWorker = localStorage.getItem('btff_worker');
         if (savedWorker) {
             try {
                 const workerData = JSON.parse(savedWorker);
-                const found = workers.find(w => w.email === workerData.email);
-                if (found) {
-                    currentWorker = found;
-                    document.getElementById('workerDashboard').classList.add('active');
-                    updateUI();
-                    renderQueue();
-                    renderCallHistory();
+                if (workerData.email) {
+                    getWorkerProfile(workerData.email).then(result => {
+                        if (result.success && result.worker) {
+                            currentWorker = result.worker;
+                            document.getElementById('workerDashboard').classList.add('active');
+                            document.getElementById('workerName').textContent = currentWorker.fullName;
+                            document.getElementById('workerEmail').textContent = currentWorker.email;
+                            document.getElementById('totalCalls').textContent = currentWorker.totalCalls || 0;
+                            renderQueue();
+                            loadCallHistory();
+                        } else {
+                            openModal('authModal');
+                        }
+                    });
                 } else {
                     openModal('authModal');
                 }
@@ -1456,7 +1279,7 @@
             openModal('authModal');
         }
         
-        console.log('✅ Call Center Page Loaded');
+        console.log('✅ Call Center Page Loaded - Using CLIENT_API_URL');
     </script>
 </body>
 </html>

@@ -1042,7 +1042,7 @@
                         <tbody id="callsTableBody">
                             <tr><td colspan="6" class="empty-state">No calls recorded yet</td>\\
                         </tbody>
-                    </table>
+                     </table>
                 </div>
             </div>
         </div>
@@ -1067,19 +1067,14 @@
     </div>
 
     <script>
+        // ==================== CONFIGURATION ====================
+        // REPLACE THIS WITH YOUR ACTUAL GOOGLE APPS SCRIPT URL
+        const CLIENT_API_URL = 'https://script.google.com/macros/s/AKfycbwUDjsW-keyZD9Y6ySq0EMdXkGz2tMptHz0h0Z4KM9wsEc7VHPILqf_0pIGF9-uPrYImg/exec';
+        
         // ==================== FAKE DATA ====================
-        // Sample workers
+        // Sample workers (kept as is)
         const workers = [
             { id: 1, fullName: 'Felix Bamson', email: 'felix@btff.com', phone: '07035255910', country: 'Nigeria', state: 'Rivers', totalCalls: 0, todayCalls: 0, calls: [] }
-        ];
-
-        // Sample clients
-        let clients = [
-            { id: 1, phoneNumber: '08012345678', clientName: 'John Doe', country: 'Nigeria', state: 'Lagos', city: 'Ikeja', callScript: 'Hello John, this is Felix from BTFF. How are you doing today?\n\nI\'m calling to connect with you and see how we can be of service.\n\n[Pause for response]\n\nGreat! Let me share some information about what we offer...' },
-            { id: 2, phoneNumber: '08098765432', clientName: 'Jane Smith', country: 'Nigeria', state: 'Abuja', city: 'Garki', callScript: 'Hello Jane, this is Felix from BTFF. Hope you\'re having a great day!\n\nI\'m reaching out because we have some exciting offers that might interest you.\n\n[Pause for response]\n\nWould you be open to learning more about this?' },
-            { id: 3, phoneNumber: '08123456789', clientName: 'Mike Johnson', country: 'Nigeria', state: 'Lagos', city: 'Victoria Island', callScript: 'Hello Mike, this is Felix from BTFF. How are things on your end?\n\nI\'m calling to follow up on your recent inquiry about our services.\n\n[Pause for response]\n\nI\'d be happy to answer any questions you might have.' },
-            { id: 4, phoneNumber: '09012345678', clientName: 'Sarah Williams', country: 'Nigeria', state: 'Rivers', city: 'Port Harcourt', callScript: 'Hello Sarah, this is Felix from BTFF. How are you today?\n\nI\'m reaching out because we value your feedback and wanted to check in.\n\n[Pause for response]\n\nIs there anything we can do to improve your experience?' },
-            { id: 5, phoneNumber: '07012345678', clientName: 'David Brown', country: 'Nigeria', state: 'Ogun', city: 'Abeokuta', callScript: 'Hello David, this is Felix from BTFF. Hope this message finds you well.\n\nI wanted to share some exciting news about our new offerings.\n\n[Pause for response]\n\nWould you have a few minutes to chat?' }
         ];
 
         // State
@@ -1088,6 +1083,59 @@
         let callStartTime = null;
         let callTimerInterval = null;
         let selectedOutcome = null;
+
+        // ==================== API FUNCTIONS ====================
+        async function fetchClientsFromSheet(searchTerm = '') {
+            if (!CLIENT_API_URL || CLIENT_API_URL === '%%CALL_CENTER_API_URL%%') {
+                console.log('API not configured, using fake data');
+                // Fallback to fake data
+                return [
+                    { id: 1, phoneNumber: '08012345678', fullName: 'John Doe', country: 'Nigeria', state: 'Lagos', callScript: 'Hello John, this is from BTFF. How are you doing today?\n\nI\'m calling to connect with you and see how we can be of service.' },
+                    { id: 2, phoneNumber: '08098765432', fullName: 'Jane Smith', country: 'Nigeria', state: 'Abuja', callScript: 'Hello Jane, this is from BTFF. Hope you\'re having a great day!\n\nI\'m reaching out because we have some exciting offers that might interest you.' }
+                ];
+            }
+            
+            try {
+                const url = `${CLIENT_API_URL}?action=getClients&searchTerm=${encodeURIComponent(searchTerm)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success) {
+                    return data.clients;
+                } else {
+                    console.error('Error fetching clients:', data.error);
+                    return [];
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                return [];
+            }
+        }
+
+        async function getClientByPhone(phoneNumber) {
+            if (!CLIENT_API_URL || CLIENT_API_URL === '%%CALL_CENTER_API_URL%%') {
+                // Fallback to fake data
+                const fakeClients = [
+                    { phoneNumber: '08012345678', fullName: 'John Doe', country: 'Nigeria', state: 'Lagos', callScript: 'Hello John, this is from BTFF. How are you doing today?' },
+                    { phoneNumber: '08098765432', fullName: 'Jane Smith', country: 'Nigeria', state: 'Abuja', callScript: 'Hello Jane, this is from BTFF. Hope you\'re having a great day!' }
+                ];
+                return fakeClients.find(c => c.phoneNumber === phoneNumber);
+            }
+            
+            try {
+                const url = `${CLIENT_API_URL}?action=getClientByPhone&phoneNumber=${encodeURIComponent(phoneNumber)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success) {
+                    return data.client;
+                }
+                return null;
+            } catch (error) {
+                console.error('Error fetching client:', error);
+                return null;
+            }
+        }
 
         // ==================== MOBILE MENU FUNCTIONS ====================
         function openMobileMenu() {
@@ -1244,54 +1292,55 @@
             }
         }
 
-        // ==================== QUEUE FUNCTIONS ====================
-        function renderQueue() {
-            const searchTerm = document.getElementById('searchClient').value.toLowerCase();
-            const filtered = clients.filter(client => 
-                client.clientName.toLowerCase().includes(searchTerm) || 
-                client.phoneNumber.includes(searchTerm)
-            );
-            
+        // ==================== QUEUE FUNCTIONS (UPDATED) ====================
+        async function renderQueue() {
+            const searchTerm = document.getElementById('searchClient').value;
             const queueList = document.getElementById('queueList');
-            document.getElementById('queueCount').textContent = filtered.length;
+            queueList.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading clients...</div>';
             
-            if (filtered.length === 0) {
+            const clients = await fetchClientsFromSheet(searchTerm);
+            document.getElementById('queueCount').textContent = clients.length;
+            
+            if (clients.length === 0) {
                 queueList.innerHTML = '<div class="empty-state">No clients found</div>';
                 return;
             }
             
-            queueList.innerHTML = filtered.map(client => `
-                <div class="queue-item" onclick="selectClient(${client.id})">
-                    <div class="client-name">${escapeHtml(client.clientName)}</div>
+            queueList.innerHTML = clients.map(client => `
+                <div class="queue-item" onclick="selectClient('${client.phoneNumber}')">
+                    <div class="client-name">${escapeHtml(client.fullName || 'Unknown')}</div>
                     <div class="client-phone">${client.phoneNumber}</div>
                     <div class="client-details">${client.country || ''} ${client.state || ''}</div>
                 </div>
             `).join('');
         }
 
-        function selectClient(clientId) {
-            const client = clients.find(c => c.id === clientId);
-            if (!client) return;
-            
-            currentClient = client;
-            
-            document.getElementById('noCallSelected').style.display = 'none';
+        async function selectClient(phoneNumber) {
             document.getElementById('callDetailsContent').style.display = 'block';
+            document.getElementById('noCallSelected').style.display = 'none';
+            document.getElementById('clientName').textContent = 'Loading...';
             
-            document.getElementById('clientName').textContent = client.clientName;
-            document.getElementById('clientPhone').textContent = client.phoneNumber;
-            document.getElementById('clientLocation').textContent = `${client.country || ''} ${client.state || ''}`.trim() || 'Not specified';
-            document.getElementById('callScript').value = client.callScript;
-            document.getElementById('aiContent').innerHTML = client.callScript;
-            
-            selectedOutcome = null;
-            document.getElementById('callRemarks').value = '';
-            
-            document.querySelectorAll('.outcome-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            
-            startCallTimer();
+            const client = await getClientByPhone(phoneNumber);
+            if (client) {
+                currentClient = client;
+                document.getElementById('clientName').textContent = client.fullName || 'Unknown';
+                document.getElementById('clientPhone').textContent = client.phoneNumber;
+                document.getElementById('clientLocation').textContent = `${client.country || ''} ${client.state || ''}`.trim() || 'Not specified';
+                document.getElementById('callScript').value = client.callScript || getDefaultScript();
+                document.getElementById('aiContent').innerHTML = client.callScript || getDefaultScript();
+                selectedOutcome = null;
+                document.getElementById('callRemarks').value = '';
+                document.querySelectorAll('.outcome-btn').forEach(btn => btn.classList.remove('selected'));
+                startCallTimer();
+            } else {
+                showNotification('Error loading client data', 'error');
+                document.getElementById('noCallSelected').style.display = 'flex';
+                document.getElementById('callDetailsContent').style.display = 'none';
+            }
+        }
+
+        function getDefaultScript() {
+            return `Hello, this is [Your Name] from BTFF. How are you doing today?\n\nI'm calling to connect with you and see how we can be of service.\n\n[Pause for response]\n\nGreat! Let me share some information about what we offer...`;
         }
 
         function startCallTimer() {
@@ -1317,9 +1366,7 @@
 
         function selectOutcome(outcome) {
             selectedOutcome = outcome;
-            document.querySelectorAll('.outcome-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
+            document.querySelectorAll('.outcome-btn').forEach(btn => btn.classList.remove('selected'));
             const selectedBtn = document.querySelector(`.outcome-btn.${outcome.toLowerCase().replace(' ', '')}`);
             if (selectedBtn) selectedBtn.classList.add('selected');
         }
@@ -1349,7 +1396,7 @@
             const callRecord = {
                 id: Date.now(),
                 timestamp: new Date().toISOString(),
-                clientName: currentClient.clientName,
+                clientName: currentClient.fullName,
                 clientPhone: currentClient.phoneNumber,
                 duration: duration,
                 outcome: selectedOutcome,
@@ -1361,8 +1408,6 @@
             currentWorker.calls.unshift(callRecord);
             currentWorker.totalCalls = (currentWorker.totalCalls || 0) + 1;
             currentWorker.todayCalls = (currentWorker.todayCalls || 0) + 1;
-            
-            currentClient.callScript = script;
             
             updateUI();
             renderCallHistory();
@@ -1416,7 +1461,7 @@
             }
         });
         
-        document.getElementById('searchClient').addEventListener('input', renderQueue);
+        document.getElementById('searchClient').addEventListener('input', () => renderQueue());
         
         document.getElementById('callScript').addEventListener('input', (e) => {
             document.getElementById('aiContent').innerHTML = e.target.value;

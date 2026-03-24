@@ -515,42 +515,36 @@
             background: #dc2626;
         }
 
-        /* Loading Overlay */
-        .global-loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10,15,26,0.95);
-            backdrop-filter: blur(5px);
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            flex-direction: column;
+        /* Skeleton Loading Styles */
+        .skeleton {
+            background: linear-gradient(90deg, #1a2a3a 25%, #2a3a4a 50%, #1a2a3a 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
         }
 
-        .global-loading-overlay.active {
-            display: flex;
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(47,107,198,0.2);
-            border-top: 4px solid #2f6bc6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+        .skeleton-text {
+            height: 20px;
+            border-radius: 4px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .skeleton-title {
+            height: 32px;
+            width: 60%;
+            border-radius: 8px;
         }
 
-        /* Call Details Loading Spinner */
+        .skeleton-card {
+            background: #101c2c;
+            border-radius: 20px;
+            padding: 20px;
+        }
+
         .call-details-loading {
             display: flex;
             flex-direction: column;
@@ -568,6 +562,11 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .call-grid {
@@ -942,12 +941,6 @@
             </div>
         </div>
 
-        <!-- Global Loading Overlay -->
-        <div class="global-loading-overlay" id="globalLoadingOverlay">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">Loading...</div>
-        </div>
-
         <!-- Auth Modal -->
         <div class="modal" id="authModal">
             <div class="modal-content">
@@ -986,7 +979,7 @@
             <div class="call-grid">
                 <div class="panel">
                     <div class="panel-header"><h3><i class="fas fa-phone-alt"></i> Clients to Call <span id="queueCount" style="background:#2f6bc6; padding:2px 8px; border-radius:20px; font-size:0.8rem;">0</span></h3><input type="text" class="search-input" id="searchClient" placeholder="Search by name or phone..."></div>
-                    <div class="queue-list" id="queueList"><div class="empty-state">Loading clients...</div></div>
+                    <div class="queue-list" id="queueList"></div>
                 </div>
 
                 <div class="panel">
@@ -1039,7 +1032,7 @@
                 <div class="table-container">
                     <table id="callsTable">
                         <thead>   <th>Date & Time</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th> </thead>
-                        <tbody id="callsTableBody">   <td colspan="6" class="empty-state">No calls recorded yet</td> </tbody>
+                        <tbody id="callsTableBody"></tbody>
                       </table>
                 </div>
             </div>
@@ -1064,18 +1057,6 @@
         let selectedOutcome = null;
 
         // ==================== LOADING FUNCTIONS ====================
-        function showGlobalLoading(message = 'Loading...') {
-            const overlay = document.getElementById('globalLoadingOverlay');
-            const text = overlay.querySelector('.loading-text');
-            if (text) text.textContent = message;
-            overlay.classList.add('active');
-        }
-
-        function hideGlobalLoading() {
-            const overlay = document.getElementById('globalLoadingOverlay');
-            overlay.classList.remove('active');
-        }
-
         function showCallDetailsLoading() {
             document.getElementById('callDetailsLoading').style.display = 'flex';
             document.getElementById('callDetailsInfo').style.display = 'none';
@@ -1186,9 +1167,7 @@
             const email = document.getElementById('loginEmail').value;
             if (!email) { showNotification('Please enter your email', 'error'); return; }
             
-            showGlobalLoading('Logging in...');
             const result = await getWorker(email);
-            hideGlobalLoading();
             
             if (result.success && result.worker) {
                 currentWorker = result.worker;
@@ -1215,9 +1194,7 @@
             
             if (!fullName || !email || !phone) { showNotification('Please fill all required fields', 'error'); return; }
             
-            showGlobalLoading('Registering...');
             const result = await registerWorker(fullName, email, phone, country, state, city);
-            hideGlobalLoading();
             
             if (result.success) {
                 showNotification('Registration successful! Please login.');
@@ -1241,7 +1218,16 @@
         async function renderQueue() {
             const searchTerm = document.getElementById('searchClient').value.toLowerCase();
             const queueList = document.getElementById('queueList');
-            queueList.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading clients...</div>';
+            
+            // Show skeleton loading
+            queueList.innerHTML = `
+                <div class="skeleton-card">
+                    <div class="skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                    <div class="skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                    <div class="skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                    <div class="skeleton" style="height: 60px;"></div>
+                </div>
+            `;
             
             const clients = await getClients();
             const filtered = clients.filter(client => 
@@ -1341,12 +1327,9 @@
             const script = document.getElementById('callScript').value;
             const remarks = document.getElementById('callRemarks').value;
             
-            showGlobalLoading('Saving call record...');
-            
             // Update client status in database
             const updateResult = await updateClientStatus(currentClient.phoneNumber, selectedOutcome, remarks);
             if (!updateResult.success) { 
-                hideGlobalLoading();
                 showNotification('Failed to update call status: ' + (updateResult.error || 'Unknown error'), 'error'); 
                 return; 
             }
@@ -1354,7 +1337,6 @@
             // Log the call
             const logResult = await logCall(currentWorker.email, currentClient.phoneNumber, currentClient.fullName, duration, selectedOutcome, remarks, script);
             if (!logResult.success) { 
-                hideGlobalLoading();
                 showNotification('Failed to save call log: ' + (logResult.error || 'Unknown error'), 'error'); 
                 return; 
             }
@@ -1371,7 +1353,6 @@
             currentClient = null;
             callStartTime = null;
             
-            hideGlobalLoading();
             showNotification(`Call saved - Outcome: ${selectedOutcome}`);
             await loadCallHistory();
             await renderQueue();
@@ -1422,9 +1403,7 @@
             }
             
             closeSoftphone();
-            showGlobalLoading('Looking up client...');
             const client = await getClientByPhone(phoneNumber);
-            hideGlobalLoading();
             
             if (client) {
                 await selectClient(phoneNumber);
@@ -1475,8 +1454,6 @@
         });
 
         // ==================== INITIALIZATION ====================
-        showGlobalLoading('Loading call center...');
-        
         const savedWorker = localStorage.getItem('btff_worker');
         if (savedWorker) {
             try {
@@ -1488,18 +1465,14 @@
                         await updateUI();
                         await renderQueue();
                         await loadCallHistory();
-                        hideGlobalLoading();
                     } else {
-                        hideGlobalLoading();
                         openModal('authModal');
                     }
                 });
             } catch(e) { 
-                hideGlobalLoading();
                 openModal('authModal'); 
             }
         } else { 
-            hideGlobalLoading();
             openModal('authModal'); 
         }
         

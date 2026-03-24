@@ -1234,6 +1234,8 @@
                 await loadCallHistory();
                 showNotification(`Welcome back, ${currentWorker.fullName}!`);
                 localStorage.setItem('btff_worker', JSON.stringify({ email: currentWorker.email, fullName: currentWorker.fullName }));
+            } else if (result.pending) {
+                showNotification('Your account is pending approval. Please wait for admin to activate your account.', 'warning');
             } else {
                 showNotification('Worker not found. Please register first.', 'error');
             }
@@ -1254,7 +1256,11 @@
             hideGlobalLoading();
             
             if (result.success) {
-                showNotification('Registration successful! Please login.');
+                if (result.pending) {
+                    showNotification('Registration successful! Your account is pending approval. You will be notified when activated.', 'warning');
+                } else {
+                    showNotification('Registration successful! Please login.');
+                }
                 showLogin();
                 document.getElementById('loginEmail').value = email;
             } else {
@@ -1525,6 +1531,10 @@
                         await renderQueue();
                         await loadCallHistory();
                         hideGlobalLoading();
+                    } else if (result.pending) {
+                        hideGlobalLoading();
+                        showNotification('Your account is pending approval. Please wait for admin to activate your account.', 'warning');
+                        openModal('authModal');
                     } else {
                         hideGlobalLoading();
                         openModal('authModal');

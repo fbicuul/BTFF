@@ -373,6 +373,48 @@
             100% { background-position: -200% 0; }
         }
 
+        /* ===== GLOBAL LOADING OVERLAY ===== */
+        .global-loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 26, 0.95);
+            backdrop-filter: blur(5px);
+            z-index: 20000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .global-loading-overlay.active {
+            display: flex;
+        }
+
+        .global-loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 5px solid rgba(47, 107, 198, 0.2);
+            border-top: 5px solid #2f6bc6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .global-loading-text {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* ===== STATS CARDS ===== */
         .stats-grid {
             display: grid;
@@ -394,19 +436,6 @@
         .stat-card:hover {
             transform: translateY(-5px);
             border-color: var(--primary);
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: var(--primary);
-            opacity: 0.03;
-            border-radius: 50%;
-            transform: translate(30px, -30px);
         }
 
         .stat-icon {
@@ -460,16 +489,6 @@
             font-weight: 600;
         }
 
-        .chart-header select {
-            background: var(--dark);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            outline: none;
-        }
-
         .chart-container {
             height: 300px;
             position: relative;
@@ -490,7 +509,7 @@
             font-weight: 600;
         }
 
-        .btn-primary, .btn-secondary, .btn-success, .btn-warning, .btn-info {
+        .btn-primary, .btn-secondary, .btn-success, .btn-warning, .btn-info, .btn-danger {
             border: none;
             padding: 12px 25px;
             border-radius: 12px;
@@ -513,28 +532,8 @@
             transform: scale(1.02);
         }
 
-        .btn-secondary {
-            background: var(--secondary);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .btn-secondary:hover {
-            background: #2a3a55;
-        }
-
         .btn-success {
             background: var(--success);
-            color: white;
-        }
-
-        .btn-warning {
-            background: var(--warning);
-            color: white;
-        }
-
-        .btn-info {
-            background: var(--info);
             color: white;
         }
 
@@ -576,14 +575,6 @@
             background: rgba(255,255,255,0.02);
         }
 
-        .movie-thumb {
-            width: 50px;
-            height: 30px;
-            border-radius: 6px;
-            background-size: cover;
-            background-position: center;
-        }
-
         .status-badge {
             padding: 5px 12px;
             border-radius: 30px;
@@ -593,12 +584,12 @@
         }
 
         .status-badge.active {
-            background: rgba(16, 185, 129, 0.1);
+            background: rgba(16, 185, 129, 0.2);
             color: var(--success);
         }
 
         .status-badge.pending {
-            background: rgba(245, 158, 11, 0.1);
+            background: rgba(245, 158, 11, 0.2);
             color: var(--warning);
         }
 
@@ -636,7 +627,7 @@
             border-color: var(--success);
         }
 
-        /* ===== SCROLLABLE MODAL ===== */
+        /* ===== MODAL ===== */
         .modal {
             display: none;
             position: fixed;
@@ -646,7 +637,7 @@
             height: 100%;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
             z-index: 1000;
             overflow-y: auto;
@@ -661,7 +652,7 @@
             background: var(--darker);
             border-radius: 30px;
             padding: 40px;
-            width: 600px;
+            width: 500px;
             max-width: 90vw;
             border: 2px solid var(--primary);
             position: relative;
@@ -702,10 +693,6 @@
             color: white;
             font-size: 1rem;
             outline: none;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            border-color: var(--primary);
         }
 
         .form-row {
@@ -756,7 +743,6 @@
             .sidebar .logo, .sidebar .sub, .nav-item span, .nav-section-title { display: none; }
             .main-content { margin-left: 80px; padding: 20px; }
             .nav-item { justify-content: center; padding: 14px; }
-            .nav-item i { margin: 0; }
             .stats-grid { grid-template-columns: 1fr; }
             .top-bar { flex-direction: column; gap: 15px; align-items: flex-start; }
         }
@@ -848,6 +834,10 @@
     </div>
 
     <div class="notification" id="notification">Action completed successfully</div>
+    <div class="global-loading-overlay" id="globalLoadingOverlay">
+        <div class="global-loading-spinner"></div>
+        <div class="global-loading-text">Loading...</div>
+    </div>
 
     <script>
         (function() {
@@ -897,21 +887,21 @@
                 loginBtn.textContent = 'Logging in...';
                 errorDiv.classList.remove('show');
                 
-                try {
-                    const result = await apiCall('adminLogin', { email, password }, 'POST');
-                    if (result.success && result.user) {
-                        isAuthenticated = true;
-                        currentAdminUser = result.user;
-                        localStorage.setItem('btff_admin_auth', 'true');
-                        localStorage.setItem('btff_admin_user', JSON.stringify(result.user));
-                        showDashboard();
-                        showNotification(`Welcome back, ${result.user.email}`);
-                    } else {
-                        errorDiv.textContent = result.error || 'Invalid email or password';
-                        errorDiv.classList.add('show');
-                    }
-                } catch (err) {
-                    errorDiv.textContent = 'Connection error. Please try again.';
+                showGlobalLoading('Verifying credentials...');
+                
+                const result = await apiCall('adminLogin', { email, password }, 'POST');
+                
+                hideGlobalLoading();
+                
+                if (result.success && result.user) {
+                    isAuthenticated = true;
+                    currentAdminUser = result.user;
+                    localStorage.setItem('btff_admin_auth', 'true');
+                    localStorage.setItem('btff_admin_user', JSON.stringify(result.user));
+                    showDashboard();
+                    showNotification(`Welcome back, ${result.user.email}`);
+                } else {
+                    errorDiv.textContent = result.error || 'Invalid email or password';
                     errorDiv.classList.add('show');
                 }
                 
@@ -946,6 +936,19 @@
             window.showLoginModal = showLoginModal;
             window.logout = logout;
             
+            // ========== GLOBAL LOADING ==========
+            const globalLoadingOverlay = document.getElementById('globalLoadingOverlay');
+            
+            function showGlobalLoading(message = 'Loading...') {
+                const text = globalLoadingOverlay.querySelector('.global-loading-text');
+                if (text) text.textContent = message;
+                globalLoadingOverlay.classList.add('active');
+            }
+            
+            function hideGlobalLoading() {
+                globalLoadingOverlay.classList.remove('active');
+            }
+            
             // ========== STATE ==========
             let movies = [];
             let ratings = [];
@@ -964,7 +967,6 @@
             let callCenterClients = [];
             let callCenterCalls = [];
 
-            // DOM elements
             const navItems = document.querySelectorAll('.nav-item');
             const mainContent = document.getElementById('mainContent');
             const notification = document.getElementById('notification');
@@ -1026,7 +1028,9 @@
             }
 
             async function approveWorker(workerEmail) {
+                showGlobalLoading('Approving worker...');
                 const result = await apiCall('approveCallCenterWorker', { email: workerEmail }, 'POST');
+                hideGlobalLoading();
                 if (result.success) {
                     await fetchCallCenterWorkers();
                     await renderView(currentView);
@@ -1038,7 +1042,9 @@
 
             async function deleteWorker(workerEmail) {
                 if (!confirm('Are you sure you want to delete this worker?')) return;
+                showGlobalLoading('Deleting worker...');
                 const result = await apiCall('deleteCallCenterWorker', { email: workerEmail }, 'POST');
+                hideGlobalLoading();
                 if (result.success) {
                     await fetchCallCenterWorkers();
                     await renderView(currentView);
@@ -1049,7 +1055,9 @@
             }
 
             async function addClient(clientData) {
+                showGlobalLoading('Adding client...');
                 const result = await apiCall('addCallCenterClient', clientData, 'POST');
+                hideGlobalLoading();
                 if (result.success) {
                     await fetchCallCenterClients();
                     await renderView(currentView);
@@ -1062,7 +1070,9 @@
 
             async function deleteClient(phoneNumber) {
                 if (!confirm('Are you sure you want to delete this client?')) return;
+                showGlobalLoading('Deleting client...');
                 const result = await apiCall('deleteCallCenterClient', { phoneNumber }, 'POST');
+                hideGlobalLoading();
                 if (result.success) {
                     await fetchCallCenterClients();
                     await renderView(currentView);
@@ -1098,13 +1108,13 @@
             async function renderView(view) {
                 currentView = view;
                 
-                // Show skeleton loading immediately
+                // Show skeleton loading
                 let skeletonHtml = '';
                 switch(view) {
                     case 'dashboard':
                         skeletonHtml = `
                             <div class="top-bar"><div class="page-title"><h1>Dashboard</h1><p>Loading...</p></div><div class="admin-profile"><div class="admin-info"><h4>Admin</h4><p>admin@btff.com</p></div><div class="admin-avatar">AD</div></div></div>
-                            <div class="stats-grid">${[1,2,3,4,5,6].map(() => `<div class="stat-card"><div class="stat-icon skeleton" style="background: var(--skeleton-dark);"></div><div class="skeleton" style="height: 35px; width: 60px;"></div><div class="skeleton" style="height: 14px; width: 80px;"></div></div>`).join('')}</div>
+                            <div class="stats-grid">${[1,2,3,4,5,6].map(() => `<div class="stat-card"><div class="stat-icon skeleton"></div><div class="skeleton" style="height: 35px; width: 60px;"></div><div class="skeleton" style="height: 14px; width: 80px;"></div></div>`).join('')}</div>
                             <div class="charts-row"><div class="chart-card"><div class="chart-header"><h3>Movies by Category</h3><div class="skeleton" style="width: 80px; height: 35px;"></div></div><div class="skeleton" style="height: 250px;"></div></div><div class="chart-card"><div class="chart-header"><h3>Rating Distribution</h3></div><div class="skeleton" style="height: 250px;"></div></div></div>
                             <div class="section-header"><h2>Recent Movies</h2><div class="skeleton" style="width: 100px; height: 40px;"></div></div>
                             <div class="table-container"><div class="skeleton" style="height: 300px;"></div></div>
@@ -1195,7 +1205,7 @@
                         <div class="chart-card"><div class="chart-header"><h3>Rating Distribution</h3></div><div class="chart-container"><canvas id="ratingChart"></canvas></div></div>
                     </div>
                     <div class="section-header"><h2>Recent Movies</h2><button class="btn-primary" onclick="document.querySelector('[data-view=\"movies\"]').click()"><i class="fas fa-plus"></i> View All</button></div>
-                    <div class="table-container"><table><thead><tr><th>Title</th><th>Category</th><th>Year</th></tr></thead><tbody>${recentMoviesList.map(m => `<tr><td>${m.title}</td><td>${m.category}</td><td>${m.year}</td></tr>`).join('')}</tbody></table></div>
+                    <div class="table-container">  <thead> <th>Title</th><th>Category</th><th>Year</th> </thead><tbody>${recentMoviesList.map(m => ` <td>${m.title}</td><td>${m.category}</td><td>${m.year}</td> `).join('')}</tbody>  </div>
                 `;
             }
 
@@ -1204,16 +1214,69 @@
                 const activeWorkers = callCenterWorkers.filter(w => w.status === 'Active');
                 
                 return `
-                    <div class="top-bar"><div class="page-title"><h1>Call Center Workers</h1><p>Manage worker registrations and approvals</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Call Center Workers</h1>
+                            <p>Manage worker registrations and approvals</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div>
+                            <div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div>
+                        </div>
+                    </div>
+                    
                     <div class="stats-grid">
                         <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-plus"></i></div><div class="stat-value">${pendingWorkers.length}</div><div class="stat-label">Pending Approvals</div></div>
                         <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value">${activeWorkers.length}</div><div class="stat-label">Active Workers</div></div>
                         <div class="stat-card"><div class="stat-icon"><i class="fas fa-phone-alt"></i></div><div class="stat-value">${callCenterWorkers.reduce((sum, w) => sum + (w.totalCalls || 0), 0)}</div><div class="stat-label">Total Calls Made</div></div>
                     </div>
+                    
                     <div class="section-header"><h2>Pending Approvals</h2></div>
-                    <div class="table-container"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Country</th><th>Registered</th><th>Actions</th></tr></thead><tbody>${pendingWorkers.map(w => `<tr><td>${w.fullName || 'N/A'}</td><td>${w.email}</td><td>${w.phoneNumber || 'N/A'}</td><td>${w.country || 'N/A'}</td><td>${w.registrationDate ? new Date(w.registrationDate).toLocaleDateString() : 'N/A'}</td><td><div class="action-btns"><button class="action-btn success" onclick="approveWorker('${w.email}')"><i class="fas fa-check"></i></button><button class="action-btn delete" onclick="deleteWorker('${w.email}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}${pendingWorkers.length === 0 ? '<tr><td colspan="6" style="text-align:center">No pending approvals</td></tr>' : ''}</tbody></table></div>
+                    <div class="table-container">
+                         <thead> <th>Name</th><th>Email</th><th>Phone</th><th>Country</th><th>Registered</th><th>Status</th><th>Actions</th> </thead>
+                        <tbody>
+                            ${pendingWorkers.map(w => `
+                                 <tr>
+                                    <td>${w.fullName || 'N/A'}</td>
+                                    <td>${w.email}</td>
+                                    <td>${w.phoneNumber || 'N/A'}</td>
+                                    <td>${w.country || 'N/A'}</td>
+                                    <td>${w.registrationDate ? new Date(w.registrationDate).toLocaleDateString() : 'N/A'}</td>
+                                    <td><span class="status-badge pending">Pending</span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="action-btn success" onclick="approveWorker('${w.email}')" title="Approve"><i class="fas fa-check"></i></button>
+                                            <button class="action-btn delete" onclick="deleteWorker('${w.email}')" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                 </tr>
+                            `).join('')}
+                            ${pendingWorkers.length === 0 ? '<tr><td colspan="7" style="text-align:center">No pending approvals</td></tr>' : ''}
+                        </tbody>
+                     </div>
+                    
                     <div class="section-header"><h2>Active Workers</h2></div>
-                    <div class="table-container"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Country</th><th>Total Calls</th><th>Last Active</th><th>Actions</th></tr></thead><tbody>${activeWorkers.map(w => `<tr><td>${w.fullName || 'N/A'}</td><td>${w.email}</td><td>${w.phoneNumber || 'N/A'}</td><td>${w.country || 'N/A'}</td><td>${w.totalCalls || 0}</td><td>${w.lastActive ? new Date(w.lastActive).toLocaleDateString() : 'Never'}</td><td><div class="action-btns"><button class="action-btn delete" onclick="deleteWorker('${w.email}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}</tbody></table></div>
+                    <div class="table-container">
+                         <thead> <th>Name</th><th>Email</th><th>Phone</th><th>Country</th><th>Total Calls</th><th>Last Active</th><th>Status</th><th>Actions</th> </thead>
+                        <tbody>
+                            ${activeWorkers.map(w => `
+                                 <tr>
+                                    <td>${w.fullName || 'N/A'}</td>
+                                    <td>${w.email}</td>
+                                    <td>${w.phoneNumber || 'N/A'}</td>
+                                    <td>${w.country || 'N/A'}</td>
+                                    <td>${w.totalCalls || 0}</td>
+                                    <td>${w.lastActive ? new Date(w.lastActive).toLocaleDateString() : 'Never'}</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="action-btn delete" onclick="deleteWorker('${w.email}')" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                 </tr>
+                            `).join('')}
+                        </tbody>
+                     </div>
                 `;
             }
 
@@ -1221,7 +1284,7 @@
                 return `
                     <div class="top-bar"><div class="page-title"><h1>Call Center Clients</h1><p>Manage client database</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
                     <div class="section-header"><h2>All Clients (${callCenterClients.length})</h2><button class="btn-primary" onclick="openAddClientModal()"><i class="fas fa-plus"></i> Add Client</button></div>
-                    <div class="table-container"><table><thead><tr><th>Phone</th><th>Name</th><th>Country</th><th>State</th><th>City</th><th>Total Calls</th><th>Last Called</th><th>Status</th><th>Actions</th></tr></thead><tbody>${callCenterClients.map(c => `<tr><td>${c.phoneNumber}</td><td>${c.fullName || 'Unknown'}</td><td>${c.country || 'N/A'}</td><td>${c.state || 'N/A'}</td><td>${c.city || 'N/A'}</td><td>${c.totalCalls || 0}</td><td>${c.lastCalled ? new Date(c.lastCalled).toLocaleDateString() : 'Never'}</td><td><span class="status-badge ${c.callStatus === 'Pending' ? 'pending' : 'active'}">${c.callStatus || 'Pending'}</span></td><td><div class="action-btns"><button class="action-btn delete" onclick="deleteClient('${c.phoneNumber}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}${callCenterClients.length === 0 ? '<tr><td colspan="9" style="text-align:center">No clients found</td></tr>' : ''}</tbody></table></div>
+                    <div class="table-container"> <thead> <th>Phone</th><th>Name</th><th>Country</th><th>State</th><th>City</th><th>Total Calls</th><th>Last Called</th><th>Status</th><th>Actions</th> </thead><tbody>${callCenterClients.map(c => ` <tr><td>${c.phoneNumber}</td><td>${c.fullName || 'Unknown'}</td><td>${c.country || 'N/A'}</td><td>${c.state || 'N/A'}</td><td>${c.city || 'N/A'}</td><td>${c.totalCalls || 0}</td><td>${c.lastCalled ? new Date(c.lastCalled).toLocaleDateString() : 'Never'}</td><td><span class="status-badge ${c.callStatus === 'Pending' ? 'pending' : 'active'}">${c.callStatus || 'Pending'}</span></td><td><div class="action-btns"><button class="action-btn delete" onclick="deleteClient('${c.phoneNumber}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}${callCenterClients.length === 0 ? '<tr><td colspan="9" style="text-align:center">No clients found</td></tr>' : ''}</tbody> </div>
                 `;
             }
 
@@ -1230,12 +1293,8 @@
                 
                 return `
                     <div class="top-bar"><div class="page-title"><h1>Call Logs</h1><p>View all call history</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
-                    <div class="stats-grid">
-                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-phone"></i></div><div class="stat-value">${callCenterCalls.length}</div><div class="stat-label">Total Calls</div></div>
-                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value">${callCenterCalls.filter(c => c.outcome === 'Connected').length}</div><div class="stat-label">Connected</div></div>
-                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">${Math.round(callCenterCalls.reduce((sum, c) => sum + (c.duration || 0), 0) / 60)}min</div><div class="stat-label">Total Talk Time</div></div>
-                    </div>
-                    <div class="table-container"><table><thead><tr><th>Date & Time</th><th>Worker</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th></tr></thead><tbody>${recentCalls.map(c => `<tr><td>${new Date(c.callDate).toLocaleString()}</td><td>${c.workerEmail?.split('@')[0] || 'Unknown'}</td><td>${c.clientName || 'Unknown'}</td><td>${c.clientPhone}</td><td>${Math.floor(c.duration / 60)}:${(c.duration % 60).toString().padStart(2,'0')}</td><td><span class="status-badge ${c.outcome === 'Connected' ? 'active' : 'pending'}">${c.outcome}</span></td><td>${c.remarks?.substring(0, 50) || ''}${c.remarks?.length > 50 ? '...' : ''}</td></tr>`).join('')}${recentCalls.length === 0 ? '<tr><td colspan="7" style="text-align:center">No calls recorded</td></tr>' : ''}</tbody></table></div>
+                    <div class="stats-grid"><div class="stat-card"><div class="stat-icon"><i class="fas fa-phone"></i></div><div class="stat-value">${callCenterCalls.length}</div><div class="stat-label">Total Calls</div></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value">${callCenterCalls.filter(c => c.outcome === 'Connected').length}</div><div class="stat-label">Connected</div></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">${Math.round(callCenterCalls.reduce((sum, c) => sum + (c.duration || 0), 0) / 60)}min</div><div class="stat-label">Total Talk Time</div></div></div>
+                    <div class="table-container"> <thead> <th>Date & Time</th><th>Worker</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th> </thead><tbody>${recentCalls.map(c => ` <tr><td>${new Date(c.callDate).toLocaleString()}</td><td>${c.workerEmail?.split('@')[0] || 'Unknown'}</td><td>${c.clientName || 'Unknown'}</td><td>${c.clientPhone}</td><td>${Math.floor(c.duration / 60)}:${(c.duration % 60).toString().padStart(2,'0')}</td><td><span class="status-badge ${c.outcome === 'Connected' ? 'active' : 'pending'}">${c.outcome}</span></td><td>${c.remarks?.substring(0, 50) || ''}${c.remarks?.length > 50 ? '...' : ''}</td></tr>`).join('')}${recentCalls.length === 0 ? '<tr><td colspan="7" style="text-align:center">No calls recorded</td></tr>' : ''}</tbody> </div>
                 `;
             }
 
@@ -1264,30 +1323,22 @@
                 
                 return `
                     <div class="top-bar"><div class="page-title"><h1>Call Analytics</h1><p>Performance metrics and insights</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
-                    <div class="stats-grid">
-                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-value">${callCenterCalls.length}</div><div class="stat-label">Total Calls</div></div>
-                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-percent"></i></div><div class="stat-value">${callCenterCalls.length ? Math.round((outcomeCounts.Connected / callCenterCalls.length) * 100) : 0}%</div><div class="stat-label">Connect Rate</div></div>
-                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">${Math.round(callCenterCalls.reduce((sum, c) => sum + (c.duration || 0), 0) / 60)}min</div><div class="stat-label">Total Talk Time</div></div>
-                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-tie"></i></div><div class="stat-value">${Object.keys(workerStats).length}</div><div class="stat-label">Active Workers</div></div>
-                    </div>
-                    <div class="charts-row">
-                        <div class="chart-card"><div class="chart-header"><h3>Call Outcomes</h3></div><div class="chart-container"><canvas id="outcomeChart"></canvas></div></div>
-                        <div class="chart-card"><div class="chart-header"><h3>Top Performers</h3></div><div class="table-container"><table><thead><tr><th>Worker</th><th>Calls</th><th>Talk Time</th></tr></thead><tbody>${topWorkers.map(w => `<tr><td>${w.name}</td><td>${w.calls}</td><td>${Math.floor(w.duration / 60)}min</td></tr>`).join('')}</tbody></table></div></div>
-                    </div>
+                    <div class="stats-grid"><div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-value">${callCenterCalls.length}</div><div class="stat-label">Total Calls</div></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-percent"></i></div><div class="stat-value">${callCenterCalls.length ? Math.round((outcomeCounts.Connected / callCenterCalls.length) * 100) : 0}%</div><div class="stat-label">Connect Rate</div></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">${Math.round(callCenterCalls.reduce((sum, c) => sum + (c.duration || 0), 0) / 60)}min</div><div class="stat-label">Total Talk Time</div></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-user-tie"></i></div><div class="stat-value">${Object.keys(workerStats).length}</div><div class="stat-label">Active Workers</div></div></div>
+                    <div class="charts-row"><div class="chart-card"><div class="chart-header"><h3>Call Outcomes</h3></div><div class="chart-container"><canvas id="outcomeChart"></canvas></div></div><div class="chart-card"><div class="chart-header"><h3>Top Performers</h3></div><div class="table-container"> <thead> <th>Worker</th><th>Calls</th><th>Talk Time</th> </thead><tbody>${topWorkers.map(w => ` <tr><td>${w.name}</td><td>${w.calls}</td><td>${Math.floor(w.duration / 60)}min</td></tr>`).join('')}</tbody> </div></div></div>
                 `;
             }
 
             function renderMovies() {
                 return `<div class="top-bar"><div class="page-title"><h1>Movies</h1><p>Manage your movie catalog</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
                 <div class="section-header"><h2>All Movies (${movies.length})</h2><button class="btn-primary" onclick="alert('Add movie coming soon')"><i class="fas fa-plus"></i> Add Movie</button></div>
-                <div class="table-container"><table><thead><tr><th>Title</th><th>Category</th><th>Genre</th><th>Year</th><th>Duration</th></tr></thead><tbody>${movies.map(m => `<tr><td>${m.title}</td><td>${m.category}</td><td>${m.genre || 'N/A'}</td><td>${m.year}</td><td>${m.duration}</td></tr>`).join('')}</tbody></table></div>`;
+                <div class="table-container"> <thead> <th>Title</th><th>Category</th><th>Genre</th><th>Year</th><th>Duration</th> </thead><tbody>${movies.map(m => ` <tr><td>${m.title}</td><td>${m.category}</td><td>${m.genre || 'N/A'}</td><td>${m.year}</td><td>${m.duration}</td></tr>`).join('')}</tbody> </div>`;
             }
 
             function renderSeries() {
                 const series = movies.filter(m => m.type === 'series');
                 return `<div class="top-bar"><div class="page-title"><h1>Series</h1><p>Manage your TV series</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
                 <div class="section-header"><h2>All Series (${series.length})</h2><button class="btn-primary" onclick="alert('Add series coming soon')"><i class="fas fa-plus"></i> Add Series</button></div>
-                <div class="table-container"><table><thead><tr><th>Title</th><th>Category</th><th>Genre</th><th>Year</th><th>Seasons</th></tr></thead><tbody>${series.map(s => `<tr><td>${s.title}</td><td>${s.category}</td><td>${s.genre || 'N/A'}</td><td>${s.year}</td><td>${s.seasons || 1}</td></tr>`).join('')}</tbody></table></div>`;
+                <div class="table-container"> <thead> <th>Title</th><th>Category</th><th>Genre</th><th>Year</th><th>Seasons</th> </thead><tbody>${series.map(s => ` <tr><td>${s.title}</td><td>${s.category}</td><td>${s.genre || 'N/A'}</td><td>${s.year}</td><td>${s.seasons || 1}</td></tr>`).join('')}</tbody> </div>`;
             }
 
             function renderGenres() {
@@ -1305,11 +1356,10 @@
                 ];
                 return `<div class="top-bar"><div class="page-title"><h1>User Profiles</h1><p>Manage user accounts</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
                 <div class="section-header"><h2>All Profiles (${profiles.length})</h2><button class="btn-primary" onclick="alert('Add profile coming soon')"><i class="fas fa-plus"></i> Add Profile</button></div>
-                <div class="table-container"><table><thead><tr><th>Avatar</th><th>Username</th><th>Email</th><th>Language</th><th>Kid Friendly</th></tr></thead><tbody>${profiles.map(p => `<tr><td style="font-size:1.5rem">${p.avatar}</td><td>${p.username}</td><td>${p.email}</td><td>${p.language}</td><td>${p.kidFriendly ? '✅' : '❌'}</td></tr>`).join('')}</tbody></table></div>`;
+                <div class="table-container"> <thead> <th>Avatar</th><th>Username</th><th>Email</th><th>Language</th><th>Kid Friendly</th> </thead><tbody>${profiles.map(p => ` <tr><td style="font-size:1.5rem">${p.avatar}</td><td>${p.username}</td><td>${p.email}</td><td>${p.language}</td><td>${p.kidFriendly ? '✅' : '❌'}</td></tr>`).join('')}</tbody> </div>`;
             }
 
             function renderRatings() {
-                const ratings = [];
                 return `<div class="top-bar"><div class="page-title"><h1>Ratings</h1><p>View user ratings analytics</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
                 <div class="stats-grid"><div class="stat-card"><div class="stat-icon"><i class="fas fa-star"></i></div><div class="stat-value">0</div><div class="stat-label">Total Ratings</div></div></div>
                 <div class="chart-card"><div class="chart-header"><h3>Rating Distribution</h3></div><div class="chart-container"><canvas id="ratingsDistChart"></canvas></div></div>`;
@@ -1335,7 +1385,7 @@
             function renderLanguages() {
                 return `<div class="top-bar"><div class="page-title"><h1>Languages</h1><p>Manage multilingual support</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
                 <div class="section-header"><h2>Available Languages (${languages.length})</h2><button class="btn-primary" onclick="alert('Add language coming soon')"><i class="fas fa-plus"></i> Add Language</button></div>
-                <div class="table-container"><table><thead><tr><th>Code</th><th>Language</th><th>Native Name</th><th>Status</th></tr></thead><tbody>${languages.map(l => `<tr><td><strong>${l.code}</strong></td><td>${l.name}</td><td>${l.native}</td><td><span class="status-badge active">Active</span></td></tr>`).join('')}</tbody></table></div>`;
+                <div class="table-container"> <thead> <th>Code</th><th>Language</th><th>Native Name</th><th>Status</th> </thead><tbody>${languages.map(l => ` <tr><td><strong>${l.code}</strong></td><td>${l.name}</td><td>${l.native}   <span class="status-badge active">Active</span>  `).join('')}</tbody> </div>`;
             }
 
             function renderAnalytics() {

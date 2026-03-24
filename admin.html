@@ -38,6 +38,7 @@
             overflow-x: hidden;
         }
 
+        /* Simple Enter Page */
         .enter-container {
             position: fixed;
             top: 0;
@@ -101,6 +102,7 @@
             margin-right: 10px;
         }
 
+        /* ===== SIDEBAR ===== */
         .sidebar {
             width: 280px;
             background: var(--darker);
@@ -179,6 +181,7 @@
             letter-spacing: 1px;
         }
 
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             flex: 1;
             margin-left: 280px;
@@ -187,6 +190,7 @@
             padding: 30px 40px;
         }
 
+        /* ===== TOP BAR ===== */
         .top-bar {
             display: flex;
             align-items: center;
@@ -242,6 +246,7 @@
             color: var(--gray);
         }
 
+        /* ===== GLOBAL LOADING OVERLAY ===== */
         .global-loading-overlay {
             display: none;
             position: fixed;
@@ -271,11 +276,24 @@
             margin-bottom: 20px;
         }
 
+        .global-loading-text {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .global-loading-text i {
+            color: #ffc107;
+            margin: 0 5px;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
+        /* ===== STATS CARDS ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -296,6 +314,19 @@
         .stat-card:hover {
             transform: translateY(-5px);
             border-color: var(--primary);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: var(--primary);
+            opacity: 0.03;
+            border-radius: 50%;
+            transform: translate(30px, -30px);
         }
 
         .stat-icon {
@@ -322,6 +353,27 @@
             font-size: 0.9rem;
         }
 
+        .stat-change {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .stat-change.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        /* ===== CHARTS SECTION ===== */
         .charts-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -348,11 +400,22 @@
             font-weight: 600;
         }
 
+        .chart-header select {
+            background: var(--dark);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            outline: none;
+        }
+
         .chart-container {
             height: 300px;
             position: relative;
         }
 
+        /* ===== TABLES SECTION ===== */
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -367,7 +430,7 @@
             font-weight: 600;
         }
 
-        .btn-primary, .btn-secondary, .btn-success, .btn-warning, .btn-info, .btn-danger {
+        .btn-primary, .btn-secondary, .btn-success, .btn-warning, .btn-info {
             border: none;
             padding: 12px 25px;
             border-radius: 12px;
@@ -390,18 +453,33 @@
             transform: scale(1.02);
         }
 
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-secondary:hover {
+            background: #2a3a55;
+        }
+
         .btn-success {
             background: var(--success);
             color: white;
         }
 
-        .btn-danger {
-            background: var(--danger);
+        .btn-warning {
+            background: var(--warning);
             color: white;
         }
 
-        .btn-warning {
-            background: var(--warning);
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
             color: white;
         }
 
@@ -438,6 +516,14 @@
             background: rgba(255,255,255,0.02);
         }
 
+        .movie-thumb {
+            width: 50px;
+            height: 30px;
+            border-radius: 6px;
+            background-size: cover;
+            background-position: center;
+        }
+
         .status-badge {
             padding: 5px 12px;
             border-radius: 30px;
@@ -447,12 +533,27 @@
         }
 
         .status-badge.active {
-            background: rgba(16, 185, 129, 0.2);
+            background: rgba(16, 185, 129, 0.1);
             color: var(--success);
         }
 
+        .status-badge.inactive {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .status-badge.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
         .status-badge.pending {
-            background: rgba(245, 158, 11, 0.2);
+            background: rgba(245, 158, 11, 0.1);
             color: var(--warning);
         }
 
@@ -485,11 +586,17 @@
             border-color: var(--danger);
         }
 
+        .action-btn.warning:hover {
+            background: var(--warning);
+            border-color: var(--warning);
+        }
+
         .action-btn.success:hover {
             background: var(--success);
             border-color: var(--success);
         }
 
+        /* ===== SCROLLABLE MODAL ===== */
         .modal {
             display: none;
             position: fixed;
@@ -499,7 +606,7 @@
             height: 100%;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             z-index: 1000;
             overflow-y: auto;
@@ -514,11 +621,13 @@
             background: var(--darker);
             border-radius: 30px;
             padding: 40px;
-            width: 500px;
+            width: 600px;
             max-width: 90vw;
             border: 2px solid var(--primary);
             position: relative;
             margin: auto;
+            max-height: none;
+            overflow-y: visible;
         }
 
         .modal-close {
@@ -535,6 +644,12 @@
             color: var(--danger);
         }
 
+        .modal h2 {
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            padding-right: 40px;
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
@@ -548,17 +663,25 @@
 
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             background: var(--dark);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             color: white;
             font-size: 1rem;
             outline: none;
+            transition: border 0.2s;
         }
 
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             border-color: var(--primary);
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+            min-height: 80px;
+            max-height: 300px;
         }
 
         .form-row {
@@ -577,6 +700,32 @@
             flex: 1;
         }
 
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 8px 20px;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ===== NOTIFICATION ===== */
         .notification {
             position: fixed;
             bottom: 30px;
@@ -600,27 +749,70 @@
             background: var(--danger);
         }
 
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.warning {
+            background: var(--warning);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 width: 80px;
             }
+            
             .sidebar .logo, .sidebar .sub, .nav-item span, .nav-section-title {
                 display: none;
             }
+            
             .main-content {
                 margin-left: 80px;
                 padding: 20px;
             }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 14px;
+            }
+            
+            .nav-item i {
+                margin: 0;
+            }
+            
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            .charts-row {
+            
+            .top-bar {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .modal-content {
+                padding: 30px 20px;
+            }
+            
+            .form-row {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
+    <!-- SIMPLE ENTER PAGE (NO LOGIN REQUIRED) -->
     <div class="enter-container" id="enterContainer">
         <div class="enter-box">
             <div class="enter-logo">BTFF</div>
@@ -628,19 +820,25 @@
             <button class="enter-btn" onclick="enterDashboard()">
                 <i class="fas fa-sign-in-alt"></i> Enter Dashboard
             </button>
+            <div style="text-align: center; margin-top: 20px; color: var(--gray); font-size: 0.85rem;">
+                <i class="fas fa-shield-alt"></i> Development Mode - No Authentication
+            </div>
         </div>
     </div>
 
+    <!-- SIDEBAR (hidden initially) -->
     <div class="sidebar" id="sidebar" style="display: none;">
         <div class="sidebar-header">
             <div class="logo">BTFF</div>
             <div class="sub">admin dashboard</div>
         </div>
+        
         <div class="sidebar-nav">
             <div class="nav-item active" data-view="dashboard">
                 <i class="fas fa-chart-pie"></i>
                 <span>Dashboard</span>
             </div>
+            
             <div class="nav-section-title">CONTENT</div>
             <div class="nav-item" data-view="movies">
                 <i class="fas fa-film"></i>
@@ -650,6 +848,12 @@
                 <i class="fas fa-tv"></i>
                 <span>Series</span>
             </div>
+            <div class="nav-item" data-view="genres">
+                <i class="fas fa-tags"></i>
+                <span>Genres</span>
+            </div>
+            
+            <!-- ADDED CALL CENTER SECTION -->
             <div class="nav-section-title">CALL CENTER</div>
             <div class="nav-item" data-view="callcenter-workers">
                 <i class="fas fa-users"></i>
@@ -665,14 +869,47 @@
             </div>
             <div class="nav-item" data-view="callcenter-analytics">
                 <i class="fas fa-chart-line"></i>
+                <span>Call Analytics</span>
+            </div>
+            
+            <div class="nav-section-title">USERS & SOCIAL</div>
+            <div class="nav-item" data-view="profiles">
+                <i class="fas fa-id-card"></i>
+                <span>User Profiles</span>
+            </div>
+            <div class="nav-item" data-view="ratings">
+                <i class="fas fa-star"></i>
+                <span>Ratings</span>
+            </div>
+            <div class="nav-item" data-view="comments">
+                <i class="fas fa-comments"></i>
+                <span>Comments</span>
+            </div>
+            <div class="nav-item" data-view="watch-history">
+                <i class="fas fa-clock"></i>
+                <span>Watch History</span>
+            </div>
+            
+            <div class="nav-section-title">SYSTEM</div>
+            <div class="nav-item" data-view="notifications">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+            </div>
+            <div class="nav-item" data-view="languages">
+                <i class="fas fa-language"></i>
+                <span>Languages</span>
+            </div>
+            <div class="nav-item" data-view="analytics">
+                <i class="fas fa-chart-line"></i>
                 <span>Analytics</span>
             </div>
-            <div class="nav-section-title">SYSTEM</div>
             <div class="nav-item" data-view="settings">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </div>
+            
             <div class="nav-divider"></div>
+            
             <div class="nav-item" id="logoutBtn" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Exit Admin</span>
@@ -680,15 +917,209 @@
         </div>
     </div>
 
-    <div class="main-content" id="mainContent" style="display: none;"></div>
-
-    <div class="notification" id="notification">Action completed successfully</div>
-    <div class="global-loading-overlay" id="globalLoadingOverlay">
-        <div class="global-loading-spinner"></div>
-        <div class="global-loading-text">Loading...</div>
+    <!-- MAIN CONTENT (hidden initially) -->
+    <div class="main-content" id="mainContent" style="display: none;">
+        <!-- Dynamic content will be loaded here -->
     </div>
 
-    <!-- Add Client Modal -->
+    <!-- ADD/EDIT MOVIE MODAL -->
+    <div class="modal" id="movieModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeMovieModal">&times;</span>
+            <h2 id="movieModalTitle">Add New Movie</h2>
+            <form id="movieForm">
+                <input type="hidden" id="movieId">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="movieTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>YouTube ID</label>
+                    <input type="text" id="movieYoutubeId" required placeholder="e.g., vgWyjYBvsUk">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="movieCategory">
+                            <option value="trending">Trending</option>
+                            <option value="popular">Popular</option>
+                            <option value="recent">Recent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Genre</label>
+                        <select id="movieGenre">
+                            <option value="Action">Action</option>
+                            <option value="Adventure">Adventure</option>
+                            <option value="Comedy">Comedy</option>
+                            <option value="Drama">Drama</option>
+                            <option value="Horror">Horror</option>
+                            <option value="Sci-Fi">Sci-Fi</option>
+                            <option value="Thriller">Thriller</option>
+                            <option value="Romance">Romance</option>
+                            <option value="Documentary">Documentary</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Year</label>
+                        <input type="text" id="movieYear" placeholder="2024">
+                    </div>
+                    <div class="form-group">
+                        <label>Duration</label>
+                        <input type="text" id="movieDuration" placeholder="1h 58m">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="movieDescription" placeholder="Movie description..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Release Date</label>
+                        <input type="date" id="movieReleaseDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="movieType">
+                            <option value="movie">Movie</option>
+                            <option value="series">Series</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row" id="seriesFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Seasons</label>
+                        <input type="number" id="movieSeasons" value="1" min="1" max="20">
+                    </div>
+                    <div class="form-group">
+                        <label>Episodes per Season</label>
+                        <input type="number" id="movieEpisodes" value="10" min="1" max="50">
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary" id="saveMovieBtn">Save Movie</button>
+                    <button type="button" class="btn-secondary" id="cancelMovieBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD USER PROFILE MODAL -->
+    <div class="modal" id="userProfileModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeUserProfileModal">&times;</span>
+            <h2>Add User Profile</h2>
+            <form id="userProfileForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="profileUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="profileEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Avatar</label>
+                    <select id="profileAvatar">
+                        <option value="👤">👤 Guest</option>
+                        <option value="👑">👑 Admin</option>
+                        <option value="👨‍👩‍👧‍👦">👨‍👩‍👧‍👦 Family</option>
+                        <option value="🧸">🧸 Kids</option>
+                        <option value="🎬">🎬 Movie Fan</option>
+                        <option value="🎮">🎮 Gamer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Language Preference</label>
+                    <select id="profileLanguage">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="it">Italiano</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><input type="checkbox" id="profileKidFriendly"> Kid Friendly Mode</label>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary">Save Profile</button>
+                    <button type="button" class="btn-secondary" id="cancelUserProfileBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD NOTIFICATION MODAL -->
+    <div class="modal" id="notificationModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeNotificationModal">&times;</span>
+            <h2>Send Notification</h2>
+            <form id="notificationForm">
+                <div class="form-group">
+                    <label>User</label>
+                    <select id="notificationUser">
+                        <option value="all">All Users</option>
+                        <option value="guest">Guest</option>
+                        <option value="admin">Admin</option>
+                        <option value="family">Family</option>
+                        <option value="kids">Kids</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="notificationMessage" required placeholder="Enter notification message..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="notificationType">
+                        <option value="info">Info</option>
+                        <option value="success">Success</option>
+                        <option value="warning">Warning</option>
+                        <option value="error">Error</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary">Send</button>
+                    <button type="button" class="btn-secondary" id="cancelNotificationBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD LANGUAGE MODAL -->
+    <div class="modal" id="languageModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeLanguageModal">&times;</span>
+            <h2>Add Language</h2>
+            <form id="languageForm">
+                <div class="form-group">
+                    <label>Language Code</label>
+                    <input type="text" id="languageCode" placeholder="en" required>
+                </div>
+                <div class="form-group">
+                    <label>Language Name</label>
+                    <input type="text" id="languageName" placeholder="English" required>
+                </div>
+                <div class="form-group">
+                    <label>Native Name</label>
+                    <input type="text" id="languageNative" placeholder="English">
+                </div>
+                <div class="form-group">
+                    <label>Translations (JSON)</label>
+                    <textarea id="languageTranslations" placeholder='{"featured": "FEATURED", "watchTrailer": "WATCH TRAILER"}'></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary">Save Language</button>
+                    <button type="button" class="btn-secondary" id="cancelLanguageBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD CLIENT MODAL (NEW) -->
     <div class="modal" id="addClientModal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('addClientModal')">&times;</span>
@@ -732,451 +1163,1767 @@
         </div>
     </div>
 
+    <!-- NOTIFICATION -->
+    <div class="notification" id="notification">Action completed successfully</div>
+
+    <!-- GLOBAL LOADING OVERLAY -->
+    <div class="global-loading-overlay" id="globalLoadingOverlay">
+        <div class="global-loading-spinner"></div>
+        <div class="global-loading-text">
+            <i class="fas fa-cog fa-spin"></i> Loading... <i class="fas fa-cog fa-spin"></i>
+        </div>
+    </div>
+
     <script>
-        const APPS_SCRIPT_URL = '%%APPS_SCRIPT_URL%%';
-        
-        let currentView = 'dashboard';
-        let movies = [];
-        let callCenterWorkers = [];
-        let callCenterClients = [];
-        let callCenterCalls = [];
+        (function() {
+            // ========== CONFIGURATION ==========
+            const APPS_SCRIPT_URL = '%%APPS_SCRIPT_URL%%';
+            
+            // ========== GLOBAL LOADING ==========
+            const globalLoadingOverlay = document.getElementById('globalLoadingOverlay');
+            let loadingTimeout = null;
 
-        function showNotification(msg, type = 'success') {
-            const notif = document.getElementById('notification');
-            notif.textContent = msg;
-            notif.className = 'notification ' + type;
-            notif.classList.add('show');
-            setTimeout(() => notif.classList.remove('show'), 3000);
-        }
-
-        function showLoading(show, message = 'Loading...') {
-            const overlay = document.getElementById('globalLoadingOverlay');
-            if (show) {
-                overlay.querySelector('.global-loading-text').textContent = message;
-                overlay.classList.add('active');
-            } else {
-                overlay.classList.remove('active');
-            }
-        }
-
-        async function apiCall(action, data = {}, method = 'GET') {
-            try {
-                let url = `/api/proxy?action=${action}&t=${Date.now()}`;
-                if (method === 'GET') {
-                    Object.keys(data).forEach(key => url += `&${key}=${encodeURIComponent(data[key])}`);
+            function showGlobalLoading(message = 'Loading...') {
+                const loadingText = document.querySelector('.global-loading-text');
+                if (loadingText) {
+                    loadingText.innerHTML = `<i class="fas fa-cog fa-spin"></i> ${message} <i class="fas fa-cog fa-spin"></i>`;
                 }
-                const options = { method, headers: { 'Content-Type': 'application/json' } };
-                if (method === 'POST') options.body = JSON.stringify(data);
-                const response = await fetch(url, options);
-                return await response.json();
-            } catch (error) {
-                return { success: false, error: error.message };
+                globalLoadingOverlay.classList.add('active');
+                
+                if (loadingTimeout) clearTimeout(loadingTimeout);
+                loadingTimeout = setTimeout(() => {
+                    hideGlobalLoading();
+                }, 30000);
             }
-        }
 
-        async function fetchMovies() {
-            const result = await apiCall('getMovies');
-            if (result.success) movies = result.movies || [];
-            return movies;
-        }
-
-        async function fetchCallCenterWorkers() {
-            const result = await apiCall('getCallCenterAllWorkers');
-            if (result.success) callCenterWorkers = result.workers || [];
-            return callCenterWorkers;
-        }
-
-        async function fetchCallCenterClients() {
-            const result = await apiCall('getCallCenterAllClients');
-            if (result.success) callCenterClients = result.clients || [];
-            return callCenterClients;
-        }
-
-        async function fetchCallCenterCalls() {
-            const result = await apiCall('getCallCenterAllCalls');
-            if (result.success) callCenterCalls = result.calls || [];
-            return callCenterCalls;
-        }
-
-        async function approveWorker(email) {
-            showLoading(true, 'Approving worker...');
-            const result = await apiCall('approveCallCenterWorker', { email }, 'POST');
-            showLoading(false);
-            if (result.success) {
-                showNotification('Worker approved successfully');
-                await renderView(currentView);
-            } else {
-                showNotification(result.error || 'Failed to approve', 'error');
+            function hideGlobalLoading() {
+                globalLoadingOverlay.classList.remove('active');
+                if (loadingTimeout) {
+                    clearTimeout(loadingTimeout);
+                    loadingTimeout = null;
+                }
             }
-        }
+            
+            // ========== STATE ==========
+            let movies = [];
+            let ratings = [];
+            let watchHistory = [];
+            let comments = [];
+            let notifications = [];
+            let users = [];
+            let profiles = [];
+            let languages = [
+                { code: 'en', name: 'English', native: 'English', translations: {} },
+                { code: 'es', name: 'Spanish', native: 'Español', translations: {} },
+                { code: 'fr', name: 'French', native: 'Français', translations: {} }
+            ];
+            let currentView = 'dashboard';
+            let charts = {};
+            
+            // ADDED CALL CENTER STATE
+            let callCenterWorkers = [];
+            let callCenterClients = [];
+            let callCenterCalls = [];
 
-        async function deleteWorker(email) {
-            if (!confirm('Are you sure you want to delete this worker?')) return;
-            showLoading(true, 'Deleting worker...');
-            const result = await apiCall('deleteCallCenterWorker', { email }, 'POST');
-            showLoading(false);
-            if (result.success) {
-                showNotification('Worker deleted successfully');
-                await renderView(currentView);
-            } else {
-                showNotification(result.error || 'Failed to delete', 'error');
-            }
-        }
+            // DOM elements
+            const enterContainer = document.getElementById('enterContainer');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const navItems = document.querySelectorAll('.nav-item');
+            const movieModal = document.getElementById('movieModal');
+            const userProfileModal = document.getElementById('userProfileModal');
+            const notificationModal = document.getElementById('notificationModal');
+            const languageModal = document.getElementById('languageModal');
+            const closeMovieModal = document.getElementById('closeMovieModal');
+            const closeUserProfileModal = document.getElementById('closeUserProfileModal');
+            const closeNotificationModal = document.getElementById('closeNotificationModal');
+            const closeLanguageModal = document.getElementById('closeLanguageModal');
+            const cancelMovieBtn = document.getElementById('cancelMovieBtn');
+            const cancelUserProfileBtn = document.getElementById('cancelUserProfileBtn');
+            const cancelNotificationBtn = document.getElementById('cancelNotificationBtn');
+            const cancelLanguageBtn = document.getElementById('cancelLanguageBtn');
+            const movieForm = document.getElementById('movieForm');
+            const userProfileForm = document.getElementById('userProfileForm');
+            const notificationForm = document.getElementById('notificationForm');
+            const languageForm = document.getElementById('languageForm');
+            const notification = document.getElementById('notification');
 
-        async function addClient(clientData) {
-            showLoading(true, 'Adding client...');
-            const result = await apiCall('addCallCenterClient', clientData, 'POST');
-            showLoading(false);
-            if (result.success) {
-                showNotification('Client added successfully');
-                closeModal('addClientModal');
-                await renderView(currentView);
-            } else {
-                showNotification(result.error || 'Failed to add client', 'error');
-            }
-        }
-
-        async function deleteClient(phoneNumber) {
-            if (!confirm('Are you sure you want to delete this client?')) return;
-            showLoading(true, 'Deleting client...');
-            const result = await apiCall('deleteCallCenterClient', { phoneNumber }, 'POST');
-            showLoading(false);
-            if (result.success) {
-                showNotification('Client deleted successfully');
-                await renderView(currentView);
-            } else {
-                showNotification(result.error || 'Failed to delete', 'error');
-            }
-        }
-
-        function openAddClientModal() {
-            document.getElementById('addClientForm').reset();
-            document.getElementById('addClientModal').classList.add('active');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        document.getElementById('addClientForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const clientData = {
-                phoneNumber: document.getElementById('clientPhone').value,
-                fullName: document.getElementById('clientFullName').value,
-                country: document.getElementById('clientCountry').value,
-                state: document.getElementById('clientState').value,
-                city: document.getElementById('clientCity').value,
-                dateOfBirth: document.getElementById('clientDOB').value,
-                callScript: document.getElementById('clientCallScript').value
+            // ========== ENTER DASHBOARD (NO AUTH) ==========
+            window.enterDashboard = function() {
+                console.log('Entering dashboard...');
+                enterContainer.style.display = 'none';
+                sidebar.style.display = 'block';
+                mainContent.style.display = 'block';
+                
+                // Set a fake admin user for display
+                window.currentAdmin = {
+                    username: 'Admin',
+                    email: 'admin@btff.com'
+                };
+                
+                updateAdminProfile();
+                updateActiveNavItem('dashboard');
+                renderView('dashboard');
+                showNotification('Welcome to Admin Dashboard');
             };
-            await addClient(clientData);
-        });
 
-        function renderCallCenterWorkers() {
-            const pendingWorkers = callCenterWorkers.filter(w => w.status === 'Pending');
-            const activeWorkers = callCenterWorkers.filter(w => w.status === 'Active');
-            
-            return `
-                <div class="top-bar">
-                    <div class="page-title">
-                        <h1>Call Center Workers</h1>
-                        <p>Manage worker registrations and approvals</p>
-                    </div>
-                    <div class="admin-profile">
-                        <div class="admin-info"><h4>Admin</h4><p>Administrator</p></div>
-                        <div class="admin-avatar">AD</div>
-                    </div>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
-                        <div class="stat-value">${pendingWorkers.length}</div>
-                        <div class="stat-label">Pending Approvals</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-users"></i></div>
-                        <div class="stat-value">${activeWorkers.length}</div>
-                        <div class="stat-label">Active Workers</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-phone-alt"></i></div>
-                        <div class="stat-value">${callCenterWorkers.reduce((sum, w) => sum + (w.totalCalls || 0), 0)}</div>
-                        <div class="stat-label">Total Calls Made</div>
-                    </div>
-                </div>
-                
-                <div class="section-header"><h2>Pending Approvals</h2></div>
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Country</th><th>Registered</th><th>Actions</th></tr></thead>
-                        <tbody>${pendingWorkers.map(w => `
-                            <tr>
-                                <td>${w.fullName || 'N/A'}</td>
-                                <td>${w.email}</td>
-                                <td>${w.phoneNumber || 'N/A'}</td>
-                                <td>${w.country || 'N/A'}</td>
-                                <td>${w.registrationDate ? new Date(w.registrationDate).toLocaleDateString() : 'N/A'}</td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="action-btn success" onclick="approveWorker('${w.email}')" title="Approve"><i class="fas fa-check"></i></button>
-                                        <button class="action-btn delete" onclick="deleteWorker('${w.email}')" title="Delete"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}</tbody>
-                        ${pendingWorkers.length === 0 ? '<tr><td colspan="6" style="text-align:center">No pending approvals</td></tr>' : ''}
-                    </table>
-                </div>
-                
-                <div class="section-header"><h2>Active Workers</h2></div>
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Country</th><th>Total Calls</th><th>Last Active</th><th>Actions</th></tr></thead>
-                        <tbody>${activeWorkers.map(w => `
-                            <tr>
-                                <td>${w.fullName || 'N/A'}</td>
-                                <td>${w.email}</td>
-                                <td>${w.phoneNumber || 'N/A'}</td>
-                                <td>${w.country || 'N/A'}</td>
-                                <td>${w.totalCalls || 0}</td>
-                                <td>${w.lastActive ? new Date(w.lastActive).toLocaleDateString() : 'Never'}</td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="action-btn delete" onclick="deleteWorker('${w.email}')" title="Delete"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}</tbody>
-                    </table>
-                </div>
-            `;
-        }
+            window.logout = function() {
+                enterContainer.style.display = 'flex';
+                sidebar.style.display = 'none';
+                mainContent.style.display = 'none';
+            };
 
-        function renderCallCenterClients() {
-            return `
-                <div class="top-bar">
-                    <div class="page-title">
-                        <h1>Call Center Clients</h1>
-                        <p>Manage client database</p>
-                    </div>
-                    <div class="admin-profile">
-                        <div class="admin-info"><h4>Admin</h4><p>Administrator</p></div>
-                        <div class="admin-avatar">AD</div>
-                    </div>
-                </div>
+            // ========== API HELPER ==========
+            async function apiCall(action, data = {}, method = 'GET', showLoading = true) {
+                if (showLoading) {
+                    showGlobalLoading('Connecting...');
+                }
                 
-                <div class="section-header">
-                    <h2>All Clients (${callCenterClients.length})</h2>
-                    <button class="btn-primary" onclick="openAddClientModal()"><i class="fas fa-plus"></i> Add Client</button>
-                </div>
-                
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Phone</th><th>Name</th><th>Country</th><th>State</th><th>City</th><th>Total Calls</th><th>Last Called</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody>${callCenterClients.map(c => `
-                            <tr>
-                                <td>${c.phoneNumber}</td>
-                                <td>${c.fullName || 'Unknown'}</td>
-                                <td>${c.country || 'N/A'}</td>
-                                <td>${c.state || 'N/A'}</td>
-                                <td>${c.city || 'N/A'}</td>
-                                <td>${c.totalCalls || 0}</td>
-                                <td>${c.lastCalled ? new Date(c.lastCalled).toLocaleDateString() : 'Never'}</td>
-                                <td><span class="status-badge ${c.callStatus === 'Pending' ? 'pending' : 'active'}">${c.callStatus || 'Pending'}</span></td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button class="action-btn delete" onclick="deleteClient('${c.phoneNumber}')" title="Delete"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}</tbody>
-                        ${callCenterClients.length === 0 ? '<tr><td colspan="9" style="text-align:center">No clients found</td></tr>' : ''}
-                    </table>
-                </div>
-            `;
-        }
-
-        function renderCallCenterCalls() {
-            const recentCalls = [...callCenterCalls].sort((a,b) => new Date(b.callDate) - new Date(a.callDate)).slice(0, 50);
-            const outcomeCounts = { Connected: 0, Missed: 0, 'Hanged Up': 0, Voicemail: 0 };
-            recentCalls.forEach(c => { if (outcomeCounts[c.outcome] !== undefined) outcomeCounts[c.outcome]++; });
-            
-            return `
-                <div class="top-bar">
-                    <div class="page-title">
-                        <h1>Call Logs</h1>
-                        <p>View all call history</p>
-                    </div>
-                    <div class="admin-profile">
-                        <div class="admin-info"><h4>Admin</h4><p>Administrator</p></div>
-                        <div class="admin-avatar">AD</div>
-                    </div>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-phone"></i></div><div class="stat-value">${callCenterCalls.length}</div><div class="stat-label">Total Calls</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value">${outcomeCounts.Connected}</div><div class="stat-label">Connected</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-phone-slash"></i></div><div class="stat-value">${outcomeCounts.Missed}</div><div class="stat-label">Missed</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">${Math.round(recentCalls.reduce((sum, c) => sum + (c.duration || 0), 0) / 60)}min</div><div class="stat-label">Total Talk Time</div></div>
-                </div>
-                
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Date & Time</th><th>Worker</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th> </thead>
-                        <tbody>${recentCalls.map(c => `
-                            <tr>
-                                <td>${new Date(c.callDate).toLocaleString()}</td>
-                                <td>${c.workerEmail?.split('@')[0] || 'Unknown'}</td>
-                                <td>${c.clientName || 'Unknown'}</td>
-                                <td>${c.clientPhone}</td>
-                                <td>${Math.floor(c.duration / 60)}:${(c.duration % 60).toString().padStart(2,'0')}</td>
-                                <td><span class="status-badge ${c.outcome === 'Connected' ? 'active' : 'pending'}">${c.outcome}</span></td>
-                                <td>${c.remarks?.substring(0, 50) || ''}${c.remarks?.length > 50 ? '...' : ''}</td>
-                             </tr>
-                        `).join('')}</tbody>
-                        ${recentCalls.length === 0 ? '<tr><td colspan="7" style="text-align:center">No calls recorded</td></tr>' : ''}
-                    </table>
-                </div>
-            `;
-        }
-
-        function renderCallCenterAnalytics() {
-            const outcomeCounts = { Connected: 0, Missed: 0, 'Hanged Up': 0, Voicemail: 0 };
-            callCenterCalls.forEach(c => { if (outcomeCounts[c.outcome] !== undefined) outcomeCounts[c.outcome]++; });
-            
-            const workerStats = {};
-            callCenterCalls.forEach(c => {
-                if (!workerStats[c.workerEmail]) workerStats[c.workerEmail] = { name: c.workerEmail?.split('@')[0] || c.workerEmail, calls: 0, duration: 0 };
-                workerStats[c.workerEmail].calls++;
-                workerStats[c.workerEmail].duration += c.duration || 0;
-            });
-            const topWorkers = Object.values(workerStats).sort((a,b) => b.calls - a.calls).slice(0, 5);
-            
-            return `
-                <div class="top-bar">
-                    <div class="page-title">
-                        <h1>Call Analytics</h1>
-                        <p>Performance metrics and insights</p>
-                    </div>
-                    <div class="admin-profile">
-                        <div class="admin-info"><h4>Admin</h4><p>Administrator</p></div>
-                        <div class="admin-avatar">AD</div>
-                    </div>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-value">${callCenterCalls.length}</div><div class="stat-label">Total Calls</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-percent"></i></div><div class="stat-value">${callCenterCalls.length ? Math.round((outcomeCounts.Connected / callCenterCalls.length) * 100) : 0}%</div><div class="stat-label">Connect Rate</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">${Math.round(callCenterCalls.reduce((sum, c) => sum + (c.duration || 0), 0) / 60)}min</div><div class="stat-label">Total Talk Time</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-tie"></i></div><div class="stat-value">${Object.keys(workerStats).length}</div><div class="stat-label">Active Workers</div></div>
-                </div>
-                
-                <div class="charts-row">
-                    <div class="chart-card"><div class="chart-header"><h3>Call Outcomes</h3></div><div class="chart-container"><canvas id="outcomeChart"></canvas></div></div>
-                    <div class="chart-card"><div class="chart-header"><h3>Top Performers</h3></div><div class="table-container" style="margin:0"><table><thead><tr><th>Worker</th><th>Calls</th><th>Talk Time</th></tr></thead><tbody>${topWorkers.map(w => `<tr><td>${w.name}</td><td>${w.calls}</td><td>${Math.floor(w.duration / 60)}min</td></tr>`).join('')}</tbody></table></div></div>
-                </div>
-            `;
-        }
-
-        async function renderView(view) {
-            currentView = view;
-            showLoading(true);
-            
-            await Promise.all([fetchMovies(), fetchCallCenterWorkers(), fetchCallCenterClients(), fetchCallCenterCalls()]);
-            
-            let html = '';
-            switch(view) {
-                case 'dashboard': html = renderDashboard(); break;
-                case 'movies': html = renderMovies(); break;
-                case 'series': html = renderSeries(); break;
-                case 'callcenter-workers': html = renderCallCenterWorkers(); break;
-                case 'callcenter-clients': html = renderCallCenterClients(); break;
-                case 'callcenter-calls': html = renderCallCenterCalls(); break;
-                case 'callcenter-analytics': html = renderCallCenterAnalytics(); break;
-                default: html = renderDashboard();
-            }
-            
-            document.getElementById('mainContent').innerHTML = html;
-            
-            if (view === 'callcenter-analytics') {
-                setTimeout(() => {
-                    const ctx = document.getElementById('outcomeChart')?.getContext('2d');
-                    if (ctx) {
-                        new Chart(ctx, {
-                            type: 'doughnut',
-                            data: { labels: ['Connected', 'Missed', 'Hanged Up', 'Voicemail'], datasets: [{ data: [outcomeCounts.Connected, outcomeCounts.Missed, outcomeCounts['Hanged Up'], outcomeCounts.Voicemail], backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6'] }] },
-                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } } }
+                try {
+                    let url = `/api/proxy?action=${action}&t=${Date.now()}`;
+                    
+                    if (method === 'GET') {
+                        Object.keys(data).forEach(key => {
+                            url += `&${key}=${encodeURIComponent(data[key])}`;
                         });
+                    }
+                    
+                    const options = {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    };
+                    
+                    if (method === 'POST') {
+                        options.body = JSON.stringify(data);
+                    }
+                    
+                    const response = await fetch(url, options);
+                    const text = await response.text();
+                    
+                    if (showLoading) {
+                        hideGlobalLoading();
+                    }
+                    
+                    try {
+                        const result = JSON.parse(text);
+                        return result;
+                    } catch (e) {
+                        console.error('Invalid JSON response:', text);
+                        return { success: false, error: 'Invalid server response' };
+                    }
+                } catch (error) {
+                    console.error('API call failed:', error);
+                    if (showLoading) {
+                        hideGlobalLoading();
+                    }
+                    return { success: false, error: error.message };
+                }
+            }
+
+            // ========== UI HELPERS ==========
+            function showNotification(msg, type = 'success') {
+                notification.textContent = msg;
+                notification.className = 'notification ' + type;
+                notification.classList.add('show');
+                setTimeout(() => notification.classList.remove('show'), 3000);
+            }
+
+            function updateActiveNavItem(view) {
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.view === view) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            function updateAdminProfile() {
+                setTimeout(() => {
+                    const adminInfoName = document.querySelector('.admin-info h4');
+                    const adminInfoEmail = document.querySelector('.admin-info p');
+                    const adminAvatar = document.querySelector('.admin-avatar');
+                    
+                    if (adminInfoName) {
+                        adminInfoName.textContent = 'Admin';
+                    }
+                    if (adminInfoEmail) {
+                        adminInfoEmail.textContent = 'Administrator';
+                    }
+                    if (adminAvatar) {
+                        adminAvatar.textContent = 'AD';
                     }
                 }, 100);
             }
-            
-            showLoading(false);
-        }
 
-        function renderDashboard() {
-            const pendingWorkers = callCenterWorkers.filter(w => w.status === 'Pending').length;
-            const totalCalls = callCenterCalls.length;
-            const recentMovies = movies.slice(0, 5);
-            
-            return `
-                <div class="top-bar"><div class="page-title"><h1>Dashboard</h1><p>Welcome back, Admin</p></div><div class="admin-profile"><div class="admin-info"><h4>Admin</h4><p>Administrator</p></div><div class="admin-avatar">AD</div></div></div>
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-film"></i></div><div class="stat-value">${movies.length}</div><div class="stat-label">Total Movies</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-phone-alt"></i></div><div class="stat-value">${totalCalls}</div><div class="stat-label">Total Calls</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-clock"></i></div><div class="stat-value">${pendingWorkers}</div><div class="stat-label">Pending Workers</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value">${callCenterWorkers.length}</div><div class="stat-label">Total Workers</div></div>
-                </div>
-                <div class="section-header"><h2>Recent Movies</h2><button class="btn-primary" onclick="document.querySelector('[data-view=\"movies\"]').click()"><i class="fas fa-plus"></i> View All</button></div>
-                <div class="table-container"><table><thead><tr><th>Title</th><th>Category</th><th>Year</th></tr></thead><tbody>${recentMovies.map(m => `<tr><td>${m.title}</td><td>${m.category}</td><td>${m.year}</td></tr>`).join('')}</tbody></table></div>
-            `;
-        }
+            // ========== DATA FETCHING ==========
+            async function fetchMovies() {
+                const result = await apiCall('getMovies', {}, 'GET', false);
+                if (result.success) {
+                    movies = result.movies || [];
+                }
+                return movies;
+            }
 
-        function renderMovies() {
-            return `<div class="top-bar"><div class="page-title"><h1>Movies</h1><p>Manage your movie catalog</p></div><div class="admin-profile"><div class="admin-info"><h4>Admin</h4><p>Administrator</p></div><div class="admin-avatar">AD</div></div></div>
-            <div class="section-header"><h2>All Movies (${movies.length})</h2><button class="btn-primary"><i class="fas fa-plus"></i> Add Movie</button></div>
-            <div class="table-container"><table><thead><tr><th>Title</th><th>Category</th><th>Genre</th><th>Year</th></tr></thead><tbody>${movies.map(m => `<tr><td>${m.title}</td><td>${m.category}</td><td>${m.genre}</td><td>${m.year}</td></tr>`).join('')}</tbody></table></div>`;
-        }
+            async function fetchRatings() {
+                const result = await apiCall('getRatings', {}, 'GET', false);
+                if (result.success) {
+                    ratings = result.ratings || [];
+                }
+                return ratings;
+            }
 
-        function renderSeries() {
-            const series = movies.filter(m => m.type === 'series');
-            return `<div class="top-bar"><div class="page-title"><h1>Series</h1><p>Manage your TV series</p></div><div class="admin-profile"><div class="admin-info"><h4>Admin</h4><p>Administrator</p></div><div class="admin-avatar">AD</div></div></div>
-            <div class="section-header"><h2>All Series (${series.length})</h2><button class="btn-primary"><i class="fas fa-plus"></i> Add Series</button></div>
-            <div class="table-container"><table><thead><tr><th>Title</th><th>Category</th><th>Year</th><th>Seasons</th></tr></thead><tbody>${series.map(s => `<tr><td>${s.title}</td><td>${s.category}</td><td>${s.year}</td><td>${s.seasons || 1}</td></tr>`).join('')}</tbody></table></div>`;
-        }
+            async function fetchComments() {
+                const result = await apiCall('getComments', { movieId: 'all' }, 'GET', false);
+                if (result.success) {
+                    comments = result.comments || [];
+                }
+                return comments;
+            }
 
-        function enterDashboard() {
-            document.getElementById('enterContainer').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'block';
-            document.getElementById('mainContent').style.display = 'block';
-            renderView('dashboard');
-        }
+            async function fetchWatchHistory() {
+                const result = await apiCall('getWatchHistory', { userId: 'all' }, 'GET', false);
+                if (result.success) {
+                    watchHistory = result.watchHistory || [];
+                }
+                return watchHistory;
+            }
 
-        function logout() {
-            document.getElementById('enterContainer').style.display = 'flex';
-            document.getElementById('sidebar').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'none';
-        }
+            async function fetchNotifications() {
+                const result = await apiCall('getNotifications', { userId: 'all' }, 'GET', false);
+                if (result.success) {
+                    notifications = result.notifications || [];
+                }
+                return notifications;
+            }
 
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const view = item.dataset.view;
-                if (view) {
-                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                    item.classList.add('active');
-                    renderView(view);
+            async function fetchUserProfiles() {
+                profiles = [
+                    { userId: 'guest', username: 'Guest User', email: 'guest@btff.com', avatar: '👤', language: 'en', kidFriendly: false, createdAt: '2024-01-01' },
+                    { userId: 'admin', username: 'Admin', email: 'admin@btff.com', avatar: '👑', language: 'en', kidFriendly: false, createdAt: '2024-01-01' },
+                    { userId: 'family', username: 'Family Account', email: 'family@btff.com', avatar: '👨‍👩‍👧‍👦', language: 'en', kidFriendly: false, createdAt: '2024-01-01' },
+                    { userId: 'kids', username: 'Kids Mode', email: 'kids@btff.com', avatar: '🧸', language: 'en', kidFriendly: true, createdAt: '2024-01-01' }
+                ];
+                return profiles;
+            }
+
+            // ========== ADDED CALL CENTER API FUNCTIONS ==========
+            async function fetchCallCenterWorkers() {
+                const result = await apiCall('getCallCenterAllWorkers', {}, 'GET', false);
+                if (result.success) {
+                    callCenterWorkers = result.workers || [];
+                }
+                return callCenterWorkers;
+            }
+
+            async function fetchCallCenterClients() {
+                const result = await apiCall('getCallCenterAllClients', {}, 'GET', false);
+                if (result.success) {
+                    callCenterClients = result.clients || [];
+                }
+                return callCenterClients;
+            }
+
+            async function fetchCallCenterCalls() {
+                const result = await apiCall('getCallCenterAllCalls', {}, 'GET', false);
+                if (result.success) {
+                    callCenterCalls = result.calls || [];
+                }
+                return callCenterCalls;
+            }
+
+            async function approveWorker(workerEmail) {
+                showGlobalLoading('Approving worker...');
+                const result = await apiCall('approveCallCenterWorker', { email: workerEmail }, 'POST', false);
+                if (result.success) {
+                    await fetchCallCenterWorkers();
+                    await renderView(currentView);
+                    hideGlobalLoading();
+                    showNotification('Worker approved successfully');
+                } else {
+                    hideGlobalLoading();
+                    showNotification(result.error || 'Failed to approve', 'error');
+                }
+                return result.success;
+            }
+
+            async function deleteWorker(workerEmail) {
+                if (!confirm('Are you sure you want to delete this worker?')) return false;
+                showGlobalLoading('Deleting worker...');
+                const result = await apiCall('deleteCallCenterWorker', { email: workerEmail }, 'POST', false);
+                if (result.success) {
+                    await fetchCallCenterWorkers();
+                    await renderView(currentView);
+                    hideGlobalLoading();
+                    showNotification('Worker deleted successfully');
+                } else {
+                    hideGlobalLoading();
+                    showNotification(result.error || 'Failed to delete', 'error');
+                }
+                return result.success;
+            }
+
+            async function addClient(clientData) {
+                showGlobalLoading('Adding client...');
+                const result = await apiCall('addCallCenterClient', clientData, 'POST', false);
+                if (result.success) {
+                    await fetchCallCenterClients();
+                    await renderView(currentView);
+                    hideGlobalLoading();
+                    showNotification('Client added successfully');
+                } else {
+                    hideGlobalLoading();
+                    showNotification(result.error || 'Failed to add client', 'error');
+                }
+                return result.success;
+            }
+
+            async function deleteClient(phoneNumber) {
+                if (!confirm('Are you sure you want to delete this client?')) return false;
+                showGlobalLoading('Deleting client...');
+                const result = await apiCall('deleteCallCenterClient', { phoneNumber }, 'POST', false);
+                if (result.success) {
+                    await fetchCallCenterClients();
+                    await renderView(currentView);
+                    hideGlobalLoading();
+                    showNotification('Client deleted successfully');
+                } else {
+                    hideGlobalLoading();
+                    showNotification(result.error || 'Failed to delete', 'error');
+                }
+                return result.success;
+            }
+
+            function openAddClientModal() {
+                document.getElementById('addClientForm').reset();
+                document.getElementById('addClientModal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal(modalId) {
+                document.getElementById(modalId).classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+
+            // ========== CRUD OPERATIONS ==========
+            async function addMovie(movieData) {
+                showGlobalLoading('Adding movie...');
+                const result = await apiCall('addMovie', movieData, 'POST', false);
+                if (result.success) {
+                    await fetchMovies();
+                    await renderView(currentView);
+                    hideGlobalLoading();
+                    showNotification('Movie added successfully');
+                } else {
+                    hideGlobalLoading();
+                    showNotification('Failed to add movie', 'error');
+                }
+                return result.success;
+            }
+
+            async function updateMovie(movieId, updates) {
+                showGlobalLoading('Updating movie...');
+                const result = await apiCall('updateMovie', {
+                    id: movieId,
+                    updates: JSON.stringify(updates)
+                }, 'POST', false);
+                
+                if (result.success) {
+                    await fetchMovies();
+                    await renderView(currentView);
+                    hideGlobalLoading();
+                    showNotification('Movie updated successfully');
+                } else {
+                    hideGlobalLoading();
+                    showNotification('Failed to update movie', 'error');
+                }
+                return result.success;
+            }
+
+            async function deleteMovie(movieId) {
+                if (!confirm('Are you sure you want to delete this movie?')) return false;
+                
+                showGlobalLoading('Deleting movie...');
+                const result = await apiCall('deleteMovie', { id: movieId }, 'POST', false);
+                if (result.success) {
+                    await fetchMovies();
+                    await renderView(currentView);
+                    hideGlobalLoading();
+                    showNotification('Movie deleted successfully');
+                } else {
+                    hideGlobalLoading();
+                    showNotification('Failed to delete movie', 'error');
+                }
+                return result.success;
+            }
+
+            async function addUserProfile(profileData) {
+                showGlobalLoading('Creating profile...');
+                setTimeout(() => {
+                    hideGlobalLoading();
+                    showNotification('User profile created successfully');
+                }, 1000);
+                return true;
+            }
+
+            async function sendNotification(data) {
+                showGlobalLoading('Sending notification...');
+                setTimeout(() => {
+                    hideGlobalLoading();
+                    showNotification('Notification sent successfully');
+                }, 1000);
+                return true;
+            }
+
+            async function addLanguage(data) {
+                showGlobalLoading('Adding language...');
+                setTimeout(() => {
+                    hideGlobalLoading();
+                    showNotification('Language added successfully');
+                }, 1000);
+                return true;
+            }
+
+            // ========== RENDERING FUNCTIONS ==========
+            async function renderView(view) {
+                currentView = view;
+                localStorage.setItem('btff_admin_last_view', view);
+                
+                showGlobalLoading('Loading dashboard...');
+                
+                await fetchMovies();
+                await fetchRatings();
+                await fetchComments();
+                await fetchWatchHistory();
+                await fetchNotifications();
+                await fetchUserProfiles();
+                await fetchCallCenterWorkers();
+                await fetchCallCenterClients();
+                await fetchCallCenterCalls();
+                
+                let html = '';
+                
+                switch(view) {
+                    case 'dashboard':
+                        html = renderDashboard();
+                        break;
+                    case 'movies':
+                        html = renderMovies();
+                        break;
+                    case 'series':
+                        html = renderSeries();
+                        break;
+                    case 'genres':
+                        html = renderGenres();
+                        break;
+                    case 'profiles':
+                        html = renderProfiles();
+                        break;
+                    case 'ratings':
+                        html = renderRatings();
+                        break;
+                    case 'comments':
+                        html = renderComments();
+                        break;
+                    case 'watch-history':
+                        html = renderWatchHistory();
+                        break;
+                    case 'notifications':
+                        html = renderNotifications();
+                        break;
+                    case 'languages':
+                        html = renderLanguages();
+                        break;
+                    case 'analytics':
+                        html = renderAnalytics();
+                        break;
+                    case 'settings':
+                        html = renderSettings();
+                        break;
+                    case 'callcenter-workers':
+                        html = renderCallCenterWorkers();
+                        break;
+                    case 'callcenter-clients':
+                        html = renderCallCenterClients();
+                        break;
+                    case 'callcenter-calls':
+                        html = renderCallCenterCalls();
+                        break;
+                    case 'callcenter-analytics':
+                        html = renderCallCenterAnalytics();
+                        break;
+                    default:
+                        html = renderDashboard();
+                }
+                
+                mainContent.innerHTML = html;
+                
+                setTimeout(() => {
+                    initializeCharts();
+                    hideGlobalLoading();
+                }, 100);
+            }
+
+            function renderDashboard() {
+                const totalMovies = movies.length;
+                const totalRatings = ratings.length;
+                const totalComments = comments.length;
+                const totalUsers = profiles.length;
+                const totalViews = watchHistory.length;
+                const unreadNotifs = notifications.filter(n => n.read !== 'TRUE').length;
+                const pendingWorkers = callCenterWorkers.filter(w => w.status === 'Pending').length;
+                const totalCalls = callCenterCalls.length;
+                
+                const trendingMovies = movies.filter(m => m.category === 'trending').length;
+                const popularMovies = movies.filter(m => m.category === 'popular').length;
+                const recentMovies = movies.filter(m => m.category === 'recent').length;
+                
+                const recentMoviesList = movies.slice(0, 5);
+                
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Dashboard</h1>
+                            <p>Welcome back, Admin</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-film"></i></div>
+                            <div class="stat-value">${totalMovies}</div>
+                            <div class="stat-label">Total Movies</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-star"></i></div>
+                            <div class="stat-value">${totalRatings}</div>
+                            <div class="stat-label">Total Ratings</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-comments"></i></div>
+                            <div class="stat-value">${totalComments}</div>
+                            <div class="stat-label">Comments</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-value">${totalUsers}</div>
+                            <div class="stat-label">User Profiles</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-phone-alt"></i></div>
+                            <div class="stat-value">${totalCalls}</div>
+                            <div class="stat-label">Total Calls</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
+                            <div class="stat-value">${pendingWorkers}</div>
+                            <div class="stat-label">Pending Workers</div>
+                        </div>
+                    </div>
+                    
+                    <div class="charts-row">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Movies by Category</h3>
+                                <select id="categoryChartType">
+                                    <option value="pie">Pie Chart</option>
+                                    <option value="bar">Bar Chart</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Rating Distribution</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="ratingChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>Recent Movies</h2>
+                        <button class="btn-primary" onclick="document.querySelector('[data-view=\"movies\"]').click()">
+                            <i class="fas fa-plus"></i> View All
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Thumb</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Genre</th>
+                                    <th>Year</th>
+                                    <th>Release Date</th>
+                                    <th>Actions</th>
+                                 </thead>
+                            <tbody>
+                                ${recentMoviesList.map(movie => `
+                                    <tr>
+                                        <td><div class="movie-thumb" style="background-image: url('https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg')"></div></td>
+                                        <td>${movie.title}</td>
+                                        <td>${movie.category}</td>
+                                        <td>${movie.genre || 'N/A'}</td>
+                                        <td>${movie.year}</td>
+                                        <td>${movie.releaseDate || 'N/A'}</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn" onclick="editMovie('${movie.id}')"><i class="fas fa-edit"></i></button>
+                                                <button class="action-btn delete" onclick="deleteMovie('${movie.id}')"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderMovies() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Movies</h1>
+                            <p>Manage your movie catalog</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>All Movies (${movies.length})</h2>
+                        <button class="btn-primary" onclick="openAddMovieModal()">
+                            <i class="fas fa-plus"></i> Add Movie
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                 <tr><th>Thumb</th><th>ID</th><th>Title</th><th>Category</th><th>Genre</th><th>Year</th><th>Duration</th><th>Release Date</th><th>Type</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody>
+                                ${movies.map(movie => `
+                                    <tr>
+                                        <td><div class="movie-thumb" style="background-image: url('https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg')"></div></td>
+                                        <td>${movie.id}</td>
+                                        <td>${movie.title}</td>
+                                        <td>${movie.category}</td>
+                                        <td>${movie.genre || 'N/A'}</td>
+                                        <td>${movie.year}</td>
+                                        <td>${movie.duration}</td>
+                                        <td>${movie.releaseDate || 'N/A'}</td>
+                                        <td>${movie.type || 'movie'}</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn" onclick="editMovie('${movie.id}')"><i class="fas fa-edit"></i></button>
+                                                <button class="action-btn delete" onclick="deleteMovie('${movie.id}')"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderSeries() {
+                const series = movies.filter(m => m.type === 'series');
+                
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Series</h1>
+                            <p>Manage your TV series</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>All Series (${series.length})</h2>
+                        <button class="btn-primary" onclick="openAddMovieModal(true)">
+                            <i class="fas fa-plus"></i> Add Series
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Thumb</th><th>Title</th><th>Category</th><th>Genre</th><th>Year</th><th>Seasons</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                ${series.map(serie => `
+                                    <tr>
+                                        <td><div class="movie-thumb" style="background-image: url('https://img.youtube.com/vi/${serie.youtubeId}/mqdefault.jpg')"></div></td>
+                                        <td>${serie.title}</td>
+                                        <td>${serie.category}</td>
+                                        <td>${serie.genre || 'N/A'}</td>
+                                        <td>${serie.year}</td>
+                                        <td>${serie.seasons || '1'}</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn" onclick="editMovie('${serie.id}')"><i class="fas fa-edit"></i></button>
+                                                <button class="action-btn delete" onclick="deleteMovie('${serie.id}')"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderGenres() {
+                const genreCount = {};
+                movies.forEach(movie => {
+                    const genre = movie.genre || movie.category || 'Other';
+                    genreCount[genre] = (genreCount[genre] || 0) + 1;
+                });
+                
+                const genres = Object.entries(genreCount).map(([name, count]) => ({ name, count }));
+                
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Genres</h1>
+                            <p>Manage content categories</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        ${genres.map(genre => `
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-tag"></i></div>
+                                <div class="stat-value">${genre.count}</div>
+                                <div class="stat-label">${genre.name}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            function renderProfiles() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>User Profiles</h1>
+                            <p>Manage user accounts</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>All Profiles (${profiles.length})</h2>
+                        <button class="btn-primary" onclick="openAddUserProfileModal()">
+                            <i class="fas fa-plus"></i> Add Profile
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Avatar</th><th>Username</th><th>Email</th><th>User ID</th><th>Language</th><th>Kid Friendly</th><th>Created</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                ${profiles.map(profile => `
+                                    <tr>
+                                        <td style="font-size: 1.5rem;">${profile.avatar}</td>
+                                        <td>${profile.username}</td>
+                                        <td>${profile.email}</td>
+                                        <td>${profile.userId}</td>
+                                        <td>${profile.language}</td>
+                                        <td>${profile.kidFriendly ? '✅' : '❌'}</td>
+                                        <td>${new Date(profile.createdAt).toLocaleDateString()}</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="action-btn warning"><i class="fas fa-ban"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderRatings() {
+                const ratingDist = [0,0,0,0,0];
+                ratings.forEach(r => {
+                    const rating = parseInt(r.rating);
+                    if (rating >= 1 && rating <= 5) ratingDist[rating-1]++;
+                });
+                
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Ratings</h1>
+                            <p>View user ratings analytics</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-star"></i></div><div class="stat-value">${ratings.length}</div><div class="stat-label">Total Ratings</div></div>
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value">${new Set(ratings.map(r => r.userId)).size}</div><div class="stat-label">Unique Users</div></div>
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-calculator"></i></div><div class="stat-value">${(ratings.reduce((sum, r) => sum + parseInt(r.rating), 0) / ratings.length || 0).toFixed(1)}</div><div class="stat-label">Average Rating</div></div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header"><h3>Rating Distribution</h3></div>
+                        <div class="chart-container"><canvas id="ratingsDistChart"></canvas></div>
+                    </div>
+                `;
+            }
+
+            function renderComments() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Comments</h1>
+                            <p>Moderate user discussions</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>User</th><th>Movie</th><th>Comment</th><th>Date</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                ${comments.slice(0, 20).map(comment => {
+                                    const movie = movies.find(m => m.id == comment.movieId);
+                                    return `
+                                        <tr>
+                                            <td>${comment.userId}</td>
+                                            <td>${movie ? movie.title : 'Unknown'}</td>
+                                            <td>${comment.comment.substring(0, 50)}...</td>
+                                            <td>${new Date(comment.timestamp).toLocaleString()}</td>
+                                            <td><div class="action-btns"><button class="action-btn delete"><i class="fas fa-trash"></i></button></div></td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderWatchHistory() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Watch History</h1>
+                            <p>Track user viewing activity</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-eye"></i></div><div class="stat-value">${watchHistory.length}</div><div class="stat-label">Total Views</div></div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Movie</th><th>User</th><th>Progress</th><th>Last Watched</th></tr></thead>
+                            <tbody>
+                                ${watchHistory.slice(0, 30).map(item => {
+                                    const movie = movies.find(m => m.id == item.movieId);
+                                    return `
+                                        <tr>
+                                            <td>${movie ? movie.title : 'Unknown'}</td>
+                                            <td>${item.userId || 'Anonymous'}</td>
+                                            <td><div style="width:100px;height:6px;background:#1f3d62;border-radius:3px;overflow:hidden;"><div style="width:${item.progress || 0}%;height:100%;background:#2f6bc6;"></div></div></td>
+                                            <td>${new Date(item.lastWatched).toLocaleString()}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderNotifications() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Notifications</h1>
+                            <p>Manage system notifications</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>All Notifications</h2>
+                        <button class="btn-primary" onclick="openNotificationModal()"><i class="fas fa-plus"></i> Send Notification</button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>User</th><th>Message</th><th>Type</th><th>Status</th><th>Date</th><th>Actions</th> </thead>
+                            <tbody>
+                                ${notifications.slice(0, 20).map(notif => `
+                                    <tr>
+                                        <td>${notif.userId}</td>
+                                        <td>${notif.message}</td>
+                                        <td><span class="status-badge ${notif.type}">${notif.type}</span></td>
+                                        <td>${notif.read === 'TRUE' ? 'Read' : 'Unread'}</td>
+                                        <td>${new Date(notif.timestamp).toLocaleString()}</td>
+                                        <td><div class="action-btns"><button class="action-btn delete"><i class="fas fa-trash"></i></button></div></td>
+                                     </tr>
+                                `).join('')}
+                            </tbody>
+                         </table>
+                    </div>
+                `;
+            }
+
+            function renderLanguages() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Languages</h1>
+                            <p>Manage multilingual support</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>Available Languages (${languages.length})</h2>
+                        <button class="btn-primary" onclick="openAddLanguageModal()"><i class="fas fa-plus"></i> Add Language</button>
+                    </div>
+                    
+                    <div class="table-container">
+                         <table>
+                            <thead> <th>Code</th><th>Language</th><th>Native Name</th><th>Translations</th><th>Status</th><th>Actions</th> </thead>
+                            <tbody>
+                                ${languages.map(lang => `
+                                     <tr>
+                                        <td><strong>${lang.code}</strong></td>
+                                        <td>${lang.name}</td>
+                                        <td>${lang.native}</td>
+                                        <td>${Object.keys(lang.translations).length} keys</td>
+                                        <td><span class="status-badge active">Active</span></td>
+                                        <td><div class="action-btns"><button class="action-btn"><i class="fas fa-edit"></i></button><button class="action-btn delete"><i class="fas fa-trash"></i></button></div></td>
+                                     </tr>
+                                `).join('')}
+                            </tbody>
+                         </table>
+                    </div>
+                `;
+            }
+
+            function renderAnalytics() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Analytics</h1>
+                            <p>Platform statistics and insights</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="charts-row">
+                        <div class="chart-card"><div class="chart-header"><h3>User Growth</h3></div><div class="chart-container"><canvas id="userGrowthChart"></canvas></div></div>
+                        <div class="chart-card"><div class="chart-header"><h3>Content Performance</h3></div><div class="chart-container"><canvas id="contentChart"></canvas></div></div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">${(watchHistory.reduce((sum, w) => sum + parseInt(w.progress || 0), 0) / 60).toFixed(0)}h</div><div class="stat-label">Total Watch Time</div></div>
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-rocket"></i></div><div class="stat-value">${movies.length}</div><div class="stat-label">Content Items</div></div>
+                    </div>
+                `;
+            }
+
+            function renderSettings() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Settings</h1>
+                            <p>Configure platform settings</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info">
+                                <h4>Admin</h4>
+                                <p>Administrator</p>
+                            </div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <h3 style="margin-bottom: 20px;">Admin Account</h3>
+                        <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 30px;">
+                            <div style="width: 80px; height: 80px; background: var(--gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">AD</div>
+                            <div><h4>Admin</h4><p style="color: var(--gray); margin-top: 5px;">admin@btff.com</p></div>
+                        </div>
+                        
+                        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 40px 0;">
+                        
+                        <h3 style="margin-bottom: 20px;">Platform Settings</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--gray);">Site Title</label>
+                            <input type="text" value="BTFF - Before The First Flight" style="width: 100%; padding: 15px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white;">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--gray);">Default Language</label>
+                            <select style="width: 100%; padding: 15px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white;">
+                                <option value="en">English</option>
+                                <option value="es">Español</option>
+                                <option value="fr">Français</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--gray);">API Endpoint</label>
+                            <input type="text" value="${APPS_SCRIPT_URL}" readonly style="width: 100%; padding: 15px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--gray);">
+                        </div>
+                        
+                        <button class="btn-primary" style="margin-top: 20px;" onclick="showNotification('Settings saved (demo)')">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                    </div>
+                `;
+            }
+
+            // ========== ADDED CALL CENTER RENDERING FUNCTIONS ==========
+            function renderCallCenterWorkers() {
+                const pendingWorkers = callCenterWorkers.filter(w => w.status === 'Pending');
+                const activeWorkers = callCenterWorkers.filter(w => w.status === 'Active');
+                
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Call Center Workers</h1>
+                            <p>Manage worker registrations and approvals</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info"><h4>Admin</h4><p>Administrator</p></div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-plus"></i></div><div class="stat-value">${pendingWorkers.length}</div><div class="stat-label">Pending Approvals</div></div>
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value">${activeWorkers.length}</div><div class="stat-label">Active Workers</div></div>
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-phone-alt"></i></div><div class="stat-value">${callCenterWorkers.reduce((sum, w) => sum + (w.totalCalls || 0), 0)}</div><div class="stat-label">Total Calls Made</div></div>
+                    </div>
+                    
+                    <div class="section-header"><h2>Pending Approvals</h2></div>
+                    <div class="table-container">
+                        <table>
+                            <thead> <th>Name</th><th>Email</th><th>Phone</th><th>Country</th><th>Registered</th><th>Actions</th> </thead>
+                            <tbody>
+                                ${pendingWorkers.map(w => `
+                                    <tr>
+                                        <td>${w.fullName || 'N/A'}</td>
+                                        <td>${w.email}</td>
+                                        <td>${w.phoneNumber || 'N/A'}</td>
+                                        <td>${w.country || 'N/A'}</td>
+                                        <td>${w.registrationDate ? new Date(w.registrationDate).toLocaleDateString() : 'N/A'}</td>
+                                        <td><div class="action-btns"><button class="action-btn success" onclick="approveWorker('${w.email}')" title="Approve"><i class="fas fa-check"></i></button><button class="action-btn delete" onclick="deleteWorker('${w.email}')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
+                                    </tr>
+                                `).join('')}
+                                ${pendingWorkers.length === 0 ? '<tr><td colspan="6" style="text-align:center">No pending approvals</td></tr>' : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section-header"><h2>Active Workers</h2></div>
+                    <div class="table-container">
+                        <table>
+                            <thead> <th>Name</th><th>Email</th><th>Phone</th><th>Country</th><th>Total Calls</th><th>Last Active</th><th>Actions</th> </thead>
+                            <tbody>
+                                ${activeWorkers.map(w => `
+                                    <tr>
+                                        <td>${w.fullName || 'N/A'}</td>
+                                        <td>${w.email}</td>
+                                        <td>${w.phoneNumber || 'N/A'}</td>
+                                        <td>${w.country || 'N/A'}</td>
+                                        <td>${w.totalCalls || 0}</td>
+                                        <td>${w.lastActive ? new Date(w.lastActive).toLocaleDateString() : 'Never'}</td>
+                                        <td><div class="action-btns"><button class="action-btn delete" onclick="deleteWorker('${w.email}')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderCallCenterClients() {
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Call Center Clients</h1>
+                            <p>Manage client database</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info"><h4>Admin</h4><p>Administrator</p></div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2>All Clients (${callCenterClients.length})</h2>
+                        <button class="btn-primary" onclick="openAddClientModal()"><i class="fas fa-plus"></i> Add Client</button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead> <th>Phone</th><th>Name</th><th>Country</th><th>State</th><th>City</th><th>Total Calls</th><th>Last Called</th><th>Status</th><th>Actions</th> </thead>
+                            <tbody>
+                                ${callCenterClients.map(c => `
+                                    <tr>
+                                        <td>${c.phoneNumber}</td>
+                                        <td>${c.fullName || 'Unknown'}</td>
+                                        <td>${c.country || 'N/A'}</td>
+                                        <td>${c.state || 'N/A'}</td>
+                                        <td>${c.city || 'N/A'}</td>
+                                        <td>${c.totalCalls || 0}</td>
+                                        <td>${c.lastCalled ? new Date(c.lastCalled).toLocaleDateString() : 'Never'}</td>
+                                        <td><span class="status-badge ${c.callStatus === 'Pending' ? 'pending' : 'active'}">${c.callStatus || 'Pending'}</span></td>
+                                        <td><div class="action-btns"><button class="action-btn delete" onclick="deleteClient('${c.phoneNumber}')" title="Delete"><i class="fas fa-trash"></i></button></div></td>
+                                    </tr>
+                                `).join('')}
+                                ${callCenterClients.length === 0 ? '<tr><td colspan="9" style="text-align:center">No clients found</td></tr>' : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderCallCenterCalls() {
+                const recentCalls = [...callCenterCalls].sort((a,b) => new Date(b.callDate) - new Date(a.callDate)).slice(0, 50);
+                
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Call Logs</h1>
+                            <p>View all call history</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info"><h4>Admin</h4><p>Administrator</p></div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-phone"></i></div><div class="stat-value">${callCenterCalls.length}</div><div class="stat-label">Total Calls</div></div>
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value">${callCenterCalls.filter(c => c.outcome === 'Connected').length}</div><div class="stat-label">Connected</div></div>
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">${Math.round(callCenterCalls.reduce((sum, c) => sum + (c.duration || 0), 0) / 60)}min</div><div class="stat-label">Total Talk Time</div></div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead> <th>Date & Time</th><th>Worker</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th> </thead>
+                            <tbody>
+                                ${recentCalls.map(c => `
+                                    <tr>
+                                        <td>${new Date(c.callDate).toLocaleString()}</td>
+                                        <td>${c.workerEmail?.split('@')[0] || 'Unknown'}</td>
+                                        <td>${c.clientName || 'Unknown'}</td>
+                                        <td>${c.clientPhone}</td>
+                                        <td>${Math.floor(c.duration / 60)}:${(c.duration % 60).toString().padStart(2,'0')}</td>
+                                        <td><span class="status-badge ${c.outcome === 'Connected' ? 'active' : 'pending'}">${c.outcome}</span></td>
+                                        <td>${c.remarks?.substring(0, 50) || ''}${c.remarks?.length > 50 ? '...' : ''}</td>
+                                    </tr>
+                                `).join('')}
+                                ${recentCalls.length === 0 ? '<tr><td colspan="7" style="text-align:center">No calls recorded</td></tr>' : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function renderCallCenterAnalytics() {
+                const outcomeCounts = { Connected: 0, Missed: 0, 'Hanged Up': 0, Voicemail: 0 };
+                callCenterCalls.forEach(c => { if (outcomeCounts[c.outcome] !== undefined) outcomeCounts[c.outcome]++; });
+                
+                const workerStats = {};
+                callCenterCalls.forEach(c => {
+                    if (!workerStats[c.workerEmail]) workerStats[c.workerEmail] = { name: c.workerEmail?.split('@')[0] || c.workerEmail, calls: 0, duration: 0 };
+                    workerStats[c.workerEmail].calls++;
+                    workerStats[c.workerEmail].duration += c.duration || 0;
+                });
+                const topWorkers = Object.values(workerStats).sort((a,b) => b.calls - a.calls).slice(0, 5);
+                
+                return `
+                    <div class="top-bar">
+                        <div class="page-title">
+                            <h1>Call Analytics</h1>
+                            <p>Performance metrics and insights</p>
+                        </div>
+                        <div class="admin-profile">
+                            <div class="admin-info"><h4>Admin</h4><p>Administrator</p></div>
+                            <div class="admin-avatar">AD</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-value">${callCenterCalls.length}</div><div class="stat-label">Total Calls</div></div>
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-percent"></i></div><div class="stat-value">${callCenterCalls.length ? Math.round((outcomeCounts.Connected / callCenterCalls.length) * 100) : 0}%</div><div class="stat-label">Connect Rate</div></div>
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">${Math.round(callCenterCalls.reduce((sum, c) => sum + (c.duration || 0), 0) / 60)}min</div><div class="stat-label">Total Talk Time</div></div>
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-tie"></i></div><div class="stat-value">${Object.keys(workerStats).length}</div><div class="stat-label">Active Workers</div></div>
+                    </div>
+                    
+                    <div class="charts-row">
+                        <div class="chart-card"><div class="chart-header"><h3>Call Outcomes</h3></div><div class="chart-container"><canvas id="outcomeChart"></canvas></div></div>
+                        <div class="chart-card"><div class="chart-header"><h3>Top Performers</h3></div><div class="table-container" style="margin:0"><table><thead> <th>Worker</th><th>Calls</th><th>Talk Time</th> </thead><tbody>${topWorkers.map(w => `<tr><td>${w.name}</td><td>${w.calls}</td><td>${Math.floor(w.duration / 60)}min</td></tr>`).join('')}</tbody></table></div></div>
+                    </div>
+                `;
+            }
+
+            // ========== CHART FUNCTIONS ==========
+            function initializeCharts() {
+                Object.values(charts).forEach(chart => {
+                    if (chart) {
+                        try {
+                            chart.destroy();
+                        } catch (e) {
+                            console.error('Error destroying chart:', e);
+                        }
+                    }
+                });
+                charts = {};
+                
+                const categoryCtx = document.getElementById('categoryChart')?.getContext('2d');
+                if (categoryCtx) {
+                    const trendingCount = movies.filter(m => m.category === 'trending').length;
+                    const popularCount = movies.filter(m => m.category === 'popular').length;
+                    const recentCount = movies.filter(m => m.category === 'recent').length;
+                    
+                    try {
+                        charts.category = new Chart(categoryCtx, {
+                            type: 'pie',
+                            data: {
+                                labels: ['Trending', 'Popular', 'Recent'],
+                                datasets: [{
+                                    data: [trendingCount, popularCount, recentCount],
+                                    backgroundColor: ['#2f6bc6', '#10b981', '#f59e0b'],
+                                    borderWidth: 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        labels: { color: '#fff' }
+                                    }
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        console.error('Error creating category chart:', e);
+                    }
+                    
+                    const typeSelect = document.getElementById('categoryChartType');
+                    if (typeSelect) {
+                        const newSelect = typeSelect.cloneNode(true);
+                        typeSelect.parentNode.replaceChild(newSelect, typeSelect);
+                        
+                        newSelect.addEventListener('change', (e) => {
+                            if (charts.category) {
+                                try {
+                                    charts.category.destroy();
+                                    charts.category = new Chart(categoryCtx, {
+                                        type: e.target.value,
+                                        data: {
+                                            labels: ['Trending', 'Popular', 'Recent'],
+                                            datasets: [{
+                                                data: [trendingCount, popularCount, recentCount],
+                                                backgroundColor: ['#2f6bc6', '#10b981', '#f59e0b'],
+                                                borderWidth: 0
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: {
+                                                    labels: { color: '#fff' }
+                                                }
+                                            }
+                                        }
+                                    });
+                                } catch (err) {
+                                    console.error('Error updating chart:', err);
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                const ratingCtx = document.getElementById('ratingChart')?.getContext('2d');
+                if (ratingCtx) {
+                    const ratingDist = [0,0,0,0,0];
+                    ratings.forEach(r => {
+                        const rating = parseInt(r.rating);
+                        if (rating >= 1 && rating <= 5) ratingDist[rating-1]++;
+                    });
+                    
+                    try {
+                        charts.rating = new Chart(ratingCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['1★', '2★', '3★', '4★', '5★'],
+                                datasets: [{
+                                    data: ratingDist,
+                                    backgroundColor: '#2f6bc6',
+                                    borderRadius: 6
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false }
+                                },
+                                scales: {
+                                    y: {
+                                        grid: { color: 'rgba(255,255,255,0.1)' },
+                                        ticks: { color: '#fff' }
+                                    },
+                                    x: {
+                                        ticks: { color: '#fff' }
+                                    }
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        console.error('Error creating rating chart:', e);
+                    }
+                }
+                
+                const ratingsDistCtx = document.getElementById('ratingsDistChart')?.getContext('2d');
+                if (ratingsDistCtx) {
+                    const ratingDist = [0,0,0,0,0];
+                    ratings.forEach(r => {
+                        const rating = parseInt(r.rating);
+                        if (rating >= 1 && rating <= 5) ratingDist[rating-1]++;
+                    });
+                    
+                    try {
+                        charts.ratingsDist = new Chart(ratingsDistCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['1★', '2★', '3★', '4★', '5★'],
+                                datasets: [{
+                                    data: ratingDist,
+                                    backgroundColor: '#2f6bc6',
+                                    borderRadius: 6
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false }
+                                },
+                                scales: {
+                                    y: {
+                                        grid: { color: 'rgba(255,255,255,0.1)' },
+                                        ticks: { color: '#fff' }
+                                    },
+                                    x: {
+                                        ticks: { color: '#fff' }
+                                    }
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        console.error('Error creating ratings distribution chart:', e);
+                    }
+                }
+                
+                // Call Center Analytics Chart
+                const outcomeCtx = document.getElementById('outcomeChart')?.getContext('2d');
+                if (outcomeCtx && currentView === 'callcenter-analytics') {
+                    const outcomeCounts = { Connected: 0, Missed: 0, 'Hanged Up': 0, Voicemail: 0 };
+                    callCenterCalls.forEach(c => { if (outcomeCounts[c.outcome] !== undefined) outcomeCounts[c.outcome]++; });
+                    
+                    try {
+                        charts.outcome = new Chart(outcomeCtx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['Connected', 'Missed', 'Hanged Up', 'Voicemail'],
+                                datasets: [{
+                                    data: [outcomeCounts.Connected, outcomeCounts.Missed, outcomeCounts['Hanged Up'], outcomeCounts.Voicemail],
+                                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6']
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        labels: { color: '#fff' }
+                                    }
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        console.error('Error creating outcome chart:', e);
+                    }
+                }
+            }
+
+            // ========== MODAL FUNCTIONS ==========
+            window.openAddMovieModal = (isSeries = false) => {
+                document.getElementById('movieModalTitle').textContent = 'Add New Movie';
+                document.getElementById('movieId').value = '';
+                document.getElementById('movieTitle').value = '';
+                document.getElementById('movieYoutubeId').value = '';
+                document.getElementById('movieCategory').value = 'trending';
+                document.getElementById('movieGenre').value = 'Action';
+                document.getElementById('movieYear').value = new Date().getFullYear().toString();
+                document.getElementById('movieDuration').value = '1h 30m';
+                document.getElementById('movieDescription').value = '';
+                document.getElementById('movieReleaseDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('movieType').value = isSeries ? 'series' : 'movie';
+                document.getElementById('movieSeasons').value = '1';
+                document.getElementById('movieEpisodes').value = '10';
+                
+                const seriesFields = document.getElementById('seriesFields');
+                seriesFields.style.display = isSeries ? 'grid' : 'none';
+                
+                movieModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.openAddUserProfileModal = () => {
+                document.getElementById('profileUsername').value = '';
+                document.getElementById('profileEmail').value = '';
+                document.getElementById('profileAvatar').value = '👤';
+                document.getElementById('profileLanguage').value = 'en';
+                document.getElementById('profileKidFriendly').checked = false;
+                userProfileModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.openNotificationModal = () => {
+                document.getElementById('notificationUser').value = 'all';
+                document.getElementById('notificationMessage').value = '';
+                document.getElementById('notificationType').value = 'info';
+                notificationModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.openAddLanguageModal = () => {
+                document.getElementById('languageCode').value = '';
+                document.getElementById('languageName').value = '';
+                document.getElementById('languageNative').value = '';
+                document.getElementById('languageTranslations').value = '';
+                languageModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.editMovie = (movieId) => {
+                const movie = movies.find(m => m.id == movieId);
+                if (!movie) return;
+                
+                document.getElementById('movieModalTitle').textContent = 'Edit Movie';
+                document.getElementById('movieId').value = movie.id;
+                document.getElementById('movieTitle').value = movie.title;
+                document.getElementById('movieYoutubeId').value = movie.youtubeId;
+                document.getElementById('movieCategory').value = movie.category;
+                document.getElementById('movieGenre').value = movie.genre || 'Action';
+                document.getElementById('movieYear').value = movie.year;
+                document.getElementById('movieDuration').value = movie.duration;
+                document.getElementById('movieDescription').value = movie.description;
+                document.getElementById('movieReleaseDate').value = movie.releaseDate || new Date().toISOString().split('T')[0];
+                document.getElementById('movieType').value = movie.type || 'movie';
+                document.getElementById('movieSeasons').value = movie.seasons || '1';
+                document.getElementById('movieEpisodes').value = movie.episodes || '10';
+                
+                const isSeries = (movie.type === 'series');
+                const seriesFields = document.getElementById('seriesFields');
+                seriesFields.style.display = isSeries ? 'grid' : 'none';
+                
+                movieModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.deleteMovie = async (movieId) => {
+                if (await deleteMovie(movieId)) {
+                    await renderView(currentView);
+                }
+            };
+
+            // Expose call center functions globally
+            window.approveWorker = approveWorker;
+            window.deleteWorker = deleteWorker;
+            window.deleteClient = deleteClient;
+            window.openAddClientModal = openAddClientModal;
+            window.closeModal = closeModal;
+
+            // ========== EVENT LISTENERS ==========
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const view = item.dataset.view;
+                    if (view && view !== currentView) {
+                        updateActiveNavItem(view);
+                        renderView(view);
+                    }
+                });
+            });
+
+            // Modal close listeners
+            closeMovieModal.addEventListener('click', () => {
+                movieModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            closeUserProfileModal.addEventListener('click', () => {
+                userProfileModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            closeNotificationModal.addEventListener('click', () => {
+                notificationModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            closeLanguageModal.addEventListener('click', () => {
+                languageModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            // Cancel buttons
+            cancelMovieBtn.addEventListener('click', () => {
+                movieModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            cancelUserProfileBtn.addEventListener('click', () => {
+                userProfileModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            cancelNotificationBtn.addEventListener('click', () => {
+                notificationModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            cancelLanguageBtn.addEventListener('click', () => {
+                languageModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            // Form submissions
+            movieForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const movieId = document.getElementById('movieId').value;
+                const movieType = document.getElementById('movieType').value;
+                
+                const movieData = {
+                    title: document.getElementById('movieTitle').value,
+                    youtubeId: document.getElementById('movieYoutubeId').value,
+                    category: document.getElementById('movieCategory').value,
+                    genre: document.getElementById('movieGenre').value,
+                    year: document.getElementById('movieYear').value,
+                    duration: document.getElementById('movieDuration').value,
+                    description: document.getElementById('movieDescription').value,
+                    releaseDate: document.getElementById('movieReleaseDate').value,
+                    type: movieType
+                };
+                
+                if (movieType === 'series') {
+                    movieData.seasons = document.getElementById('movieSeasons').value;
+                    movieData.episodes = document.getElementById('movieEpisodes').value;
+                }
+                
+                let success;
+                if (movieId) {
+                    success = await updateMovie(movieId, movieData);
+                } else {
+                    success = await addMovie(movieData);
+                }
+                
+                if (success) {
+                    movieModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
                 }
             });
-        });
 
-        window.approveWorker = approveWorker;
-        window.deleteWorker = deleteWorker;
-        window.deleteClient = deleteClient;
-        window.openAddClientModal = openAddClientModal;
-        window.closeModal = closeModal;
-        
-        console.log('Admin panel ready');
+            userProfileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const profileData = {
+                    username: document.getElementById('profileUsername').value,
+                    email: document.getElementById('profileEmail').value,
+                    avatar: document.getElementById('profileAvatar').value,
+                    language: document.getElementById('profileLanguage').value,
+                    kidFriendly: document.getElementById('profileKidFriendly').checked
+                };
+                
+                const success = await addUserProfile(profileData);
+                
+                if (success) {
+                    userProfileModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            notificationForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const data = {
+                    userId: document.getElementById('notificationUser').value,
+                    message: document.getElementById('notificationMessage').value,
+                    type: document.getElementById('notificationType').value
+                };
+                
+                const success = await sendNotification(data);
+                
+                if (success) {
+                    notificationModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            languageForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const data = {
+                    code: document.getElementById('languageCode').value,
+                    name: document.getElementById('languageName').value,
+                    native: document.getElementById('languageNative').value,
+                    translations: document.getElementById('languageTranslations').value
+                };
+                
+                const success = await addLanguage(data);
+                
+                if (success) {
+                    languageModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            document.getElementById('addClientForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const clientData = {
+                    phoneNumber: document.getElementById('clientPhone').value,
+                    fullName: document.getElementById('clientFullName').value,
+                    country: document.getElementById('clientCountry').value,
+                    state: document.getElementById('clientState').value,
+                    city: document.getElementById('clientCity').value,
+                    dateOfBirth: document.getElementById('clientDOB').value,
+                    callScript: document.getElementById('clientCallScript').value
+                };
+                await addClient(clientData);
+            });
+
+            document.addEventListener('change', (e) => {
+                if (e.target.id === 'movieType') {
+                    const isSeries = e.target.value === 'series';
+                    const seriesFields = document.getElementById('seriesFields');
+                    seriesFields.style.display = isSeries ? 'grid' : 'none';
+                }
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === movieModal) {
+                    movieModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (e.target === userProfileModal) {
+                    userProfileModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (e.target === notificationModal) {
+                    notificationModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (e.target === languageModal) {
+                    languageModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (e.target === document.getElementById('addClientModal')) {
+                    closeModal('addClientModal');
+                }
+            });
+
+            // ========== INITIALIZATION ==========
+            console.log('Admin panel ready - click Enter to continue');
+        })();
     </script>
 </body>
 </html>

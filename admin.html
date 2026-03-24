@@ -104,6 +104,118 @@
             margin-right: 10px;
         }
 
+        /* Login Modal Styles */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            z-index: 20000;
+        }
+
+        .login-modal.active {
+            display: flex;
+        }
+
+        .login-box {
+            background: var(--darker);
+            border-radius: 30px;
+            padding: 50px;
+            width: 400px;
+            max-width: 90vw;
+            border: 2px solid var(--primary);
+            text-align: center;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #aaccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .login-box h2 {
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+        }
+
+        .login-input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .login-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .login-input-group input {
+            width: 100%;
+            padding: 14px;
+            background: var(--dark);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .login-input-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .login-error {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .login-error.show {
+            display: block;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .login-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         /* ===== SIDEBAR ===== */
         .sidebar {
             width: 280px;
@@ -772,6 +884,15 @@
             background: var(--warning);
         }
 
+        /* ===== LOGOUT BUTTON ===== */
+        .logout-link {
+            color: #ef4444 !important;
+        }
+
+        .logout-link:hover {
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
             .stats-grid {
@@ -827,16 +948,34 @@
     </style>
 </head>
 <body>
-    <!-- SIMPLE ENTER PAGE (NO LOGIN REQUIRED) -->
-    <div class="enter-container" id="enterContainer">
+    <!-- LOGIN MODAL -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-box">
+            <div class="login-logo">BTFF</div>
+            <h2>Admin Login</h2>
+            <div class="login-input-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="admin@btff.com">
+            </div>
+            <div class="login-input-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <div class="login-error" id="loginError">Invalid credentials</div>
+            <button class="login-btn" id="loginSubmitBtn">Login</button>
+        </div>
+    </div>
+
+    <!-- SIMPLE ENTER PAGE (hidden initially, shown after logout) -->
+    <div class="enter-container" id="enterContainer" style="display: none;">
         <div class="enter-box">
             <div class="enter-logo">BTFF</div>
             <div class="enter-sub">admin dashboard</div>
-            <button class="enter-btn" onclick="enterDashboard()">
-                <i class="fas fa-sign-in-alt"></i> Enter Dashboard
+            <button class="enter-btn" onclick="showLoginModal()">
+                <i class="fas fa-sign-in-alt"></i> Login
             </button>
             <div style="text-align: center; margin-top: 20px; color: var(--gray); font-size: 0.85rem;">
-                <i class="fas fa-shield-alt"></i> Development Mode - No Authentication
+                <i class="fas fa-shield-alt"></i> Secure Admin Access
             </div>
         </div>
     </div>
@@ -868,7 +1007,7 @@
                 <span>Genres</span>
             </div>
             
-            <!-- ADDED CALL CENTER SECTION -->
+            <!-- CALL CENTER SECTION -->
             <div class="nav-section-title">CALL CENTER</div>
             <div class="nav-item" data-view="callcenter-workers">
                 <i class="fas fa-users"></i>
@@ -925,9 +1064,9 @@
             
             <div class="nav-divider"></div>
             
-            <div class="nav-item" id="logoutBtn" onclick="logout()">
+            <div class="nav-item logout-link" id="logoutBtn" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i>
-                <span>Exit Admin</span>
+                <span>Logout</span>
             </div>
         </div>
     </div>
@@ -1134,7 +1273,7 @@
         </div>
     </div>
 
-    <!-- ADD CLIENT MODAL (NEW) -->
+    <!-- ADD CLIENT MODAL -->
     <div class="modal" id="addClientModal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('addClientModal')">&times;</span>
@@ -1191,6 +1330,94 @@
 
     <script>
         (function() {
+            // ========== AUTHENTICATION ==========
+            const ADMIN_EMAIL = 'admin@btff.com';
+            const ADMIN_PASSWORD = 'admin123';
+            
+            let isAuthenticated = false;
+            
+            // Check if user is already logged in
+            function checkAuth() {
+                const savedAuth = localStorage.getItem('btff_admin_auth');
+                if (savedAuth === 'true') {
+                    isAuthenticated = true;
+                    showDashboard();
+                } else {
+                    showLoginScreen();
+                }
+            }
+            
+            function showLoginScreen() {
+                document.getElementById('loginModal').classList.add('active');
+                document.getElementById('enterContainer').style.display = 'none';
+                document.getElementById('sidebar').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'none';
+            }
+            
+            function showLoginModal() {
+                document.getElementById('loginModal').classList.add('active');
+                document.getElementById('enterContainer').style.display = 'none';
+            }
+            
+            function showDashboard() {
+                document.getElementById('loginModal').classList.remove('active');
+                document.getElementById('enterContainer').style.display = 'none';
+                document.getElementById('sidebar').style.display = 'block';
+                document.getElementById('mainContent').style.display = 'block';
+                
+                updateAdminProfile();
+                updateActiveNavItem('dashboard');
+                renderView('dashboard');
+                showNotification('Welcome to Admin Dashboard');
+            }
+            
+            function login() {
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
+                const errorDiv = document.getElementById('loginError');
+                const loginBtn = document.getElementById('loginSubmitBtn');
+                
+                if (!email || !password) {
+                    errorDiv.textContent = 'Please enter both email and password';
+                    errorDiv.classList.add('show');
+                    return;
+                }
+                
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'Logging in...';
+                errorDiv.classList.remove('show');
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                        isAuthenticated = true;
+                        localStorage.setItem('btff_admin_auth', 'true');
+                        showDashboard();
+                    } else {
+                        errorDiv.textContent = 'Invalid email or password';
+                        errorDiv.classList.add('show');
+                    }
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Login';
+                }, 500);
+            }
+            
+            function logout() {
+                isAuthenticated = false;
+                localStorage.removeItem('btff_admin_auth');
+                document.getElementById('loginModal').classList.remove('active');
+                document.getElementById('enterContainer').style.display = 'flex';
+                document.getElementById('sidebar').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                showNotification('Logged out successfully');
+            }
+            
+            // Expose auth functions globally
+            window.showLoginModal = showLoginModal;
+            window.logout = logout;
+            
             // ========== CONFIGURATION ==========
             const APPS_SCRIPT_URL = '%%APPS_SCRIPT_URL%%';
             
@@ -1262,31 +1489,6 @@
             const notificationForm = document.getElementById('notificationForm');
             const languageForm = document.getElementById('languageForm');
             const notification = document.getElementById('notification');
-
-            // ========== ENTER DASHBOARD (NO AUTH) ==========
-            window.enterDashboard = function() {
-                console.log('Entering dashboard...');
-                enterContainer.style.display = 'none';
-                sidebar.style.display = 'block';
-                mainContent.style.display = 'block';
-                
-                // Set a fake admin user for display
-                window.currentAdmin = {
-                    username: 'Admin',
-                    email: 'admin@btff.com'
-                };
-                
-                updateAdminProfile();
-                updateActiveNavItem('dashboard');
-                renderView('dashboard');
-                showNotification('Welcome to Admin Dashboard');
-            };
-
-            window.logout = function() {
-                enterContainer.style.display = 'flex';
-                sidebar.style.display = 'none';
-                mainContent.style.display = 'none';
-            };
 
             // ========== API HELPER ==========
             async function apiCall(action, data = {}, method = 'GET', showLoading = true) {
@@ -1891,7 +2093,7 @@
                             </thead>
                             <tbody>
                                 ${recentMoviesList.map(movie => `
-                                    <tr>
+                                     <tr>
                                         <td><div class="movie-thumb" style="background-image: url('https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg')"></div></td>
                                         <td>${movie.title}</td>
                                         <td>${movie.category}</td>
@@ -1904,7 +2106,7 @@
                                                 <button class="action-btn delete" onclick="deleteMovie('${movie.id}')"><i class="fas fa-trash"></i></button>
                                             </div>
                                         </td>
-                                    </tr>
+                                     </tr>
                                 `).join('')}
                             </tbody>
                          </table>
@@ -1953,7 +2155,7 @@
                             </thead>
                             <tbody>
                                 ${movies.map(movie => `
-                                    <tr>
+                                     <tr>
                                         <td><div class="movie-thumb" style="background-image: url('https://img.youtube.com/vi/${movie.youtubeId}/mqdefault.jpg')"></div></td>
                                         <td>${movie.id}</td>
                                         <td>${movie.title}</td>
@@ -1968,7 +2170,8 @@
                                                 <button class="action-btn" onclick="editMovie('${movie.id}')"><i class="fas fa-edit"></i></button>
                                                 <button class="action-btn delete" onclick="deleteMovie('${movie.id}')"><i class="fas fa-trash"></i></button>
                                             </div>
-                                         </tr>
+                                        </td>
+                                     </tr>
                                 `).join('')}
                             </tbody>
                          </table>
@@ -2587,9 +2790,9 @@
                                         <td>${c.remarks?.substring(0, 50) || ''}${c.remarks?.length > 50 ? '...' : ''}</td>
                                      </tr>
                                 `).join('')}
-                                ${recentCalls.length === 0 ? '<tr><td colspan="7" style="text-align:center">No calls recorded</td></tr>' : ''}
+                                ${recentCalls.length === 0 ? '<tr><td colspan="7" style="text-align:center">No calls recorded<th>May</th>' : ''}
                             </tbody>
-                         </table>
+                          </>
                     </div>
                 `;
             }
@@ -2627,7 +2830,7 @@
                     
                     <div class="charts-row">
                         <div class="chart-card"><div class="chart-header"><h3>Call Outcomes</h3></div><div class="chart-container"><canvas id="outcomeChart"></canvas></div></div>
-                        <div class="chart-card"><div class="chart-header"><h3>Top Performers</h3></div><div class="table-container" style="margin:0"> <table> <thead> <tr><th>Worker</th><th>Calls</th><th>Talk Time</th></tr> </thead> <tbody>${topWorkers.map(w => `<tr><td>${w.name}</td><td>${w.calls}</td><td>${Math.floor(w.duration / 60)}min</td></tr>`).join('')}</tbody> </table> </div></div>
+                        <div class="chart-card"><div class="chart-header"><h3>Top Performers</h3></div><div class="table-container" style="margin:0">  <thead>  <th>Worker</th><th>Calls</th><th>Talk Time</th> </thead> <tbody>${topWorkers.map(w => `<tr><td>${w.name}</td><td>${w.calls}</td><td>${Math.floor(w.duration / 60)}min</td></tr>`).join('')}</tbody>  </div></div>
                     </div>
                 `;
             }
@@ -2915,6 +3118,12 @@
             window.deleteClient = deleteClient;
             window.openAddClientModal = openAddClientModal;
             window.closeModal = closeModal;
+            
+            // Add login event listener
+            document.getElementById('loginSubmitBtn').addEventListener('click', login);
+            document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') login();
+            });
 
             // ========== EVENT LISTENERS ==========
             navItems.forEach(item => {
@@ -3105,7 +3314,9 @@
             });
 
             // ========== INITIALIZATION ==========
-            console.log('Admin panel ready - click Enter to continue');
+            // Check authentication on load
+            checkAuth();
+            console.log('Admin panel ready');
         })();
     </script>
 </body>

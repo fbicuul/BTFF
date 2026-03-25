@@ -1621,6 +1621,25 @@
             .ai-chat-input-area button {
                 padding: 0 20px;
             }
+
+            .ask-pastor-section {
+                padding: 30px 20px;
+            }
+            
+            .ask-pastor-section > div:last-of-type {
+                flex-direction: column !important;
+            }
+            
+            .ask-pastor-section input {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+            
+            .ask-pastor-section button {
+                width: 100%;
+                padding: 15px !important;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1785,7 +1804,7 @@
                 <p style="color: #b0c7e9; max-width: 600px; margin: 0 auto;">Ask any question about life, faith, relationships, or spiritual growth. Get answers with Bible-based wisdom and relevant video teachings.</p>
             </div>
             
-            <div style="display: flex; gap: 15px; max-width: 800px; margin: 0 auto; @media screen and (max-width: 600px) { flex-direction: column; }">
+            <div style="display: flex; gap: 15px; max-width: 800px; margin: 0 auto;">
                 <input type="text" id="pastorQuestion" placeholder="Type your question here... (e.g., 'How do I find peace?', 'What does the Bible say about love?')" style="flex: 1; background: #0a0f1a; border: 2px solid #3d6190; border-radius: 60px; padding: 18px 25px; color: white; font-size: 1rem; outline: none; transition: all 0.3s;">
                 <button id="askPastorBtn" style="background: #2f6bc6; border: none; border-radius: 60px; padding: 0 40px; color: white; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; justify-content: center;">
                     <i class="fas fa-pray"></i> Ask

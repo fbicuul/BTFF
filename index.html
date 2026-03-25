@@ -740,6 +740,56 @@
             gap: 15px;
         }
         
+        .ai-chat-input-area {
+            padding: 20px;
+            border-top: 1px solid #2d4560;
+            background: #0f1a2b;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .ai-chat-input-area input {
+            flex: 1;
+            background: #0a0f1a;
+            border: 2px solid #3d6190;
+            border-radius: 60px;
+            padding: 14px 20px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .ai-chat-input-area input:focus {
+            border-color: #2f6bc6;
+            box-shadow: 0 0 0 3px rgba(47,107,198,0.2);
+        }
+        
+        .ai-chat-input-area button {
+            background: #2f6bc6;
+            border: none;
+            border-radius: 60px;
+            padding: 0 30px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+        
+        .ai-chat-input-area button:hover:not(:disabled) {
+            background: #3e7ed9;
+            transform: scale(1.02);
+        }
+        
+        .ai-chat-input-area button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
         .message {
             display: flex;
             gap: 12px;
@@ -816,6 +866,7 @@
             border-radius: 8px;
             background-size: cover;
             background-position: center;
+            flex-shrink: 0;
         }
         
         .video-result-info {
@@ -1562,6 +1613,14 @@
             .message-content {
                 max-width: 85%;
             }
+            
+            .ai-chat-input-area {
+                padding: 15px;
+            }
+            
+            .ai-chat-input-area button {
+                padding: 0 20px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1588,6 +1647,15 @@
             
             .ask-pastor-section button {
                 padding: 0 25px;
+            }
+            
+            .ai-chat-input-area {
+                flex-direction: column;
+            }
+            
+            .ai-chat-input-area button {
+                padding: 12px;
+                justify-content: center;
             }
         }
     </style>
@@ -1826,6 +1894,12 @@
                     Hello! I'm Pastor Enoch's AI assistant. I'm here to help you with wisdom, guidance, and biblical teachings. What would you like to know today?
                 </div>
             </div>
+        </div>
+        <div class="ai-chat-input-area">
+            <input type="text" id="aiChatInput" placeholder="Type your question here...">
+            <button id="aiChatSendBtn">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
         </div>
     </div>
 </div>
@@ -3006,11 +3080,14 @@
             return { answer: pastorKnowledgeBase.defaultAnswer, videos: [] };
         }
         
+        // AI Chat elements
         const aiChatModal = document.getElementById('aiChatModal');
         const aiChatMessages = document.getElementById('aiChatMessages');
         const pastorQuestionInput = document.getElementById('pastorQuestion');
         const askPastorBtn = document.getElementById('askPastorBtn');
         const closeAiChat = document.getElementById('closeAiChat');
+        const aiChatInput = document.getElementById('aiChatInput');
+        const aiChatSendBtn = document.getElementById('aiChatSendBtn');
         let isTyping = false;
         
         function addAIMessage(content, isUser = false, videos = []) {
@@ -3057,18 +3134,44 @@
             isTyping = false;
         }
         
-        async function askPastor(question) {
+        async function sendToPastor(question, sourceButton = null) {
             if (!question.trim()) return;
-            addAIMessage(question, true);
-            pastorQuestionInput.value = '';
-            showTypingIndicator();
-            const result = await searchKnowledgeBase(question);
-            hideTypingIndicator();
-            addAIMessage(result.answer, false, result.videos);
+            
+            // Show loading state on button if provided
+            if (sourceButton) {
+                const originalHtml = sourceButton.innerHTML;
+                sourceButton.disabled = true;
+                sourceButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                
+                // Add user message
+                addAIMessage(question, true);
+                
+                showTypingIndicator();
+                const result = await searchKnowledgeBase(question);
+                hideTypingIndicator();
+                addAIMessage(result.answer, false, result.videos);
+                
+                // Reset button
+                sourceButton.disabled = false;
+                sourceButton.innerHTML = originalHtml;
+            } else {
+                // For chat input
+                addAIMessage(question, true);
+                showTypingIndicator();
+                const result = await searchKnowledgeBase(question);
+                hideTypingIndicator();
+                addAIMessage(result.answer, false, result.videos);
+            }
+            
+            // Open modal if not already open
             if (!aiChatModal.classList.contains('active')) {
                 aiChatModal.classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
+            
+            // Clear inputs
+            if (pastorQuestionInput) pastorQuestionInput.value = '';
+            if (aiChatInput) aiChatInput.value = '';
         }
         
         function closeAiChatModal() {
@@ -3076,19 +3179,61 @@
             document.body.style.overflow = 'auto';
         }
         
+        // Make playVideo globally accessible
         window.playVideo = function(videoId) {
             closeAiChatModal();
-            const tempMovie = { id: videoId, title: "Pastor Enoch Teaching", youtubeId: videoId, description: "A spiritual teaching from Pastor Enoch" };
-            if (typeof openVideoPlayer === 'function') openVideoPlayer(tempMovie.id);
-            else window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+            // Use the existing video player to play the YouTube video
+            const tempMovie = { 
+                id: videoId, 
+                title: "Pastor Enoch Teaching", 
+                youtubeId: videoId, 
+                description: "A spiritual teaching from Pastor Enoch" 
+            };
+            if (typeof openVideoPlayer === 'function') {
+                openVideoPlayer(tempMovie.id);
+            } else {
+                window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+            }
         };
         
-        if (askPastorBtn) askPastorBtn.addEventListener('click', () => { const q = pastorQuestionInput.value.trim(); if (q) askPastor(q); else showNotification('Please type a question first'); });
-        if (pastorQuestionInput) pastorQuestionInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { const q = pastorQuestionInput.value.trim(); if (q) askPastor(q); } });
+        // Event listeners for Pastor Enoch
+        if (askPastorBtn) {
+            askPastorBtn.addEventListener('click', () => { 
+                const q = pastorQuestionInput.value.trim(); 
+                if (q) sendToPastor(q, askPastorBtn); 
+                else showNotification('Please type a question first'); 
+            });
+        }
+        
+        if (pastorQuestionInput) {
+            pastorQuestionInput.addEventListener('keypress', (e) => { 
+                if (e.key === 'Enter') { 
+                    const q = pastorQuestionInput.value.trim(); 
+                    if (q) sendToPastor(q, askPastorBtn); 
+                } 
+            });
+        }
+        
+        if (aiChatSendBtn) {
+            aiChatSendBtn.addEventListener('click', () => { 
+                const q = aiChatInput.value.trim(); 
+                if (q) sendToPastor(q, aiChatSendBtn); 
+            });
+        }
+        
+        if (aiChatInput) {
+            aiChatInput.addEventListener('keypress', (e) => { 
+                if (e.key === 'Enter') { 
+                    const q = aiChatInput.value.trim(); 
+                    if (q) sendToPastor(q, aiChatSendBtn); 
+                } 
+            });
+        }
+        
         if (closeAiChat) closeAiChat.addEventListener('click', closeAiChatModal);
         window.addEventListener('click', (e) => { if (e.target === aiChatModal) closeAiChatModal(); });
 
-        // Event Listeners
+        // ========== EXISTING EVENT LISTENERS ==========
         if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', (e) => { e.preventDefault(); openMobileMenu(); });
         if (closeMobileMenu) closeMobileMenu.addEventListener('click', (e) => { e.preventDefault(); closeMobileMenuFunc(); });
         if (menuOverlay) menuOverlay.addEventListener('click', (e) => { e.preventDefault(); closeMobileMenuFunc(); });

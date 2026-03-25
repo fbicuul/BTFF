@@ -28,7 +28,6 @@
             min-height: 100vh;
         }
 
-        /* hero wrapper with video background */
         .hero-wrapper {
             position: relative;
             width: 100%;
@@ -38,7 +37,6 @@
             align-items: center;
         }
 
-        /* Video Hero Background */
         .hero-video-container {
             position: absolute;
             top: 0;
@@ -88,7 +86,6 @@
             width: 100%;
         }
 
-        /* ===== NAVBAR ===== */
         .navbar {
             display: flex;
             align-items: center;
@@ -110,7 +107,6 @@
             cursor: pointer;
         }
 
-        /* Desktop Navigation */
         .nav-links-desktop {
             display: flex;
             gap: 2.5rem;
@@ -144,7 +140,6 @@
             border-radius: 2px;
         }
 
-        /* Right side icons */
         .nav-icons {
             display: flex;
             align-items: center;
@@ -162,7 +157,6 @@
             color: white;
         }
 
-        /* Mobile Menu Toggle Button */
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -178,7 +172,6 @@
             color: white;
         }
 
-        /* ===== RIGHT SLIDE MENU ===== */
         .mobile-slide-menu {
             position: fixed;
             top: 0;
@@ -250,7 +243,6 @@
             border-left: 4px solid white;
         }
         
-        /* Overlay when menu is open */
         .menu-overlay {
             display: none;
             position: fixed;
@@ -267,7 +259,6 @@
             display: block;
         }
 
-        /* Advanced Search Bar */
         .search-container {
             padding: 16px 0 8px;
             transition: all 0.3s;
@@ -298,7 +289,6 @@
             color: #6a7f9f;
         }
         
-        /* Genre Filter Pills */
         .genre-filters {
             display: flex;
             gap: 10px;
@@ -372,7 +362,6 @@
             padding-left: 16px;
         }
 
-        /* hero */
         .hero {
             position: relative;
             display: flex;
@@ -462,7 +451,6 @@
             background: rgba(47, 107, 198, 0.3);
         }
 
-        /* section headers */
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -488,7 +476,6 @@
             color: white;
         }
 
-        /* movie rows */
         .movie-row {
             display: flex;
             gap: 18px;
@@ -509,7 +496,6 @@
             border-radius: 20px;
         }
 
-        /* movie card */
         .movie-card {
             flex: 0 0 auto;
             width: 240px;
@@ -588,7 +574,6 @@
             font-size: 0.7rem;
         }
         
-        /* Rating bars */
         .rating-bars {
             margin-top: 8px;
             padding-top: 8px;
@@ -651,7 +636,6 @@
             background: #2f6bc6;
         }
 
-        /* Progress bar for continue watching */
         .progress-bar {
             width: 100%;
             height: 4px;
@@ -667,7 +651,219 @@
             transition: width 0.3s;
         }
 
-        /* DETAILS MODAL */
+        /* ASK PASTOR ENOCH SECTION */
+        .ask-pastor-section {
+            background: linear-gradient(135deg, #0f1a2b 0%, #1a2a40 100%);
+            border-radius: 30px;
+            margin: 40px 0;
+            padding: 40px;
+            border: 1px solid rgba(47,107,198,0.3);
+        }
+        
+        .ask-pastor-section input:focus {
+            border-color: #2f6bc6;
+            box-shadow: 0 0 0 3px rgba(47,107,198,0.2);
+        }
+        
+        /* AI CHAT MODAL */
+        .ai-chat-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .ai-chat-modal.active {
+            display: flex;
+        }
+        
+        .ai-chat-container {
+            width: 900px;
+            max-width: 90vw;
+            height: 80vh;
+            max-height: 80vh;
+            background: #0c1727;
+            border-radius: 30px;
+            border: 2px solid #2f6bc6;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        .ai-chat-header {
+            padding: 20px 25px;
+            background: #0f1a2b;
+            border-bottom: 1px solid #2d4560;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .ai-chat-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+        }
+        
+        .ai-chat-header h3 i {
+            color: #ffc107;
+            font-size: 1.5rem;
+        }
+        
+        .ai-chat-close {
+            font-size: 2rem;
+            cursor: pointer;
+            color: #88abdf;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        
+        .ai-chat-close:hover {
+            color: #e50914;
+        }
+        
+        .ai-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: messageFadeIn 0.3s ease;
+        }
+        
+        .message.user {
+            justify-content: flex-end;
+        }
+        
+        .message.user .message-content {
+            background: #2f6bc6;
+            border-radius: 20px 20px 5px 20px;
+        }
+        
+        .message.ai .message-content {
+            background: #1c2a3f;
+            border-radius: 20px 20px 20px 5px;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .message.ai .message-avatar {
+            background: #2f6bc6;
+        }
+        
+        .message.user .message-avatar {
+            background: #ffc107;
+            color: #0a0f1a;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 12px 18px;
+            color: white;
+            line-height: 1.5;
+        }
+        
+        .video-results {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .video-result-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0a0f1a;
+            padding: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #2d4560;
+        }
+        
+        .video-result-item:hover {
+            background: #2f6bc6;
+            transform: translateX(5px);
+        }
+        
+        .video-result-thumb {
+            width: 80px;
+            height: 45px;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .video-result-info {
+            flex: 1;
+        }
+        
+        .video-result-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .video-result-desc {
+            font-size: 0.75rem;
+            color: #88abdf;
+        }
+        
+        .ai-typing {
+            display: flex;
+            gap: 4px;
+            padding: 12px 18px;
+        }
+        
+        .ai-typing span {
+            width: 8px;
+            height: 8px;
+            background: #88abdf;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+        .ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+        
+        @keyframes messageFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         .details-modal {
             display: none;
             position: fixed;
@@ -715,7 +911,6 @@
             overflow: hidden;
         }
         
-        /* Trailer background */
         .trailer-background {
             position: absolute;
             top: 0;
@@ -770,7 +965,6 @@
             color: #e50914;
         }
         
-        /* Cinema mode */
         .cinema-mode .details-modal-content {
             max-width: 90vw;
             margin: 20px auto;
@@ -824,7 +1018,6 @@
             flex-wrap: wrap;
         }
         
-        /* Season/Episode selector */
         .season-selector {
             display: flex;
             gap: 10px;
@@ -972,7 +1165,6 @@
             color: white;
         }
 
-        /* Rating Modal */
         .rating-modal {
             display: none;
             position: fixed;
@@ -1013,7 +1205,6 @@
             margin: 5px;
         }
 
-        /* Global Loading Overlay */
         .global-loading-overlay {
             display: none;
             position: fixed;
@@ -1060,7 +1251,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* loading indicator */
         .loading {
             text-align: center;
             padding: 50px;
@@ -1072,7 +1262,6 @@
             margin-bottom: 10px;
         }
 
-        /* error message */
         .error-message {
             text-align: center;
             padding: 50px;
@@ -1101,7 +1290,6 @@
             background: #3e7ed9;
         }
 
-        /* empty state */
         .empty-row {
             color: #6a7f9f;
             padding: 30px;
@@ -1110,7 +1298,6 @@
             font-style: italic;
         }
 
-        /* footer */
         .footer {
             margin-top: 80px;
             padding: 40px 0 50px;
@@ -1149,7 +1336,6 @@
             color: white;
         }
 
-        /* video player modal */
         .video-modal {
             display: none;
             position: fixed;
@@ -1220,7 +1406,6 @@
             border-radius: 24px;
         }
         
-        /* notifications */
         .notification {
             position: fixed;
             bottom: 30px;
@@ -1240,7 +1425,6 @@
             transform: translateX(0);
         }
         
-        /* Watch party */
         .watch-party-modal {
             display: none;
             position: fixed;
@@ -1306,7 +1490,6 @@
             border-radius: 5px;
         }
 
-        /* ===== MOBILE RESPONSIVE STYLES ===== */
         @media (max-width: 800px) {
             .container { 
                 padding: 0 20px; 
@@ -1370,6 +1553,15 @@
             .details-buttons {
                 justify-content: center;
             }
+            
+            .ai-chat-container {
+                width: 95vw;
+                height: 90vh;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1383,6 +1575,19 @@
             
             .mobile-slide-menu {
                 width: 250px;
+            }
+            
+            .ask-pastor-section {
+                padding: 25px;
+            }
+            
+            .ask-pastor-section input {
+                font-size: 0.9rem;
+                padding: 14px 20px;
+            }
+            
+            .ask-pastor-section button {
+                padding: 0 25px;
             }
         }
     </style>
@@ -1398,17 +1603,13 @@
 
 <div class="page-wrapper">
     <div class="hero-wrapper">
-        <!-- Dynamic Video Hero Background -->
         <div class="hero-video-container" id="heroVideoContainer"></div>
         <div class="hero-video-overlay"></div>
         <div class="hero-video-fade"></div>
 
         <div class="container">
-            <!-- NAVBAR -->
             <nav class="navbar">
                 <div class="logo" id="logoHome">BTFF</div>
-                
-                <!-- Desktop Navigation -->
                 <div class="nav-links-desktop">
                     <span class="active" data-category="all">Home</span>
                     <span data-category="trending">Trending</span>
@@ -1417,8 +1618,6 @@
                     <span data-category="myList">My List</span>
                     <span onclick="window.location.href='/callcenter'">Call Center</span>
                 </div>
-                
-                <!-- Right Side Icons -->
                 <div class="nav-icons">
                     <i class="fas fa-search" id="searchIcon"></i>
                     <i class="fas fa-bell" id="notificationIcon" title="Notifications"></i>
@@ -1430,7 +1629,6 @@
                 </div>
             </nav>
 
-            <!-- Mobile Slide Menu (Right Side) -->
             <div class="mobile-slide-menu" id="mobileSlideMenu">
                 <div class="mobile-menu-close" id="closeMobileMenu">
                     <i class="fas fa-times"></i>
@@ -1445,13 +1643,10 @@
                 </div>
             </div>
             
-            <!-- Overlay when menu is open -->
             <div class="menu-overlay" id="menuOverlay"></div>
 
-            <!-- Genre Filter Pills -->
             <div class="genre-filters" id="genreFilters"></div>
 
-            <!-- Language Selector -->
             <div class="language-selector" id="languageSelector" style="display: none; margin-bottom: 20px;">
                 <select id="languageSelect" class="filter-select">
                     <option value="en">English</option>
@@ -1467,7 +1662,6 @@
                 </select>
             </div>
 
-            <!-- ADVANCED SEARCH -->
             <div class="search-container" id="searchContainer" style="display: none;">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
@@ -1497,7 +1691,6 @@
                 <div class="search-results-count" id="searchCount"></div>
             </div>
 
-            <!-- HERO Content -->
             <section class="hero">
                 <div class="hero-left">
                     <div class="hero-eyebrow"><i class="fas fa-rocket"></i> FEATURED</div>
@@ -1513,20 +1706,39 @@
     </div>
 
     <div class="container">
-        <!-- LOADING INDICATOR (kept for backward compatibility) -->
+        <!-- ASK PASTOR ENOCH SECTION -->
+        <div class="ask-pastor-section">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="display: inline-flex; align-items: center; gap: 15px; background: rgba(47,107,198,0.2); padding: 10px 30px; border-radius: 60px; margin-bottom: 20px;">
+                    <i class="fas fa-microphone-alt" style="font-size: 1.5rem; color: #2f6bc6;"></i>
+                    <span style="font-weight: 600; letter-spacing: 1px;">ASK PASTOR ENOCH</span>
+                </div>
+                <h2 style="font-size: 2rem; margin-bottom: 15px; background: linear-gradient(135deg, #fff, #aaccff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Get Wisdom & Understanding</h2>
+                <p style="color: #b0c7e9; max-width: 600px; margin: 0 auto;">Ask any question about life, faith, relationships, or spiritual growth. Get answers with Bible-based wisdom and relevant video teachings.</p>
+            </div>
+            
+            <div style="display: flex; gap: 15px; max-width: 800px; margin: 0 auto;">
+                <input type="text" id="pastorQuestion" placeholder="Type your question here... (e.g., 'How do I find peace?', 'What does the Bible say about love?')" style="flex: 1; background: #0a0f1a; border: 2px solid #3d6190; border-radius: 60px; padding: 18px 25px; color: white; font-size: 1rem; outline: none; transition: all 0.3s;">
+                <button id="askPastorBtn" style="background: #2f6bc6; border: none; border-radius: 60px; padding: 0 40px; color: white; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-pray"></i> Ask
+                </button>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <small style="color: #6a7f9f;"><i class="fas fa-lightbulb"></i> Try: "What is the meaning of life?" or "How to overcome fear?"</small>
+            </div>
+        </div>
+
         <div id="loadingIndicator" class="loading" style="display: block;">
             <i class="fas fa-spinner fa-spin"></i>
             <p>Connecting to Our Database...</p>
         </div>
 
-        <!-- ERROR MESSAGE -->
         <div id="errorMessage" class="error-message" style="display: none;">
             <i class="fas fa-exclamation-triangle"></i>
             <p id="errorText">Failed to load movies from Google Sheets</p>
             <button class="retry-btn" id="retryBtn"><i class="fas fa-sync-alt"></i> Retry Connection</button>
         </div>
 
-        <!-- CONTINUE WATCHING ROW -->
         <div id="continueWatchingSection" style="display: none;">
             <div class="section-header">
                 <h2 class="section-title">⏯️ CONTINUE WATCHING</h2>
@@ -1535,7 +1747,6 @@
             <div class="movie-row" id="continueWatchingRow"></div>
         </div>
 
-        <!-- MY LIST ROW -->
         <div id="myListSection" style="display: none;">
             <div class="section-header">
                 <h2 class="section-title">📋 MY LIST</h2>
@@ -1544,7 +1755,6 @@
             <div class="movie-row" id="myListRow"></div>
         </div>
 
-        <!-- BECAUSE YOU WATCHED (AI Recommendations) -->
         <div id="recommendationsSection" style="display: none;">
             <div class="section-header">
                 <h2 class="section-title">🤖 RECOMMENDED FOR YOU</h2>
@@ -1553,7 +1763,6 @@
             <div class="movie-row" id="recommendationsRow"></div>
         </div>
 
-        <!-- TRENDING NOW -->
         <div class="section-header">
             <h2 class="section-title">🔥 TRENDING NOW</h2>
             <span class="section-link" data-category="trending">View all →</span>
@@ -1562,7 +1771,6 @@
             <div class="empty-row">No trending movies available</div>
         </div>
 
-        <!-- POPULAR ON BTFF -->
         <div class="section-header">
             <h2 class="section-title">⭐ POPULAR ON BTFF</h2>
             <span class="section-link" data-category="popular">View all →</span>
@@ -1571,7 +1779,6 @@
             <div class="empty-row">No popular movies available</div>
         </div>
 
-        <!-- RECENTLY ADDED -->
         <div class="section-header">
             <h2 class="section-title">🆕 RECENTLY ADDED</h2>
             <span class="section-link" data-category="recent">View all →</span>
@@ -1580,7 +1787,6 @@
             <div class="empty-row">No recent movies available</div>
         </div>
 
-        <!-- FOOTER -->
         <footer class="footer">
             <div class="footer-left">
                 <span class="footer-logo">BTFF</span>
@@ -1600,7 +1806,30 @@
     </div>
 </div>
 
-<!-- DETAILS MODAL -->
+<!-- AI CHAT MODAL -->
+<div class="ai-chat-modal" id="aiChatModal">
+    <div class="ai-chat-container">
+        <div class="ai-chat-header">
+            <h3>
+                <i class="fas fa-praying-hands"></i>
+                Pastor Enoch
+                <span style="font-size: 0.8rem; background: #2f6bc6; padding: 2px 8px; border-radius: 20px;">AI Assistant</span>
+            </h3>
+            <span class="ai-chat-close" id="closeAiChat">&times;</span>
+        </div>
+        <div class="ai-chat-messages" id="aiChatMessages">
+            <div class="message ai">
+                <div class="message-avatar">
+                    <i class="fas fa-microphone-alt"></i>
+                </div>
+                <div class="message-content">
+                    Hello! I'm Pastor Enoch's AI assistant. I'm here to help you with wisdom, guidance, and biblical teachings. What would you like to know today?
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="details-modal" id="detailsModal">
     <div class="details-modal-content">
         <div class="details-hero" id="detailsHero">
@@ -1614,8 +1843,6 @@
                 <div class="details-info">
                     <h1 class="details-title" id="detailsTitle"></h1>
                     <div class="details-meta" id="detailsMeta"></div>
-                    
-                    <!-- Season/Episode Selector (hidden by default) -->
                     <div id="seasonEpisodeContainer" style="display: none;">
                         <div class="season-selector">
                             <select class="season-select" id="seasonSelect">
@@ -1624,14 +1851,9 @@
                         </div>
                         <div class="episode-list" id="episodeList"></div>
                     </div>
-                    
                     <div class="details-rating" id="detailsRating"></div>
-                    
-                    <!-- Rating Distribution -->
                     <div class="rating-distribution" id="ratingDistribution"></div>
-                    
                     <p class="details-description" id="detailsDescription"></p>
-                    
                     <div class="details-buttons">
                         <button class="btn-primary" id="detailsPlayBtn"><i class="fas fa-play"></i> Play Now</button>
                         <button class="btn-secondary" id="detailsListBtn"><i class="fas fa-plus"></i> My List</button>
@@ -1640,8 +1862,6 @@
                         <button class="btn-secondary" id="watchPartyBtn"><i class="fas fa-users"></i> Party</button>
                         <button class="btn-secondary" id="shareBtn"><i class="fas fa-share-alt"></i> Share</button>
                     </div>
-                    
-                    <!-- Comments Section -->
                     <div class="comments-section" style="margin-top: 30px;">
                         <h4>Discussion</h4>
                         <div class="comment-input" style="display: flex; gap: 10px; margin-bottom: 20px;">
@@ -1660,7 +1880,6 @@
     </div>
 </div>
 
-<!-- VIDEO PLAYER MODAL -->
 <div class="video-modal" id="videoModal">
     <div class="video-modal-content">
         <div class="video-modal-header">
@@ -1674,7 +1893,6 @@
     </div>
 </div>
 
-<!-- RATING MODAL -->
 <div class="rating-modal" id="ratingModal">
     <h2>Rate this movie</h2>
     <div class="rating-stars" id="ratingStars">
@@ -1688,7 +1906,6 @@
     <button class="btn-secondary" id="closeRatingModal">Cancel</button>
 </div>
 
-<!-- WATCH PARTY MODAL -->
 <div class="watch-party-modal" id="watchPartyModal">
     <h2>🎬 Watch Party</h2>
     <p>Share this link with friends to watch together:</p>
@@ -1706,17 +1923,14 @@
     <button class="btn-secondary" id="closePartyModal" style="margin-top: 10px;">Close</button>
 </div>
 
-<!-- NOTIFICATION -->
 <div class="notification" id="notification">✅ Added to My List</div>
 
-<!-- NOTIFICATIONS PANEL -->
 <div class="notifications-panel" id="notificationsPanel" style="display: none; position: fixed; top: 80px; right: 40px; width: 300px; background: #0c1727; border: 2px solid #2f6bc6; border-radius: 12px; padding: 20px; z-index: 2000;">
     <h3 style="margin-bottom: 15px;">Notifications</h3>
     <div id="notificationsList"></div>
     <button class="btn-secondary" style="width: 100%; margin-top: 10px;" onclick="document.getElementById('notificationsPanel').style.display='none'">Close</button>
 </div>
 
-<!-- PROFILE MODAL (Simplified) -->
 <div class="modal" id="profileModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); align-items: center; justify-content: center; z-index: 5000;">
     <div class="modal-content" style="background: #0c1727; border-radius: 30px; padding: 40px; width: 400px; max-width: 90vw; border: 2px solid #2f6bc6;">
         <span class="modal-close" id="closeProfileModal" style="position: absolute; top: 20px; right: 20px; font-size: 2rem; cursor: pointer;">&times;</span>
@@ -1740,7 +1954,6 @@
     </div>
 </div>
 
-<!-- SWITCH USER MODAL -->
 <div class="modal" id="switchUserModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); align-items: center; justify-content: center; z-index: 5000;">
     <div class="modal-content" style="background: #0c1727; border-radius: 30px; padding: 40px; width: 400px; max-width: 90vw; border: 2px solid #2f6bc6;">
         <span class="modal-close" id="closeSwitchUserModal" style="position: absolute; top: 20px; right: 20px; font-size: 2rem; cursor: pointer;">&times;</span>
@@ -1754,7 +1967,6 @@
     </div>
 </div>
 
-<!-- KIDS MODE OVERLAY -->
 <div id="kidsModeOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ff6b6b; z-index: 10000; overflow-y: auto;">
     <div style="text-align: center; padding: 50px;">
         <h1 style="font-size: 4rem; color: white; margin-bottom: 30px;">🧸 KIDS MODE</h1>
@@ -1765,10 +1977,9 @@
 
 <script>
     (function() {
-        // ---------- CONFIGURATION ----------
+        // ========== CONFIGURATION ==========
         const APPS_SCRIPT_URL = '%%APPS_SCRIPT_URL%%';
         
-        // ===== SESSION MANAGEMENT =====
         let currentSessionToken = localStorage.getItem('btff_session_token');
 
         async function initSession() {
@@ -1779,7 +1990,6 @@
             return currentSessionToken;
         }
 
-        // Global Loading Overlay
         const globalLoadingOverlay = document.getElementById('globalLoadingOverlay');
         let loadingTimeout = null;
 
@@ -1789,7 +1999,6 @@
                 loadingText.innerHTML = `<i class="fas fa-film"></i> ${message} <i class="fas fa-film"></i>`;
             }
             globalLoadingOverlay.classList.add('active');
-            
             if (loadingTimeout) clearTimeout(loadingTimeout);
             loadingTimeout = setTimeout(() => {
                 hideGlobalLoading();
@@ -1804,7 +2013,6 @@
             }
         }
 
-        // API wrapper
         async function apiCall(action, data = {}, method = 'GET', showLoading = true) {
             await initSession();
             
@@ -1854,7 +2062,7 @@
             }
         }
 
-        // ---------- STATE ----------
+        // ========== STATE ==========
         let movies = [];
         let myList = JSON.parse(localStorage.getItem('btffMyList')) || [];
         let continueWatching = JSON.parse(localStorage.getItem('btffContinueWatching')) || [];
@@ -2043,20 +2251,16 @@
             });
         }
 
-        // AI Recommendations (simple version based on watch history)
         function generateAIRecommendations(movieId) {
             const movie = movies.find(m => m.id == movieId);
             if (!movie) return [];
-            
             const similar = movies.filter(m => 
                 m.id != movie.id && 
                 (m.category === movie.category || m.genre === movie.genre)
             ).sort(() => 0.5 - Math.random()).slice(0, 10);
-            
             return similar;
         }
 
-        // Comments
         function loadComments(movieId) {
             const movieComments = comments[movieId] || [];
             if (commentsList) {
@@ -2076,20 +2280,11 @@
 
         async function addComment(movieId, text) {
             if (!text.trim()) return;
-            
             showGlobalLoading('Posting comment...');
-            const data = await apiCall('addComment', {
-                movieId: movieId,
-                comment: text
-            }, 'POST', false);
-            
+            const data = await apiCall('addComment', { movieId: movieId, comment: text }, 'POST', false);
             if (data.success) {
                 if (!comments[movieId]) comments[movieId] = [];
-                comments[movieId].push({
-                    user: currentUser,
-                    text: text,
-                    timestamp: new Date().toISOString()
-                });
+                comments[movieId].push({ user: currentUser, text: text, timestamp: new Date().toISOString() });
                 localStorage.setItem('btffComments', JSON.stringify(comments));
                 loadComments(movieId);
                 if (commentInput) commentInput.value = '';
@@ -2100,15 +2295,8 @@
             }
         }
 
-        // Notifications
         function addNotification(message, type = 'info') {
-            notifications.unshift({
-                id: Date.now(),
-                message,
-                type,
-                timestamp: new Date().toISOString(),
-                read: false
-            });
+            notifications.unshift({ id: Date.now(), message, type, timestamp: new Date().toISOString(), read: false });
             notifications = notifications.slice(0, 50);
             localStorage.setItem('btffNotifications', JSON.stringify(notifications));
             updateNotificationsBadge();
@@ -2142,10 +2330,7 @@
                     const div = document.createElement('div');
                     div.className = 'notification-item';
                     div.style.cssText = 'padding: 10px; border-bottom: 1px solid #1f334a; cursor: pointer;';
-                    div.innerHTML = `
-                        <strong>${n.message}</strong>
-                        <div style="color: #88abdf; font-size: 0.7rem;">${new Date(n.timestamp).toLocaleString()}</div>
-                    `;
+                    div.innerHTML = `<strong>${n.message}</strong><div style="color: #88abdf; font-size: 0.7rem;">${new Date(n.timestamp).toLocaleString()}</div>`;
                     div.onclick = () => {
                         n.read = true;
                         localStorage.setItem('btffNotifications', JSON.stringify(notifications));
@@ -2158,7 +2343,6 @@
             if (notificationsPanel) notificationsPanel.style.display = 'block';
         }
 
-        // User Profiles (simplified)
         window.switchUser = function() {
             if (switchUserModal) switchUserModal.style.display = 'flex';
         };
@@ -2180,7 +2364,6 @@
             }
             
             const profile = userProfiles[currentUser];
-            
             const profileNameEl = document.getElementById('profileName');
             const profileEmailEl = document.getElementById('profileEmail');
             const profileWatchCountEl = document.getElementById('profileWatchCount');
@@ -2192,22 +2375,12 @@
             if (profileWatchCountEl) profileWatchCountEl.textContent = profile.watchCount || 0;
             if (profileRatingCountEl) profileRatingCountEl.textContent = profile.ratingCount || 0;
             
-            const avatars = {
-                guest: '👤',
-                admin: '👑',
-                family: '👨‍👩‍👧‍👦',
-                kids: '🧸'
-            };
+            const avatars = { guest: '👤', admin: '👑', family: '👨‍👩‍👧‍👦', kids: '🧸' };
             if (profileAvatarEl) profileAvatarEl.textContent = avatars[userType] || profile.avatar || '👤';
             
-            if (kidsModeOverlay) {
-                kidsModeOverlay.style.display = currentUser === 'kids' ? 'block' : 'none';
-            }
-            
+            if (kidsModeOverlay) kidsModeOverlay.style.display = currentUser === 'kids' ? 'block' : 'none';
             if (switchUserModal) switchUserModal.style.display = 'none';
-            
             showNotification(`Switched to ${profile.name || userType}`);
-            
             loadUserData();
         };
 
@@ -2223,23 +2396,14 @@
             renderAll();
         }
 
-        setTimeout(() => {
-            window.setUser(currentUser);
-        }, 100);
+        setTimeout(() => { window.setUser(currentUser); }, 100);
 
-        // Share
         async function shareMovie(movie) {
             if (navigator.share) {
                 try {
-                    await navigator.share({
-                        title: movie.title,
-                        text: movie.description,
-                        url: window.location.href + '?movie=' + movie.id
-                    });
+                    await navigator.share({ title: movie.title, text: movie.description, url: window.location.href + '?movie=' + movie.id });
                     showNotification('Shared successfully!');
-                } catch (err) {
-                    console.error('Share failed:', err);
-                }
+                } catch (err) { console.error('Share failed:', err); }
             } else {
                 navigator.clipboard.writeText(window.location.href + '?movie=' + movie.id);
                 showNotification('Link copied to clipboard!');
@@ -2258,7 +2422,6 @@
             return 0;
         }
 
-        // Mobile Menu
         function openMobileMenu() {
             if (mobileSlideMenu) {
                 mobileSlideMenu.classList.add('active');
@@ -2275,87 +2438,40 @@
             }
         }
 
-        // Hero - 20 second autoplay
         function updateHero(movie) {
-            if (!movie) return;
-            
-            if (!movie.youtubeId) {
-                console.warn('Hero movie missing youtubeId:', movie);
-                return;
-            }
-            
+            if (!movie || !movie.youtubeId) return;
             heroMovie = movie;
-            
             if (heroVideoContainer) {
-                heroVideoContainer.innerHTML = `
-                    <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0&modestbranding=1&playsinline=1" 
-                            frameborder="0" 
-                            allow="autoplay; encrypted-media; picture-in-picture" 
-                            allowfullscreen
-                            style="pointer-events: none;">
-                    </iframe>
-                `;
+                heroVideoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0&modestbranding=1&playsinline=1" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="pointer-events: none;"></iframe>`;
             }
-            
             if (heroTitle) heroTitle.textContent = movie.title;
             if (heroDescription) heroDescription.textContent = movie.description || 'No description available';
-            
-            if (heroPlayBtn) {
-                heroPlayBtn.onclick = () => openVideoPlayer(movie.id);
-            }
-            if (heroAddBtn) {
-                heroAddBtn.onclick = () => addToMyList(movie.id);
-            }
-            
+            if (heroPlayBtn) heroPlayBtn.onclick = () => openVideoPlayer(movie.id);
+            if (heroAddBtn) heroAddBtn.onclick = () => addToMyList(movie.id);
             if (heroTimeout) clearTimeout(heroTimeout);
-            
-            // Stop video after 20 seconds
             heroTimeout = setTimeout(() => {
                 if (heroVideoContainer) {
-                    heroVideoContainer.innerHTML = `
-                        <iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=0&mute=1&controls=0&showinfo=0&modestbranding=1" 
-                                frameborder="0" 
-                                allow="encrypted-media; picture-in-picture" 
-                                allowfullscreen
-                                style="pointer-events: none;">
-                        </iframe>
-                    `;
+                    heroVideoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${movie.youtubeId}?autoplay=0&mute=1&controls=0&showinfo=0&modestbranding=1" frameborder="0" allow="encrypted-media; picture-in-picture" allowfullscreen style="pointer-events: none;"></iframe>`;
                 }
             }, 20000);
         }
 
-        // API Functions
         async function fetchMovies() {
             try {
                 showGlobalLoading('Loading movies...');
-                
                 const data = await apiCall('getMovies', {}, 'GET', false);
-                
                 if (data.success && Array.isArray(data.movies)) {
                     movies = data.movies;
-                    
-                    movies.sort((a, b) => {
-                        const idA = getNumericId(a.id);
-                        const idB = getNumericId(b.id);
-                        return idB - idA;
-                    });
-                    
-                    if (movies.length > 0) {
-                        updateHero(movies[0]);
-                    }
-                    
+                    movies.sort((a, b) => getNumericId(b.id) - getNumericId(a.id));
+                    if (movies.length > 0) updateHero(movies[0]);
                     await fetchAllRatings();
                     extractGenres();
                     populateYearFilter();
                     renderAll();
                     hideError();
-                    
                     const urlParams = new URLSearchParams(window.location.search);
                     const movieParam = urlParams.get('movie');
-                    if (movieParam) {
-                        openDetailsModal(movieParam);
-                    }
-                    
+                    if (movieParam) openDetailsModal(movieParam);
                     hideGlobalLoading();
                 } else {
                     hideGlobalLoading();
@@ -2370,27 +2486,18 @@
 
         async function fetchAllRatings() {
             const data = await apiCall('getRatings', {}, 'GET', false);
-            
             if (data.success && data.ratings) {
-                const ratingsMap = {};
-                const distributionsMap = {};
-                
+                const ratingsMap = {}, distributionsMap = {};
                 data.ratings.forEach(r => {
-                    if (!ratingsMap[r.movieId]) {
-                        ratingsMap[r.movieId] = [];
-                    }
+                    if (!ratingsMap[r.movieId]) ratingsMap[r.movieId] = [];
                     ratingsMap[r.movieId].push(parseInt(r.rating));
                 });
-                
                 Object.keys(ratingsMap).forEach(movieId => {
                     const movieRatings = ratingsMap[movieId];
-                    const distribution = [0, 0, 0, 0, 0];
-                    movieRatings.forEach(r => {
-                        if (r >= 1 && r <= 5) distribution[r-1]++;
-                    });
+                    const distribution = [0,0,0,0,0];
+                    movieRatings.forEach(r => { if (r >= 1 && r <= 5) distribution[r-1]++; });
                     distributionsMap[movieId] = distribution;
                 });
-                
                 ratings = ratingsMap;
                 ratingDistributions = distributionsMap;
                 localStorage.setItem('btffRatings', JSON.stringify(ratings));
@@ -2399,16 +2506,11 @@
 
         async function fetchMovieRatings(movieId) {
             const data = await apiCall('getMovieRatings', { movieId: movieId }, 'GET', false);
-            
             if (data.success) {
                 ratings[movieId] = data.ratings || [];
-                
-                const distribution = [0, 0, 0, 0, 0];
-                (data.ratings || []).forEach(r => {
-                    if (r >= 1 && r <= 5) distribution[r-1]++;
-                });
+                const distribution = [0,0,0,0,0];
+                (data.ratings || []).forEach(r => { if (r >= 1 && r <= 5) distribution[r-1]++; });
                 ratingDistributions[movieId] = distribution;
-                
                 localStorage.setItem('btffRatings', JSON.stringify(ratings));
                 return data;
             }
@@ -2417,27 +2519,16 @@
 
         async function fetchContinueWatching() {
             const data = await apiCall('getContinueWatching', { userId: userId }, 'GET', false);
-            
             if (data.success && data.continueWatching) {
-                continueWatching = data.continueWatching.map(item => ({
-                    id: item.movieId,
-                    progress: parseInt(item.progress),
-                    timestamp: new Date(item.lastWatched).getTime()
-                }));
+                continueWatching = data.continueWatching.map(item => ({ id: item.movieId, progress: parseInt(item.progress), timestamp: new Date(item.lastWatched).getTime() }));
                 localStorage.setItem('btffContinueWatching', JSON.stringify(continueWatching));
                 renderContinueWatchingRow();
             }
         }
 
-        // Genres
         function extractGenres() {
             const genres = new Set();
-            movies.forEach(movie => {
-                if (movie.genre) {
-                    genres.add(movie.genre);
-                }
-            });
-            
+            movies.forEach(movie => { if (movie.genre) genres.add(movie.genre); });
             renderGenrePills(Array.from(genres).map(g => ({ name: g })));
         }
 
@@ -2451,7 +2542,6 @@
                     genreFilters.innerHTML += `<span class="genre-pill" data-genre="${genre.name}">${genre.name} (${genre.count || 0})</span>`;
                 }
             });
-            
             document.querySelectorAll('.genre-pill').forEach(pill => {
                 pill.addEventListener('click', () => {
                     document.querySelectorAll('.genre-pill').forEach(p => p.classList.remove('active'));
@@ -2464,10 +2554,7 @@
 
         function populateYearFilter() {
             const years = new Set();
-            movies.forEach(movie => {
-                if (movie.year) years.add(movie.year);
-            });
-            
+            movies.forEach(movie => { if (movie.year) years.add(movie.year); });
             if (yearFilter) {
                 yearFilter.innerHTML = '<option value="">All Years</option>';
                 Array.from(years).sort().reverse().forEach(year => {
@@ -2476,7 +2563,6 @@
             }
         }
 
-        // UI State
         function showError(message) {
             if (errorText) errorText.textContent = message;
             if (errorMessage) errorMessage.style.display = 'block';
@@ -2493,12 +2579,10 @@
             setTimeout(() => notification.classList.remove('show'), 2500);
         }
 
-        // Ratings
         function getAverageRating(movieId) {
             const movieRatings = ratings[movieId] || [];
             if (movieRatings.length === 0) return 0;
-            const sum = movieRatings.reduce((a, b) => a + b, 0);
-            return sum / movieRatings.length;
+            return movieRatings.reduce((a, b) => a + b, 0) / movieRatings.length;
         }
 
         function getRatingCount(movieId) {
@@ -2506,30 +2590,22 @@
         }
 
         function getRatingDistribution(movieId) {
-            return ratingDistributions[movieId] || [0, 0, 0, 0, 0];
+            return ratingDistributions[movieId] || [0,0,0,0,0];
         }
 
         async function addRating(movieId, rating) {
             showGlobalLoading('Submitting rating...');
-            const data = await apiCall('addRating', { 
-                movieId: movieId, 
-                rating: rating 
-            }, 'POST', false);
-            
+            const data = await apiCall('addRating', { movieId: movieId, rating: rating }, 'POST', false);
             if (data.success) {
                 await fetchAllRatings();
                 if (currentMovie && currentMovie.id == movieId) {
                     const ratingData = await fetchMovieRatings(movieId);
-                    if (ratingData) {
-                        updateDetailsModal(currentMovie);
-                    }
+                    if (ratingData) updateDetailsModal(currentMovie);
                 }
-                
                 if (userProfiles[currentUser]) {
                     userProfiles[currentUser].ratingCount = (userProfiles[currentUser].ratingCount || 0) + 1;
                     localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
                 }
-                
                 hideGlobalLoading();
                 showNotification(`⭐ Rated ${rating} stars`);
                 addNotification(`You rated "${currentMovie?.title}" ${rating} stars`);
@@ -2539,25 +2615,17 @@
             }
         }
 
-        // Continue Watching
         async function updateProgress(movieId, progress) {
-            const data = await apiCall('updateProgress', {
-                movieId: movieId,
-                progress: progress
-            }, 'POST', false);
-            
+            const data = await apiCall('updateProgress', { movieId: movieId, progress: progress }, 'POST', false);
             if (data.success) {
                 await fetchContinueWatching();
-                
                 if (!watchHistory.includes(movieId)) {
                     watchHistory.push(movieId);
                     localStorage.setItem('btffWatchHistory', JSON.stringify(watchHistory));
-                    
                     if (userProfiles[currentUser]) {
                         userProfiles[currentUser].watchCount = (userProfiles[currentUser].watchCount || 0) + 1;
                         localStorage.setItem('btffUserProfiles', JSON.stringify(userProfiles));
                     }
-                    
                     aiRecommendations = generateAIRecommendations(movieId);
                     renderRecommendations();
                 }
@@ -2569,7 +2637,6 @@
             return item ? item.progress : 0;
         }
 
-        // My List
         function isInMyList(movieId) {
             return myList.includes(movieId);
         }
@@ -2596,100 +2663,46 @@
 
         function toggleMyList(movieId, event) {
             if (event) event.stopPropagation();
-            if (isInMyList(movieId)) {
-                removeFromMyList(movieId);
-            } else {
-                addToMyList(movieId);
-            }
+            if (isInMyList(movieId)) removeFromMyList(movieId);
+            else addToMyList(movieId);
         }
 
-        // Video Player
         function openVideoPlayer(movieId, episode = null) {
             const movie = movies.find(m => m.id == movieId);
-            if (!movie) {
-                console.error('Movie not found:', movieId);
-                return;
-            }
-            
-            if (!movie.youtubeId) {
-                console.error('Movie missing youtubeId:', movie);
+            if (!movie || !movie.youtubeId) {
                 showNotification('This movie has no video URL');
                 return;
             }
-            
             currentMovie = movie;
-            
             const youtubeId = movie.youtubeId.split('?')[0].split('&')[0];
-            
-            if (videoModalTitle) {
-                videoModalTitle.textContent = episode ? `${movie.title} - ${episode}` : movie.title;
-            }
-            
-            const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
-            
-            console.log('🎬 Playing video:', embedUrl);
-            
-            if (videoIframe) {
-                videoIframe.src = embedUrl;
-            }
-            
-            if (videoModal) {
-                videoModal.style.display = 'flex';
-                videoModal.classList.add('active');
-            }
-            
+            if (videoModalTitle) videoModalTitle.textContent = episode ? `${movie.title} - ${episode}` : movie.title;
+            if (videoIframe) videoIframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
+            if (videoModal) { videoModal.style.display = 'flex'; videoModal.classList.add('active'); }
             document.body.style.overflow = 'hidden';
-            
-            setTimeout(() => {
-                updateProgress(movieId, 25);
-            }, 30000);
-            
-            if (videoModalAddBtn) {
-                videoModalAddBtn.innerHTML = isInMyList(movieId) ? 
-                    '<i class="fas fa-check"></i> In My List' : 
-                    '<i class="fas fa-plus"></i> My List';
-            }
+            setTimeout(() => updateProgress(movieId, 25), 30000);
+            if (videoModalAddBtn) videoModalAddBtn.innerHTML = isInMyList(movieId) ? '<i class="fas fa-check"></i> In My List' : '<i class="fas fa-plus"></i> My List';
         }
 
         function closeVideoPlayer() {
-            if (videoModal) {
-                videoModal.style.display = 'none';
-                videoModal.classList.remove('active');
-            }
-            if (videoIframe) {
-                videoIframe.src = '';
-            }
+            if (videoModal) { videoModal.style.display = 'none'; videoModal.classList.remove('active'); }
+            if (videoIframe) videoIframe.src = '';
             document.body.style.overflow = 'auto';
         }
 
-        // Details Modal
         async function openDetailsModal(movieId) {
             const movie = movies.find(m => m.id == movieId);
             if (!movie) return;
-            
             showGlobalLoading('Loading details...');
             currentMovie = movie;
-            
             const ratingData = await fetchMovieRatings(movieId);
-            if (ratingData) {
-                ratings[movieId] = ratingData.ratings || [];
-            }
-            
+            if (ratingData) ratings[movieId] = ratingData.ratings || [];
             updateDetailsModal(movie);
             if (detailsModal) detailsModal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            
             if (trailerBackground && movie.youtubeId) {
                 const youtubeId = movie.youtubeId.split('?')[0].split('&')[0];
-                trailerBackground.innerHTML = `
-                    <iframe src="https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0&loop=1&playlist=${youtubeId}" 
-                            frameborder="0" 
-                            allow="autoplay; encrypted-media" 
-                            allowfullscreen>
-                    </iframe>
-                `;
+                trailerBackground.innerHTML = `<iframe src="https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&showinfo=0&loop=1&playlist=${youtubeId}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
             }
-            
             loadComments(movieId);
             hideGlobalLoading();
         }
@@ -2699,9 +2712,7 @@
             document.body.style.overflow = 'auto';
             cinemaModeActive = false;
             if (detailsModal) detailsModal.classList.remove('cinema-mode');
-            if (trailerBackground) {
-                trailerBackground.innerHTML = '';
-            }
+            if (trailerBackground) trailerBackground.innerHTML = '';
         }
 
         function toggleCinemaMode() {
@@ -2720,96 +2731,46 @@
             if (detailsPoster) detailsPoster.src = `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`;
             if (detailsTitle) detailsTitle.textContent = movie.title;
             if (detailsMeta) {
-                detailsMeta.innerHTML = `
-                    <span>${movie.year || '2024'}</span>
-                    <span>${movie.duration || '0m'}</span>
-                    <span>${movie.category}</span>
-                    ${movie.genre ? `<span>${movie.genre}</span>` : ''}
-                `;
+                detailsMeta.innerHTML = `<span>${movie.year || '2024'}</span><span>${movie.duration || '0m'}</span><span>${movie.category}</span>${movie.genre ? `<span>${movie.genre}</span>` : ''}`;
             }
-            
             const avgRating = getAverageRating(movie.id);
             const ratingCount = getRatingCount(movie.id);
             const fullStars = '★'.repeat(Math.floor(avgRating));
             const emptyStars = '☆'.repeat(5 - Math.floor(avgRating));
-            if (detailsRating) {
-                detailsRating.innerHTML = `
-                    <span class="stars">${fullStars}${emptyStars}</span>
-                    <span class="rating-value">${avgRating.toFixed(1)} (${ratingCount} ratings)</span>
-                `;
-            }
-            
+            if (detailsRating) detailsRating.innerHTML = `<span class="stars">${fullStars}${emptyStars}</span><span class="rating-value">${avgRating.toFixed(1)} (${ratingCount} ratings)</span>`;
             const dist = getRatingDistribution(movie.id);
             const total = dist.reduce((a, b) => a + b, 0);
             let distHtml = '<h4>Rating Distribution</h4>';
-            
             if (total > 0) {
                 for (let i = 5; i >= 1; i--) {
                     const count = dist[i-1];
                     const percentage = (count / total) * 100;
-                    distHtml += `
-                        <div class="rating-bar-dist">
-                            <span>${i}★</span>
-                            <div class="bar-bg"><div class="bar-fill" style="width: ${percentage}%"></div></div>
-                            <span>${count}</span>
-                        </div>
-                    `;
+                    distHtml += `<div class="rating-bar-dist"><span>${i}★</span><div class="bar-bg"><div class="bar-fill" style="width: ${percentage}%"></div></div><span>${count}</span></div>`;
                 }
             } else {
-                for (let i = 5; i >= 1; i--) {
-                    distHtml += `
-                        <div class="rating-bar-dist">
-                            <span>${i}★</span>
-                            <div class="bar-bg"><div class="bar-fill" style="width: 0%"></div></div>
-                            <span>0</span>
-                        </div>
-                    `;
-                }
+                for (let i = 5; i >= 1; i--) distHtml += `<div class="rating-bar-dist"><span>${i}★</span><div class="bar-bg"><div class="bar-fill" style="width: 0%"></div></div><span>0</span></div>`;
             }
             if (ratingDistribution) ratingDistribution.innerHTML = distHtml;
-            
             if (detailsDescription) detailsDescription.textContent = movie.description || movie.desc || 'No description available';
-            if (detailsListBtn) {
-                detailsListBtn.innerHTML = isInMyList(movie.id) ? 
-                    '<i class="fas fa-check"></i> In My List' : 
-                    '<i class="fas fa-plus"></i> My List';
-            }
-            
+            if (detailsListBtn) detailsListBtn.innerHTML = isInMyList(movie.id) ? '<i class="fas fa-check"></i> In My List' : '<i class="fas fa-plus"></i> My List';
             if (movie.type === 'series') {
                 if (seasonEpisodeContainer) seasonEpisodeContainer.style.display = 'block';
                 renderEpisodes(movie);
             } else {
                 if (seasonEpisodeContainer) seasonEpisodeContainer.style.display = 'none';
             }
-            
-            const similar = movies.filter(m => 
-                m.id != movie.id && 
-                (m.category === movie.category || m.genre === movie.genre || 
-                 (m.year && movie.year && Math.abs(parseInt(m.year) - parseInt(movie.year)) <= 2))
-            ).sort((a, b) => {
-                const ratingA = getAverageRating(a.id);
-                const ratingB = getAverageRating(b.id);
-                const targetRating = getAverageRating(movie.id);
-                return Math.abs(ratingB - targetRating) - Math.abs(ratingA - targetRating);
-            }).slice(0, 10);
-            
+            const similar = movies.filter(m => m.id != movie.id && (m.category === movie.category || m.genre === movie.genre || (m.year && movie.year && Math.abs(parseInt(m.year) - parseInt(movie.year)) <= 2))).sort((a, b) => Math.abs(getAverageRating(b.id) - getAverageRating(movie.id)) - Math.abs(getAverageRating(a.id) - getAverageRating(movie.id))).slice(0, 10);
             if (moreLikeThisRow) {
                 moreLikeThisRow.innerHTML = '';
-                similar.forEach(m => {
-                    moreLikeThisRow.appendChild(createMovieCard(m, true));
-                });
+                similar.forEach(m => { moreLikeThisRow.appendChild(createMovieCard(m, true)); });
             }
         }
 
         function renderEpisodes(movie) {
             if (!seasonSelect || !episodeList) return;
-            
             const seasons = movie.seasons || 1;
             seasonSelect.innerHTML = '';
-            for (let i = 1; i <= seasons; i++) {
-                seasonSelect.innerHTML += `<option value="${i}">Season ${i}</option>`;
-            }
-            
+            for (let i = 1; i <= seasons; i++) seasonSelect.innerHTML += `<option value="${i}">Season ${i}</option>`;
             const episodes = movie.episodes || 10;
             episodeList.innerHTML = '';
             for (let i = 1; i <= episodes; i++) {
@@ -2825,17 +2786,11 @@
             }
         }
 
-        // Search and Filter
         function updateActiveFilters() {
             if (activeFilters) {
                 activeFilters.innerHTML = '';
-                
-                if (categoryFilter && categoryFilter.value) {
-                    activeFilters.innerHTML += `<span class="filter-tag">${categoryFilter.value} <i class="fas fa-times" onclick="document.getElementById('categoryFilter').value=''; applyFilters();"></i></span>`;
-                }
-                if (yearFilter && yearFilter.value) {
-                    activeFilters.innerHTML += `<span class="filter-tag">${yearFilter.value} <i class="fas fa-times" onclick="document.getElementById('yearFilter').value=''; applyFilters();"></i></span>`;
-                }
+                if (categoryFilter && categoryFilter.value) activeFilters.innerHTML += `<span class="filter-tag">${categoryFilter.value} <i class="fas fa-times" onclick="document.getElementById('categoryFilter').value=''; applyFilters();"></i></span>`;
+                if (yearFilter && yearFilter.value) activeFilters.innerHTML += `<span class="filter-tag">${yearFilter.value} <i class="fas fa-times" onclick="document.getElementById('yearFilter').value=''; applyFilters();"></i></span>`;
             }
         }
 
@@ -2846,160 +2801,68 @@
 
         function filterAndSortMovies(movieList) {
             let filtered = [...movieList];
-            
             const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-            if (searchTerm) {
-                filtered = filtered.filter(m => 
-                    m.title.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            if (categoryFilter && categoryFilter.value) {
-                filtered = filtered.filter(m => m.category === categoryFilter.value);
-            }
-            
-            if (yearFilter && yearFilter.value) {
-                filtered = filtered.filter(m => m.year === yearFilter.value);
-            }
-            
-            if (currentGenre !== 'all') {
-                filtered = filtered.filter(m => m.genre === currentGenre);
-            }
-            
-            filtered.sort((a, b) => {
-                const idA = getNumericId(a.id);
-                const idB = getNumericId(b.id);
-                return idB - idA;
-            });
-            
+            if (searchTerm) filtered = filtered.filter(m => m.title.toLowerCase().includes(searchTerm));
+            if (categoryFilter && categoryFilter.value) filtered = filtered.filter(m => m.category === categoryFilter.value);
+            if (yearFilter && yearFilter.value) filtered = filtered.filter(m => m.year === yearFilter.value);
+            if (currentGenre !== 'all') filtered = filtered.filter(m => m.genre === currentGenre);
+            filtered.sort((a, b) => getNumericId(b.id) - getNumericId(a.id));
             if (sortFilter && sortFilter.value && sortFilter.value !== 'default') {
                 if (sortFilter.value === 'aiRecommend') {
                     if (watchHistory.length > 0) {
                         const lastWatched = watchHistory[watchHistory.length - 1];
                         const lastMovie = movies.find(m => m.id == lastWatched);
-                        if (lastMovie) {
-                            filtered = generateAIRecommendations(lastMovie.id);
-                        }
+                        if (lastMovie) filtered = generateAIRecommendations(lastMovie.id);
                     }
                 } else {
                     switch(sortFilter.value) {
-                        case 'titleAsc':
-                            filtered.sort((a, b) => a.title.localeCompare(b.title));
-                            break;
-                        case 'titleDesc':
-                            filtered.sort((a, b) => b.title.localeCompare(a.title));
-                            break;
-                        case 'yearDesc':
-                            filtered.sort((a, b) => (b.year || '0').localeCompare(a.year || '0'));
-                            break;
-                        case 'yearAsc':
-                            filtered.sort((a, b) => (a.year || '0').localeCompare(b.year || '0'));
-                            break;
-                        case 'ratingDesc':
-                            filtered.sort((a, b) => {
-                                const ratingA = getAverageRating(a.id);
-                                const ratingB = getAverageRating(b.id);
-                                return ratingB - ratingA;
-                            });
-                            break;
+                        case 'titleAsc': filtered.sort((a, b) => a.title.localeCompare(b.title)); break;
+                        case 'titleDesc': filtered.sort((a, b) => b.title.localeCompare(a.title)); break;
+                        case 'yearDesc': filtered.sort((a, b) => (b.year || '0').localeCompare(a.year || '0')); break;
+                        case 'yearAsc': filtered.sort((a, b) => (a.year || '0').localeCompare(b.year || '0')); break;
+                        case 'ratingDesc': filtered.sort((a, b) => getAverageRating(b.id) - getAverageRating(a.id)); break;
                     }
                 }
             }
-            
             return filtered;
         }
 
-        // Card Creation
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function createMovieCard(movie, forSimilar = false) {
             const youtubeId = movie.youtubeId ? movie.youtubeId.split('?')[0].split('&')[0] : '';
-            if (!youtubeId) {
-                console.warn('Movie missing youtubeId:', movie);
-                return document.createElement('div');
-            }
-            
+            if (!youtubeId) return document.createElement('div');
             const card = document.createElement('div');
             card.className = `movie-card ${isInMyList(movie.id) ? 'in-my-list' : ''}`;
             if (getProgress(movie.id) > 0) card.classList.add('continue-watching');
             card.dataset.id = movie.id;
-
             const thumb = `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`;
             const icon = isInMyList(movie.id) ? 'fa-check' : 'fa-plus';
             const avgRating = getAverageRating(movie.id);
             const ratingCount = getRatingCount(movie.id);
-            
             const dist = getRatingDistribution(movie.id);
             const total = dist.reduce((a, b) => a + b, 0);
-            
             let ratingBarsHtml = '';
             if (total > 0) {
                 ratingBarsHtml = '<div class="rating-bars">';
                 for (let i = 5; i >= 1; i--) {
                     const count = dist[i-1];
                     const percentage = (count / total) * 100;
-                    ratingBarsHtml += `
-                        <div class="rating-bar-item">
-                            <span class="rating-bar-label">${i}★</span>
-                            <div class="rating-bar-bg"><div class="rating-bar-fill" style="width: ${percentage}%"></div></div>
-                            <span class="rating-bar-count">${count}</span>
-                        </div>
-                    `;
+                    ratingBarsHtml += `<div class="rating-bar-item"><span class="rating-bar-label">${i}★</span><div class="rating-bar-bg"><div class="rating-bar-fill" style="width: ${percentage}%"></div></div><span class="rating-bar-count">${count}</span></div>`;
                 }
                 ratingBarsHtml += '</div>';
             }
-
-            card.innerHTML = `
-                <img class="card-poster" src="${thumb}" loading="lazy">
-                <div class="card-info">
-                    <div class="card-title">${movie.title}</div>
-                    <div class="card-meta">
-                        <span>${movie.year || '2024'}</span>
-                        <span>${movie.duration || '0m'}</span>
-                        <span>${movie.genre || movie.category}</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <span>${avgRating.toFixed(1)}</span>
-                        <span class="rating-count">(${ratingCount})</span>
-                    </div>
-                    ${ratingBarsHtml}
-                    <div class="card-description">${(movie.description || '').substring(0,60)}...</div>
-                    <div class="card-footer">
-                        <i class="fas fa-play"></i>
-                        <i class="fas ${icon}"></i>
-                    </div>
-                    ${getProgress(movie.id) > 0 ? `
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${getProgress(movie.id)}%"></div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-
+            card.innerHTML = `<img class="card-poster" src="${thumb}" loading="lazy"><div class="card-info"><div class="card-title">${escapeHtml(movie.title)}</div><div class="card-meta"><span>${movie.year || '2024'}</span><span>${movie.duration || '0m'}</span><span>${escapeHtml(movie.genre || movie.category)}</span></div><div class="card-rating"><i class="fas fa-star"></i><span>${avgRating.toFixed(1)}</span><span class="rating-count">(${ratingCount})</span></div>${ratingBarsHtml}<div class="card-description">${escapeHtml((movie.description || '').substring(0, 60))}...</div><div class="card-footer"><i class="fas fa-play"></i><i class="fas ${icon}"></i></div>${getProgress(movie.id) > 0 ? `<div class="progress-bar"><div class="progress-fill" style="width: ${getProgress(movie.id)}%"></div></div>` : ''}</div>`;
             const playIcon = card.querySelector('.fa-play');
             const listIcon = card.querySelector('.fa-plus, .fa-check');
-            
-            playIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                openVideoPlayer(movie.id);
-            });
-
-            listIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                toggleMyList(movie.id, e);
-            });
-
-            card.addEventListener('click', (e) => {
-                if (!e.target.closest('i')) {
-                    if (forSimilar) {
-                        openVideoPlayer(movie.id);
-                    } else {
-                        openDetailsModal(movie.id);
-                    }
-                }
-            });
-
+            playIcon.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); openVideoPlayer(movie.id); });
+            listIcon.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); toggleMyList(movie.id, e); });
+            card.addEventListener('click', (e) => { if (!e.target.closest('i')) { if (forSimilar) openVideoPlayer(movie.id); else openDetailsModal(movie.id); } });
             return card;
         }
 
@@ -3007,9 +2870,7 @@
             if (aiRecommendations.length > 0) {
                 if (recommendationsRow) {
                     recommendationsRow.innerHTML = '';
-                    aiRecommendations.forEach(m => {
-                        recommendationsRow.appendChild(createMovieCard(m, true));
-                    });
+                    aiRecommendations.forEach(m => recommendationsRow.appendChild(createMovieCard(m, true)));
                 }
                 if (recommendationsSection) recommendationsSection.style.display = 'block';
             } else {
@@ -3017,119 +2878,55 @@
             }
         }
 
-        // Rendering
-        function clearRow(row) {
-            if (!row) return;
-            while (row.firstChild) {
-                row.removeChild(row.firstChild);
-            }
-        }
+        function clearRow(row) { if (row) while (row.firstChild) row.removeChild(row.firstChild); }
 
         function renderAll() {
             clearRow(trendingRow);
             clearRow(popularRow);
             clearRow(recentRow);
-
             const filteredMovies = filterAndSortMovies(movies);
-
-            filteredMovies.forEach(movie => {
-                if (movie.category === 'trending') {
-                    if (trendingRow) trendingRow.appendChild(createMovieCard(movie));
-                }
-            });
-            
-            filteredMovies.forEach(movie => {
-                if (movie.category === 'popular') {
-                    if (popularRow) popularRow.appendChild(createMovieCard(movie));
-                }
-            });
-            
-            filteredMovies.forEach(movie => {
-                if (movie.category === 'recent') {
-                    if (recentRow) recentRow.appendChild(createMovieCard(movie));
-                }
-            });
-
-            if (trendingRow && trendingRow.children.length === 0) {
-                trendingRow.innerHTML = '<div class="empty-row">No trending movies</div>';
-            }
-            if (popularRow && popularRow.children.length === 0) {
-                popularRow.innerHTML = '<div class="empty-row">No popular movies</div>';
-            }
-            if (recentRow && recentRow.children.length === 0) {
-                recentRow.innerHTML = '<div class="empty-row">No recent movies</div>';
-            }
-
+            filteredMovies.forEach(movie => { if (movie.category === 'trending' && trendingRow) trendingRow.appendChild(createMovieCard(movie)); });
+            filteredMovies.forEach(movie => { if (movie.category === 'popular' && popularRow) popularRow.appendChild(createMovieCard(movie)); });
+            filteredMovies.forEach(movie => { if (movie.category === 'recent' && recentRow) recentRow.appendChild(createMovieCard(movie)); });
+            if (trendingRow && trendingRow.children.length === 0) trendingRow.innerHTML = '<div class="empty-row">No trending movies</div>';
+            if (popularRow && popularRow.children.length === 0) popularRow.innerHTML = '<div class="empty-row">No popular movies</div>';
+            if (recentRow && recentRow.children.length === 0) recentRow.innerHTML = '<div class="empty-row">No recent movies</div>';
             renderMyListRow();
             renderContinueWatchingRow();
             renderRecommendations();
-
             const totalVisible = (trendingRow?.children.length || 0) + (popularRow?.children.length || 0) + (recentRow?.children.length || 0);
-            if (searchCount) {
-                if (searchInput?.value) {
-                    searchCount.textContent = `${totalVisible} movies found`;
-                } else {
-                    searchCount.textContent = '';
-                }
-            }
+            if (searchCount) searchCount.textContent = searchInput?.value ? `${totalVisible} movies found` : '';
         }
 
         function renderMyListRow() {
             if (!myListRow) return;
             clearRow(myListRow);
-            
-            if (myList.length === 0) {
-                if (myListSection) myListSection.style.display = 'none';
-                return;
-            }
-            
+            if (myList.length === 0) { if (myListSection) myListSection.style.display = 'none'; return; }
             if (myListSection) myListSection.style.display = 'block';
-            
             const myMovies = movies.filter(m => myList.includes(m.id));
-            myMovies.forEach(movie => {
-                myListRow.appendChild(createMovieCard(movie, true));
-            });
+            myMovies.forEach(movie => myListRow.appendChild(createMovieCard(movie, true)));
         }
 
         function renderContinueWatchingRow() {
             if (!continueWatchingRow) return;
             clearRow(continueWatchingRow);
-            
-            if (continueWatching.length === 0) {
-                if (continueWatchingSection) continueWatchingSection.style.display = 'none';
-                return;
-            }
-            
+            if (continueWatching.length === 0) { if (continueWatchingSection) continueWatchingSection.style.display = 'none'; return; }
             if (continueWatchingSection) continueWatchingSection.style.display = 'block';
-            
             const sorted = [...continueWatching].sort((a, b) => b.timestamp - a.timestamp);
-            sorted.forEach(item => {
-                const movie = movies.find(m => m.id == item.id);
-                if (movie) {
-                    continueWatchingRow.appendChild(createMovieCard(movie, true));
-                }
-            });
+            sorted.forEach(item => { const movie = movies.find(m => m.id == item.id); if (movie) continueWatchingRow.appendChild(createMovieCard(movie, true)); });
         }
 
         function setActiveCategory(category) {
             allNavLinks.forEach(link => {
-                if (link.dataset.category === category) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
+                if (link.dataset.category === category) link.classList.add('active');
+                else link.classList.remove('active');
             });
         }
 
-        // Watch Party
         async function createWatchParty() {
             if (!currentMovie) return;
-            
             showGlobalLoading('Creating watch party...');
-            const data = await apiCall('createParty', {
-                movieId: currentMovie.id
-            }, 'POST', false);
-            
+            const data = await apiCall('createParty', { movieId: currentMovie.id }, 'POST', false);
             if (data.success) {
                 partyId = data.partyId;
                 if (partyLinkInput) partyLinkInput.value = window.location.href + '?party=' + partyId;
@@ -3143,437 +2940,208 @@
             }
         }
 
-        function startPartyPolling(partyId) {
-            setInterval(() => {
-                fetchMessages(partyId);
-            }, 3000);
-        }
+        function startPartyPolling(partyId) { setInterval(() => fetchMessages(partyId), 3000); }
 
         async function fetchMessages(partyId) {
             const data = await apiCall('getMessages', { partyId: partyId }, 'GET', false);
-            
             if (data.success && data.messages && chatBox) {
                 chatBox.innerHTML = '';
-                data.messages.forEach(msg => {
-                    addChatMessage(msg.userId === userId ? 'You' : 'Friend', msg.message);
-                });
+                data.messages.forEach(msg => addChatMessage(msg.userId === userId ? 'You' : 'Friend', msg.message));
             }
         }
 
         async function sendChatMessage(message) {
             if (!partyId || !message.trim()) return;
-            
-            const data = await apiCall('sendMessage', {
-                partyId: partyId,
-                message: message
-            }, 'POST', false);
-            
-            if (data.success && chatInput) {
-                chatInput.value = '';
-            }
+            const data = await apiCall('sendMessage', { partyId: partyId, message: message }, 'POST', false);
+            if (data.success && chatInput) chatInput.value = '';
         }
 
         function addChatMessage(user, message) {
             if (!chatBox) return;
             const msgDiv = document.createElement('div');
             msgDiv.className = 'chat-message';
-            msgDiv.innerHTML = `<strong>${user}:</strong> ${message}`;
+            msgDiv.innerHTML = `<strong>${escapeHtml(user)}:</strong> ${escapeHtml(message)}`;
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // Event Listeners
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                openMobileMenu();
-            });
-        }
-
-        if (closeMobileMenu) {
-            closeMobileMenu.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                closeMobileMenuFunc();
-            });
-        }
-
-        if (menuOverlay) {
-            menuOverlay.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                closeMobileMenuFunc();
-            });
-        }
-
-        if (searchIcon) {
-            searchIcon.addEventListener('click', () => {
-                if (searchContainer) {
-                    if (searchContainer.style.display === 'none') {
-                        searchContainer.style.display = 'block';
-                        if (categoryFilter) categoryFilter.value = '';
-                        if (yearFilter) yearFilter.value = '';
-                        if (sortFilter) sortFilter.value = 'default';
-                        if (searchInput) searchInput.value = '';
-                        applyFilters();
-                    } else {
-                        searchContainer.style.display = 'none';
-                    }
-                }
-                closeMobileMenuFunc();
-            });
-        }
-
-        if (searchInput) {
-            searchInput.addEventListener('input', applyFilters);
-        }
-
-        if (categoryFilter) {
-            categoryFilter.addEventListener('change', applyFilters);
-        }
-
-        if (yearFilter) {
-            yearFilter.addEventListener('change', applyFilters);
-        }
-
-        if (sortFilter) {
-            sortFilter.addEventListener('change', applyFilters);
-        }
-
-        if (logoHome) {
-            logoHome.addEventListener('click', () => {
-                closeDetailsModalFunc();
-                closeVideoPlayer();
-                setActiveCategory('all');
-                document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex');
-                if (trendingRow) trendingRow.style.display = 'flex';
-                if (popularRow) popularRow.style.display = 'flex';
-                if (recentRow) recentRow.style.display = 'flex';
-                if (myList.length === 0) {
-                    if (myListSection) myListSection.style.display = 'none';
-                } else {
-                    if (myListSection) myListSection.style.display = 'block';
-                }
-                closeMobileMenuFunc();
-            });
-        }
-
-        if (notificationIcon) {
-            notificationIcon.addEventListener('click', showNotifications);
-        }
-
-        if (profileIcon) {
-            profileIcon.addEventListener('click', () => {
-                if (profileModal) profileModal.style.display = 'flex';
-            });
-        }
-
-        if (languageIcon) {
-            languageIcon.addEventListener('click', () => {
-                if (languageSelector) {
-                    languageSelector.style.display = languageSelector.style.display === 'none' ? 'block' : 'none';
-                }
-            });
-        }
-
-        if (languageSelect) {
-            languageSelect.addEventListener('change', (e) => {
-                currentLanguage = e.target.value;
-                updateUILanguage();
-                if (languageSelector) languageSelector.style.display = 'none';
-            });
-        }
-
-        allNavLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                const category = link.dataset.category;
-                setActiveCategory(category);
-                closeMobileMenuFunc();
-                
-                if (category === 'myList') {
-                    document.querySelectorAll('.section-header').forEach(header => {
-                        if (header.querySelector('.section-title')?.textContent.includes('MY LIST')) {
-                            header.style.display = 'flex';
-                        } else {
-                            header.style.display = 'none';
-                        }
+        // ========== PASTOR ENOCH AI FUNCTIONS ==========
+        
+        let pastorKnowledgeBase = {
+            keywords: {},
+            defaultAnswer: "That's a beautiful question. Let me share some wisdom with you. Remember that God's Word is a lamp to our feet and a light to our path. Whatever you're going through, know that God is with you and He cares deeply about every detail of your life. Would you like me to share a specific Bible verse or teaching about this?"
+        };
+        
+        async function loadPastorKnowledge() {
+            try {
+                const result = await apiCall('getPastorKnowledge', {}, 'GET', false);
+                if (result.success && result.knowledgeBase) {
+                    pastorKnowledgeBase.keywords = {};
+                    result.knowledgeBase.forEach(entry => {
+                        pastorKnowledgeBase.keywords[entry.keyword] = {
+                            answer: entry.answer,
+                            videos: entry.videos
+                        };
                     });
-                    if (trendingRow) trendingRow.style.display = 'none';
-                    if (popularRow) popularRow.style.display = 'none';
-                    if (recentRow) recentRow.style.display = 'none';
-                    if (myListSection) myListSection.style.display = myList.length ? 'block' : 'none';
-                } else if (category === 'all') {
-                    document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex');
-                    if (trendingRow) trendingRow.style.display = 'flex';
-                    if (popularRow) popularRow.style.display = 'flex';
-                    if (recentRow) recentRow.style.display = 'flex';
-                    if (myListSection) myListSection.style.display = myList.length ? 'block' : 'none';
-                } else {
-                    document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex');
-                    if (trendingRow) trendingRow.style.display = category === 'trending' ? 'flex' : 'none';
-                    if (popularRow) popularRow.style.display = category === 'popular' ? 'flex' : 'none';
-                    if (recentRow) recentRow.style.display = category === 'recent' ? 'flex' : 'none';
-                    if (myListSection) myListSection.style.display = 'none';
+                    console.log('Pastor Enoch knowledge base loaded:', Object.keys(pastorKnowledgeBase.keywords).length, 'entries');
                 }
-            });
-        });
-
-        if (heroPlayBtn) {
-            heroPlayBtn.addEventListener('click', () => {
-                if (heroMovie) openVideoPlayer(heroMovie.id);
-            });
-        }
-
-        if (heroAddBtn) {
-            heroAddBtn.addEventListener('click', () => {
-                if (heroMovie) {
-                    addToMyList(heroMovie.id);
-                }
-            });
-        }
-
-        if (closeDetailsModal) {
-            closeDetailsModal.addEventListener('click', closeDetailsModalFunc);
-        }
-
-        if (closeVideoModal) {
-            closeVideoModal.addEventListener('click', closeVideoPlayer);
-        }
-
-        if (cinemaModeBtn) {
-            cinemaModeBtn.addEventListener('click', toggleCinemaMode);
-        }
-
-        if (videoModalAddBtn) {
-            videoModalAddBtn.addEventListener('click', () => {
-                if (currentMovie) {
-                    toggleMyList(currentMovie.id);
-                    if (videoModalAddBtn) {
-                        videoModalAddBtn.innerHTML = isInMyList(currentMovie.id) ? 
-                            '<i class="fas fa-check"></i> In My List' : 
-                            '<i class="fas fa-plus"></i> My List';
-                    }
-                }
-            });
-        }
-
-        if (shareBtn) {
-            shareBtn.addEventListener('click', () => {
-                if (currentMovie) shareMovie(currentMovie);
-            });
-        }
-
-        if (postCommentBtn) {
-            postCommentBtn.addEventListener('click', () => {
-                if (currentMovie && commentInput) addComment(currentMovie.id, commentInput.value);
-            });
-        }
-
-        if (refreshRecommendations) {
-            refreshRecommendations.addEventListener('click', () => {
-                if (watchHistory.length > 0) {
-                    const lastWatched = watchHistory[watchHistory.length - 1];
-                    const lastMovie = movies.find(m => m.id == lastWatched);
-                    if (lastMovie) {
-                        aiRecommendations = generateAIRecommendations(lastMovie.id);
-                        renderRecommendations();
-                    }
-                }
-            });
-        }
-
-        if (clearMyList) {
-            clearMyList.addEventListener('click', () => {
-                myList = [];
-                saveMyList();
-                showNotification('🗑️ My List cleared');
-                if (document.querySelector('[data-category="myList"]')?.classList.contains('active')) {
-                    if (myListSection) myListSection.style.display = 'none';
-                }
-            });
-        }
-
-        if (clearProgress) {
-            clearProgress.addEventListener('click', async () => {
-                showGlobalLoading('Clearing progress...');
-                const data = await apiCall('clearProgress', { userId: userId }, 'POST', false);
-                if (data.success) {
-                    continueWatching = [];
-                    localStorage.setItem('btffContinueWatching', JSON.stringify(continueWatching));
-                    renderContinueWatchingRow();
-                    hideGlobalLoading();
-                    showNotification('🗑️ Continue watching cleared');
-                } else {
-                    hideGlobalLoading();
-                }
-            });
-        }
-
-        if (retryBtn) {
-            retryBtn.addEventListener('click', fetchMovies);
-        }
-
-        if (detailsPlayBtn) {
-            detailsPlayBtn.addEventListener('click', () => {
-                if (currentMovie) {
-                    closeDetailsModalFunc();
-                    openVideoPlayer(currentMovie.id);
-                }
-            });
-        }
-
-        if (detailsListBtn) {
-            detailsListBtn.addEventListener('click', () => {
-                if (currentMovie) {
-                    toggleMyList(currentMovie.id);
-                    if (detailsListBtn) {
-                        detailsListBtn.innerHTML = isInMyList(currentMovie.id) ? 
-                            '<i class="fas fa-check"></i> In My List' : 
-                            '<i class="fas fa-plus"></i> My List';
-                    }
-                }
-            });
-        }
-
-        if (watchPartyBtn) {
-            watchPartyBtn.addEventListener('click', createWatchParty);
-        }
-
-        if (copyPartyLink) {
-            copyPartyLink.addEventListener('click', () => {
-                if (partyLinkInput) {
-                    partyLinkInput.select();
-                    document.execCommand('copy');
-                    showNotification('✅ Link copied to clipboard');
-                }
-            });
-        }
-
-        if (sendChat) {
-            sendChat.addEventListener('click', () => {
-                if (chatInput) sendChatMessage(chatInput.value);
-            });
-        }
-
-        if (chatInput) {
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && chatInput.value.trim()) {
-                    sendChatMessage(chatInput.value);
-                }
-            });
-        }
-
-        if (closePartyModal) {
-            closePartyModal.addEventListener('click', () => {
-                if (watchPartyModal) watchPartyModal.classList.remove('active');
-            });
-        }
-
-        if (closeProfileModal) {
-            closeProfileModal.addEventListener('click', () => {
-                if (profileModal) profileModal.style.display = 'none';
-            });
-        }
-
-        if (closeSwitchUserModal) {
-            closeSwitchUserModal.addEventListener('click', () => {
-                if (switchUserModal) switchUserModal.style.display = 'none';
-            });
-        }
-
-        if (rateMovieBtn) {
-            rateMovieBtn.addEventListener('click', () => {
-                if (ratingModal) ratingModal.classList.add('active');
-                currentRating = 0;
-                document.querySelectorAll('.rating-stars i').forEach(star => {
-                    star.className = 'far fa-star';
-                });
-            });
-        }
-
-        if (ratingStars) {
-            const stars = ratingStars.querySelectorAll('i');
-            stars.forEach(star => {
-                star.addEventListener('mouseover', () => {
-                    const rating = star.dataset.rating;
-                    stars.forEach((s, index) => {
-                        if (index < rating) {
-                            s.className = 'fas fa-star';
-                        } else {
-                            s.className = 'far fa-star';
-                        }
-                    });
-                });
-                
-                star.addEventListener('mouseout', () => {
-                    stars.forEach((s, index) => {
-                        if (index < currentRating) {
-                            s.className = 'fas fa-star';
-                        } else {
-                            s.className = 'far fa-star';
-                        }
-                    });
-                });
-                
-                star.addEventListener('click', () => {
-                    currentRating = parseInt(star.dataset.rating);
-                });
-            });
-        }
-
-        if (submitRating) {
-            submitRating.addEventListener('click', () => {
-                if (currentRating > 0 && currentMovie) {
-                    addRating(currentMovie.id, currentRating);
-                    if (ratingModal) ratingModal.classList.remove('active');
-                }
-            });
-        }
-
-        if (closeRatingModal) {
-            closeRatingModal.addEventListener('click', () => {
-                if (ratingModal) ratingModal.classList.remove('active');
-            });
-        }
-
-        window.addEventListener('click', (e) => {
-            if (e.target === detailsModal) closeDetailsModalFunc();
-            if (e.target === videoModal) closeVideoPlayer();
-            if (e.target === ratingModal && ratingModal) ratingModal.classList.remove('active');
-            if (e.target === watchPartyModal && watchPartyModal) watchPartyModal.classList.remove('active');
-            if (e.target === profileModal && profileModal) profileModal.style.display = 'none';
-            if (e.target === switchUserModal && switchUserModal) switchUserModal.style.display = 'none';
-            if (e.target === notificationsPanel) e.stopPropagation();
-            if (!e.target.closest('.notifications-panel') && e.target !== notificationIcon && notificationsPanel?.style.display === 'block') {
-                if (notificationsPanel) notificationsPanel.style.display = 'none';
+            } catch (error) {
+                console.error('Failed to load pastor knowledge:', error);
             }
-        });
+        }
+        
+        async function searchKnowledgeBase(question) {
+            try {
+                const result = await apiCall('searchPastorKnowledge', { question: question }, 'GET', false);
+                if (result.success) {
+                    return { answer: result.answer, videos: result.videos || [] };
+                }
+            } catch (error) {
+                console.error('Search failed, using local fallback:', error);
+            }
+            const lowerQuestion = question.toLowerCase();
+            for (const [keyword, data] of Object.entries(pastorKnowledgeBase.keywords)) {
+                if (lowerQuestion.includes(keyword)) return data;
+            }
+            return { answer: pastorKnowledgeBase.defaultAnswer, videos: [] };
+        }
+        
+        const aiChatModal = document.getElementById('aiChatModal');
+        const aiChatMessages = document.getElementById('aiChatMessages');
+        const pastorQuestionInput = document.getElementById('pastorQuestion');
+        const askPastorBtn = document.getElementById('askPastorBtn');
+        const closeAiChat = document.getElementById('closeAiChat');
+        let isTyping = false;
+        
+        function addAIMessage(content, isUser = false, videos = []) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-microphone-alt"></i>';
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            if (isUser) {
+                contentDiv.innerHTML = `<p>${escapeHtml(content)}</p>`;
+            } else {
+                let html = `<p>${escapeHtml(content)}</p>`;
+                if (videos && videos.length > 0) {
+                    html += '<div class="video-results"><strong><i class="fas fa-video"></i> Related Teachings:</strong>';
+                    videos.forEach(video => {
+                        html += `<div class="video-result-item" onclick="playVideo('${video.id}')"><div class="video-result-thumb" style="background-image: url('https://img.youtube.com/vi/${video.id}/mqdefault.jpg')"></div><div class="video-result-info"><div class="video-result-title">${escapeHtml(video.title)}</div><div class="video-result-desc">${escapeHtml(video.description)}</div></div><i class="fas fa-play-circle" style="font-size: 1.5rem; color: #2f6bc6;"></i></div>`;
+                    });
+                    html += '</div>';
+                }
+                contentDiv.innerHTML = html;
+            }
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(contentDiv);
+            aiChatMessages.appendChild(messageDiv);
+            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            if (isTyping) return;
+            isTyping = true;
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `<div class="message-avatar"><i class="fas fa-microphone-alt"></i></div><div class="message-content"><div class="ai-typing"><span></span><span></span><span></span></div></div>`;
+            aiChatMessages.appendChild(typingDiv);
+            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+        }
+        
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) typingIndicator.remove();
+            isTyping = false;
+        }
+        
+        async function askPastor(question) {
+            if (!question.trim()) return;
+            addAIMessage(question, true);
+            pastorQuestionInput.value = '';
+            showTypingIndicator();
+            const result = await searchKnowledgeBase(question);
+            hideTypingIndicator();
+            addAIMessage(result.answer, false, result.videos);
+            if (!aiChatModal.classList.contains('active')) {
+                aiChatModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeAiChatModal() {
+            aiChatModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        window.playVideo = function(videoId) {
+            closeAiChatModal();
+            const tempMovie = { id: videoId, title: "Pastor Enoch Teaching", youtubeId: videoId, description: "A spiritual teaching from Pastor Enoch" };
+            if (typeof openVideoPlayer === 'function') openVideoPlayer(tempMovie.id);
+            else window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+        };
+        
+        if (askPastorBtn) askPastorBtn.addEventListener('click', () => { const q = pastorQuestionInput.value.trim(); if (q) askPastor(q); else showNotification('Please type a question first'); });
+        if (pastorQuestionInput) pastorQuestionInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { const q = pastorQuestionInput.value.trim(); if (q) askPastor(q); } });
+        if (closeAiChat) closeAiChat.addEventListener('click', closeAiChatModal);
+        window.addEventListener('click', (e) => { if (e.target === aiChatModal) closeAiChatModal(); });
+
+        // Event Listeners
+        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', (e) => { e.preventDefault(); openMobileMenu(); });
+        if (closeMobileMenu) closeMobileMenu.addEventListener('click', (e) => { e.preventDefault(); closeMobileMenuFunc(); });
+        if (menuOverlay) menuOverlay.addEventListener('click', (e) => { e.preventDefault(); closeMobileMenuFunc(); });
+        if (searchIcon) searchIcon.addEventListener('click', () => { if (searchContainer) { if (searchContainer.style.display === 'none') { searchContainer.style.display = 'block'; if (categoryFilter) categoryFilter.value = ''; if (yearFilter) yearFilter.value = ''; if (sortFilter) sortFilter.value = 'default'; if (searchInput) searchInput.value = ''; applyFilters(); } else { searchContainer.style.display = 'none'; } } closeMobileMenuFunc(); });
+        if (searchInput) searchInput.addEventListener('input', applyFilters);
+        if (categoryFilter) categoryFilter.addEventListener('change', applyFilters);
+        if (yearFilter) yearFilter.addEventListener('change', applyFilters);
+        if (sortFilter) sortFilter.addEventListener('change', applyFilters);
+        if (logoHome) logoHome.addEventListener('click', () => { closeDetailsModalFunc(); closeVideoPlayer(); setActiveCategory('all'); document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex'); if (trendingRow) trendingRow.style.display = 'flex'; if (popularRow) popularRow.style.display = 'flex'; if (recentRow) recentRow.style.display = 'flex'; if (myList.length === 0) { if (myListSection) myListSection.style.display = 'none'; } else { if (myListSection) myListSection.style.display = 'block'; } closeMobileMenuFunc(); });
+        if (notificationIcon) notificationIcon.addEventListener('click', showNotifications);
+        if (profileIcon) profileIcon.addEventListener('click', () => { if (profileModal) profileModal.style.display = 'flex'; });
+        if (languageIcon) languageIcon.addEventListener('click', () => { if (languageSelector) languageSelector.style.display = languageSelector.style.display === 'none' ? 'block' : 'none'; });
+        if (languageSelect) languageSelect.addEventListener('change', (e) => { currentLanguage = e.target.value; updateUILanguage(); if (languageSelector) languageSelector.style.display = 'none'; });
+        allNavLinks.forEach(link => { link.addEventListener('click', () => { const category = link.dataset.category; setActiveCategory(category); closeMobileMenuFunc(); if (category === 'myList') { document.querySelectorAll('.section-header').forEach(header => { if (header.querySelector('.section-title')?.textContent.includes('MY LIST')) header.style.display = 'flex'; else header.style.display = 'none'; }); if (trendingRow) trendingRow.style.display = 'none'; if (popularRow) popularRow.style.display = 'none'; if (recentRow) recentRow.style.display = 'none'; if (myListSection) myListSection.style.display = myList.length ? 'block' : 'none'; } else if (category === 'all') { document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex'); if (trendingRow) trendingRow.style.display = 'flex'; if (popularRow) popularRow.style.display = 'flex'; if (recentRow) recentRow.style.display = 'flex'; if (myListSection) myListSection.style.display = myList.length ? 'block' : 'none'; } else { document.querySelectorAll('.section-header').forEach(h => h.style.display = 'flex'); if (trendingRow) trendingRow.style.display = category === 'trending' ? 'flex' : 'none'; if (popularRow) popularRow.style.display = category === 'popular' ? 'flex' : 'none'; if (recentRow) recentRow.style.display = category === 'recent' ? 'flex' : 'none'; if (myListSection) myListSection.style.display = 'none'; } }); });
+        if (heroPlayBtn) heroPlayBtn.addEventListener('click', () => { if (heroMovie) openVideoPlayer(heroMovie.id); });
+        if (heroAddBtn) heroAddBtn.addEventListener('click', () => { if (heroMovie) addToMyList(heroMovie.id); });
+        if (closeDetailsModal) closeDetailsModal.addEventListener('click', closeDetailsModalFunc);
+        if (closeVideoModal) closeVideoModal.addEventListener('click', closeVideoPlayer);
+        if (cinemaModeBtn) cinemaModeBtn.addEventListener('click', toggleCinemaMode);
+        if (videoModalAddBtn) videoModalAddBtn.addEventListener('click', () => { if (currentMovie) { toggleMyList(currentMovie.id); if (videoModalAddBtn) videoModalAddBtn.innerHTML = isInMyList(currentMovie.id) ? '<i class="fas fa-check"></i> In My List' : '<i class="fas fa-plus"></i> My List'; } });
+        if (shareBtn) shareBtn.addEventListener('click', () => { if (currentMovie) shareMovie(currentMovie); });
+        if (postCommentBtn) postCommentBtn.addEventListener('click', () => { if (currentMovie && commentInput) addComment(currentMovie.id, commentInput.value); });
+        if (refreshRecommendations) refreshRecommendations.addEventListener('click', () => { if (watchHistory.length > 0) { const lastWatched = watchHistory[watchHistory.length - 1]; const lastMovie = movies.find(m => m.id == lastWatched); if (lastMovie) { aiRecommendations = generateAIRecommendations(lastMovie.id); renderRecommendations(); } } });
+        if (clearMyList) clearMyList.addEventListener('click', () => { myList = []; saveMyList(); showNotification('🗑️ My List cleared'); if (document.querySelector('[data-category="myList"]')?.classList.contains('active') && myListSection) myListSection.style.display = 'none'; });
+        if (clearProgress) clearProgress.addEventListener('click', async () => { showGlobalLoading('Clearing progress...'); const data = await apiCall('clearProgress', { userId: userId }, 'POST', false); if (data.success) { continueWatching = []; localStorage.setItem('btffContinueWatching', JSON.stringify(continueWatching)); renderContinueWatchingRow(); hideGlobalLoading(); showNotification('🗑️ Continue watching cleared'); } else { hideGlobalLoading(); } });
+        if (retryBtn) retryBtn.addEventListener('click', fetchMovies);
+        if (detailsPlayBtn) detailsPlayBtn.addEventListener('click', () => { if (currentMovie) { closeDetailsModalFunc(); openVideoPlayer(currentMovie.id); } });
+        if (detailsListBtn) detailsListBtn.addEventListener('click', () => { if (currentMovie) { toggleMyList(currentMovie.id); if (detailsListBtn) detailsListBtn.innerHTML = isInMyList(currentMovie.id) ? '<i class="fas fa-check"></i> In My List' : '<i class="fas fa-plus"></i> My List'; } });
+        if (watchPartyBtn) watchPartyBtn.addEventListener('click', createWatchParty);
+        if (copyPartyLink) copyPartyLink.addEventListener('click', () => { if (partyLinkInput) { partyLinkInput.select(); document.execCommand('copy'); showNotification('✅ Link copied to clipboard'); } });
+        if (sendChat) sendChat.addEventListener('click', () => { if (chatInput) sendChatMessage(chatInput.value); });
+        if (chatInput) chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && chatInput.value.trim()) sendChatMessage(chatInput.value); });
+        if (closePartyModal) closePartyModal.addEventListener('click', () => { if (watchPartyModal) watchPartyModal.classList.remove('active'); });
+        if (closeProfileModal) closeProfileModal.addEventListener('click', () => { if (profileModal) profileModal.style.display = 'none'; });
+        if (closeSwitchUserModal) closeSwitchUserModal.addEventListener('click', () => { if (switchUserModal) switchUserModal.style.display = 'none'; });
+        if (rateMovieBtn) rateMovieBtn.addEventListener('click', () => { if (ratingModal) ratingModal.classList.add('active'); currentRating = 0; document.querySelectorAll('.rating-stars i').forEach(star => star.className = 'far fa-star'); });
+        if (ratingStars) { const stars = ratingStars.querySelectorAll('i'); stars.forEach(star => { star.addEventListener('mouseover', () => { const rating = star.dataset.rating; stars.forEach((s, index) => { if (index < rating) s.className = 'fas fa-star'; else s.className = 'far fa-star'; }); }); star.addEventListener('mouseout', () => { stars.forEach((s, index) => { if (index < currentRating) s.className = 'fas fa-star'; else s.className = 'far fa-star'; }); }); star.addEventListener('click', () => { currentRating = parseInt(star.dataset.rating); }); }); }
+        if (submitRating) submitRating.addEventListener('click', () => { if (currentRating > 0 && currentMovie) { addRating(currentMovie.id, currentRating); if (ratingModal) ratingModal.classList.remove('active'); } });
+        if (closeRatingModal) closeRatingModal.addEventListener('click', () => { if (ratingModal) ratingModal.classList.remove('active'); });
+        window.addEventListener('click', (e) => { if (e.target === detailsModal) closeDetailsModalFunc(); if (e.target === videoModal) closeVideoPlayer(); if (e.target === ratingModal && ratingModal) ratingModal.classList.remove('active'); if (e.target === watchPartyModal && watchPartyModal) watchPartyModal.classList.remove('active'); if (e.target === profileModal && profileModal) profileModal.style.display = 'none'; if (e.target === switchUserModal && switchUserModal) switchUserModal.style.display = 'none'; if (e.target === notificationsPanel) e.stopPropagation(); if (!e.target.closest('.notifications-panel') && e.target !== notificationIcon && notificationsPanel?.style.display === 'block') { if (notificationsPanel) notificationsPanel.style.display = 'none'; } });
 
         const urlParams = new URLSearchParams(window.location.search);
         const partyParam = urlParams.get('party');
-        if (partyParam) {
-            partyId = partyParam;
-            setTimeout(() => {
-                if (watchPartyModal) watchPartyModal.classList.add('active');
-                addChatMessage('System', 'You joined the watch party!');
-                startPartyPolling(partyId);
-            }, 1000);
-        }
+        if (partyParam) { partyId = partyParam; setTimeout(() => { if (watchPartyModal) watchPartyModal.classList.add('active'); addChatMessage('System', 'You joined the watch party!'); startPartyPolling(partyId); }, 1000); }
 
-        setTimeout(() => {
-            window.setUser(currentUser);
-        }, 100);
-
-        // Hide the old loading indicator
-        if (loadingIndicator) {
-            loadingIndicator.style.display = 'none';
-        }
+        setTimeout(() => { window.setUser(currentUser); }, 100);
+        if (loadingIndicator) loadingIndicator.style.display = 'none';
 
         initSession().then(() => {
             fetchMovies();
             fetchContinueWatching();
             updateNotificationsBadge();
+            loadPastorKnowledge();
         });
     })();
 </script>

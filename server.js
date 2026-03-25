@@ -1,4 +1,4 @@
-// server.js - VERCEL VERSION (FIXED)
+// server.js - VERCEL VERSION (UPDATED WITH BATCH API)
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Serve static files
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// ===== PROXY ENDPOINT FOR APPS SCRIPT (Main) =====
+// ===== PROXY ENDPOINT FOR APPS SCRIPT (WITH BATCH SUPPORT) =====
 app.all('/api/proxy', async (req, res) => {
     try {
         const targetUrl = process.env.APPS_SCRIPT_URL;
@@ -33,10 +33,69 @@ app.all('/api/proxy', async (req, res) => {
             });
         }
         
+        // Check if this is a batch request
+        if (req.body && req.body.actions && Array.isArray(req.body.actions)) {
+            console.log('🔄 Processing batch request with', req.body.actions.length, 'actions');
+            
+            // Handle batch request - execute all actions in parallel
+            const results = await Promise.all(
+                req.body.actions.map(async (actionItem) => {
+                    const action = actionItem.action;
+                    const url = new URL(targetUrl);
+                    url.searchParams.append('action', action);
+                    
+                    // Add all parameters from the action item
+                    Object.keys(actionItem).forEach(key => {
+                        if (key !== 'action') {
+                            url.searchParams.append(key, actionItem[key]);
+                        }
+                    });
+                    
+                    try {
+                        const response = await fetch(url.toString());
+                        const data = await response.json();
+                        return {
+                            action: action,
+                            success: data.success !== false,
+                            ...data
+                        };
+                    } catch (error) {
+                        console.error(`❌ Batch action ${action} failed:`, error);
+                        return {
+                            action: action,
+                            success: false,
+                            error: error.message
+                        };
+                    }
+                })
+            );
+            
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            return res.json({
+                success: true,
+                results: results
+            });
+        }
+        
+        // Regular single request handling
         const url = new URL(targetUrl);
         Object.keys(req.query).forEach(key => {
             url.searchParams.append(key, req.query[key]);
         });
+        
+        // If it's a POST with body, add those as parameters too (for actions that need them)
+        if (req.method === 'POST' && req.body) {
+            Object.keys(req.body).forEach(key => {
+                if (key !== 'actions') {
+                    // Convert objects to JSON strings for URL params
+                    const value = typeof req.body[key] === 'object' 
+                        ? JSON.stringify(req.body[key]) 
+                        : req.body[key];
+                    url.searchParams.append(key, value);
+                }
+            });
+        }
         
         console.log('🔄 Proxying to:', url.toString());
         
@@ -47,7 +106,8 @@ app.all('/api/proxy', async (req, res) => {
             }
         };
         
-        if (req.method === 'POST') {
+        // Only include body for POST requests that aren't batch
+        if (req.method === 'POST' && req.body && !req.body.actions) {
             fetchOptions.body = JSON.stringify(req.body);
         }
         
@@ -95,18 +155,24 @@ app.all('/api/callcenter-proxy', async (req, res) => {
             url.searchParams.append(key, req.query[key]);
         });
         
+        // Add POST body parameters
+        if (req.method === 'POST' && req.body) {
+            Object.keys(req.body).forEach(key => {
+                const value = typeof req.body[key] === 'object' 
+                    ? JSON.stringify(req.body[key]) 
+                    : req.body[key];
+                url.searchParams.append(key, value);
+            });
+        }
+        
         console.log('🔄 Call Center Proxy to:', url.toString());
         
         const fetchOptions = {
-            method: req.method,
+            method: 'GET', // Always use GET for call center (params in URL)
             headers: {
                 'Content-Type': 'application/json',
             }
         };
-        
-        if (req.method === 'POST') {
-            fetchOptions.body = JSON.stringify(req.body);
-        }
         
         const response = await fetch(url.toString(), fetchOptions);
         const responseText = await response.text();
@@ -297,7 +363,6 @@ app.get('/callcenter', (req, res) => {
         
         let html = fs.readFileSync(templatePath, 'utf8');
         
-        // IMPORTANT: Replace the placeholder with the actual proxy URL
         // The callcenter.html should use the proxy endpoint
         const proxyUrl = '/api/callcenter-proxy';
         

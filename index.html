@@ -540,6 +540,12 @@
             aspect-ratio: 16/9;
             object-fit: cover;
             background: #1d324b;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .card-poster.loaded {
+            opacity: 1;
         }
 
         .card-info {
@@ -665,6 +671,66 @@
             background: #2f6bc6;
             width: 0%;
             transition: width 0.3s;
+        }
+
+        /* Skeleton Loading Styles */
+        .skeleton-card {
+            flex: 0 0 auto;
+            width: 240px;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #101c2c;
+            border: 1px solid #2d4560;
+        }
+        
+        .skeleton-poster {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(90deg, #1a2a3a 25%, #2a3a4a 50%, #1a2a3a 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        
+        .skeleton-text {
+            height: 16px;
+            background: linear-gradient(90deg, #1a2a3a 25%, #2a3a4a 50%, #1a2a3a 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 4px;
+            margin: 10px 12px;
+        }
+        
+        .skeleton-text-sm {
+            width: 60%;
+            height: 12px;
+        }
+        
+        .skeleton-text-lg {
+            width: 80%;
+            height: 20px;
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Load More Trigger */
+        .load-trigger {
+            height: 20px;
+            width: 100%;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .load-more-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(47,107,198,0.2);
+            border-top: 3px solid #2f6bc6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
         /* DETAILS MODAL */
@@ -1514,7 +1580,7 @@
 
     <div class="container">
         <!-- LOADING INDICATOR (kept for backward compatibility) -->
-        <div id="loadingIndicator" class="loading" style="display: block;">
+        <div id="loadingIndicator" class="loading" style="display: none;">
             <i class="fas fa-spinner fa-spin"></i>
             <p>Connecting to Our Database...</p>
         </div>
@@ -1558,26 +1624,25 @@
             <h2 class="section-title">🔥 TRENDING NOW</h2>
             <span class="section-link" data-category="trending">View all →</span>
         </div>
-        <div class="movie-row" id="trendingRow">
-            <div class="empty-row">No trending movies available</div>
-        </div>
+        <div class="movie-row" id="trendingRow"></div>
 
         <!-- POPULAR ON BTFF -->
         <div class="section-header">
             <h2 class="section-title">⭐ POPULAR ON BTFF</h2>
             <span class="section-link" data-category="popular">View all →</span>
         </div>
-        <div class="movie-row" id="popularRow">
-            <div class="empty-row">No popular movies available</div>
-        </div>
+        <div class="movie-row" id="popularRow"></div>
 
         <!-- RECENTLY ADDED -->
         <div class="section-header">
             <h2 class="section-title">🆕 RECENTLY ADDED</h2>
             <span class="section-link" data-category="recent">View all →</span>
         </div>
-        <div class="movie-row" id="recentRow">
-            <div class="empty-row">No recent movies available</div>
+        <div class="movie-row" id="recentRow"></div>
+
+        <!-- Load More Trigger -->
+        <div class="load-trigger" id="loadTrigger" style="display: none;">
+            <div class="load-more-spinner"></div>
         </div>
 
         <!-- FOOTER -->
@@ -1765,7 +1830,21 @@
 
 <script>
     (function() {
-        // ---------- CONFIGURATION ----------
+        // ========== PERFORMANCE OPTIMIZATIONS ==========
+        
+        // Configuration
+        const ITEMS_PER_PAGE = 12; // Load 12 movies at a time
+        let currentPage = 1;
+        let totalPages = 1;
+        let isLoadingMore = false;
+        let hasMoreMovies = true;
+        let allMoviesCache = null; // Cache all movies after first load
+        
+        // Lazy loading observer
+        let imageObserver = null;
+        let loadTriggerObserver = null;
+        
+        // ========== CONFIGURATION ==========
         const APPS_SCRIPT_URL = '%%APPS_SCRIPT_URL%%';
         
         // ===== SESSION MANAGEMENT =====
@@ -1804,7 +1883,7 @@
             }
         }
 
-        // API wrapper
+        // API wrapper with batch support
         async function apiCall(action, data = {}, method = 'GET', showLoading = true) {
             await initSession();
             
@@ -1853,8 +1932,312 @@
                 return { success: false, error: error.message };
             }
         }
+        
+        // Batch API calls - fetch multiple data in one request
+        async function batchAPICall(actions) {
+            showGlobalLoading('Loading data...');
+            
+            try {
+                const batchData = {
+                    actions: actions,
+                    sessionToken: currentSessionToken
+                };
+                
+                const url = `/api/proxy?action=batch&t=${Date.now()}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(batchData)
+                });
+                
+                const result = await response.json();
+                hideGlobalLoading();
+                
+                return result;
+            } catch (error) {
+                hideGlobalLoading();
+                console.error('Batch API call failed:', error);
+                return { success: false, error: error.message };
+            }
+        }
 
-        // ---------- STATE ----------
+        // Initialize Intersection Observer for lazy loading images
+        function initLazyLoading() {
+            if ('IntersectionObserver' in window) {
+                if (imageObserver) imageObserver.disconnect();
+                
+                imageObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const dataSrc = img.getAttribute('data-src');
+                            if (dataSrc && !img.src) {
+                                img.src = dataSrc;
+                                img.classList.add('loading');
+                                
+                                img.onload = () => {
+                                    img.classList.remove('loading');
+                                    img.classList.add('loaded');
+                                };
+                                
+                                img.onerror = () => {
+                                    img.classList.remove('loading');
+                                    img.src = 'https://via.placeholder.com/300x169?text=No+Image';
+                                    img.classList.add('loaded');
+                                };
+                                
+                                img.removeAttribute('data-src');
+                                imageObserver.unobserve(img);
+                            }
+                        }
+                    });
+                }, {
+                    rootMargin: '100px',
+                    threshold: 0.01
+                });
+                
+                // Observe all images with data-src
+                document.querySelectorAll('.card-poster[data-src]').forEach(img => {
+                    imageObserver.observe(img);
+                });
+            } else {
+                // Fallback for older browsers
+                document.querySelectorAll('.card-poster[data-src]').forEach(img => {
+                    img.src = img.getAttribute('data-src');
+                });
+            }
+        }
+        
+        // Initialize infinite scroll with Intersection Observer
+        function initInfiniteScroll() {
+            const loadTrigger = document.getElementById('loadTrigger');
+            if (!loadTrigger) return;
+            
+            if ('IntersectionObserver' in window) {
+                if (loadTriggerObserver) loadTriggerObserver.disconnect();
+                
+                loadTriggerObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && !isLoadingMore && hasMoreMovies) {
+                            loadMoreMovies();
+                        }
+                    });
+                }, {
+                    rootMargin: '200px',
+                    threshold: 0.1
+                });
+                
+                loadTriggerObserver.observe(loadTrigger);
+            }
+        }
+        
+        // Load more movies (pagination)
+        async function loadMoreMovies() {
+            if (isLoadingMore || !hasMoreMovies) return;
+            
+            isLoadingMore = true;
+            const loadTrigger = document.getElementById('loadTrigger');
+            if (loadTrigger) loadTrigger.style.display = 'block';
+            
+            try {
+                currentPage++;
+                const data = await apiCall('getMoviesPaginated', {
+                    page: currentPage,
+                    limit: ITEMS_PER_PAGE
+                }, 'GET', false);
+                
+                if (data.success && data.movies && data.movies.length > 0) {
+                    // Append new movies to existing rows
+                    appendMoviesToRows(data.movies);
+                    hasMoreMovies = data.hasMore || false;
+                    totalPages = data.totalPages || totalPages;
+                    
+                    // Re-initialize lazy loading for new images
+                    setTimeout(() => initLazyLoading(), 100);
+                } else {
+                    hasMoreMovies = false;
+                }
+            } catch (error) {
+                console.error('Error loading more movies:', error);
+                hasMoreMovies = false;
+            } finally {
+                isLoadingMore = false;
+                if (loadTrigger && !hasMoreMovies) {
+                    loadTrigger.style.display = 'none';
+                    if (loadTriggerObserver) loadTriggerObserver.unobserve(loadTrigger);
+                } else if (loadTrigger) {
+                    loadTrigger.style.display = 'none';
+                }
+            }
+        }
+        
+        // Append movies to rows (for pagination)
+        function appendMoviesToRows(newMovies) {
+            newMovies.forEach(movie => {
+                if (movie.category === 'trending') {
+                    if (trendingRow) trendingRow.appendChild(createMovieCard(movie));
+                }
+                if (movie.category === 'popular') {
+                    if (popularRow) popularRow.appendChild(createMovieCard(movie));
+                }
+                if (movie.category === 'recent') {
+                    if (recentRow) recentRow.appendChild(createMovieCard(movie));
+                }
+            });
+        }
+        
+        // Show skeleton loading for movie rows
+        function showSkeletonRows() {
+            const rows = [trendingRow, popularRow, recentRow];
+            rows.forEach(row => {
+                if (row) {
+                    row.innerHTML = '';
+                    for (let i = 0; i < 6; i++) {
+                        const skeleton = document.createElement('div');
+                        skeleton.className = 'skeleton-card';
+                        skeleton.innerHTML = `
+                            <div class="skeleton-poster"></div>
+                            <div class="skeleton-text skeleton-text-lg"></div>
+                            <div class="skeleton-text skeleton-text-sm"></div>
+                            <div class="skeleton-text" style="width: 40%;"></div>
+                        `;
+                        row.appendChild(skeleton);
+                    }
+                }
+            });
+        }
+        
+        // Optimized fetchMovies with pagination
+        async function fetchMovies(page = 1, limit = ITEMS_PER_PAGE) {
+            try {
+                // If we already have cached movies, use pagination on the client side
+                if (allMoviesCache) {
+                    const start = (page - 1) * limit;
+                    const end = start + limit;
+                    const paginatedMovies = allMoviesCache.slice(start, end);
+                    totalPages = Math.ceil(allMoviesCache.length / limit);
+                    hasMoreMovies = end < allMoviesCache.length;
+                    
+                    return {
+                        success: true,
+                        movies: paginatedMovies,
+                        total: allMoviesCache.length,
+                        page: page,
+                        totalPages: totalPages,
+                        hasMore: hasMoreMovies
+                    };
+                }
+                
+                // First load - fetch all movies but with pagination from server
+                const data = await apiCall('getMoviesPaginated', {
+                    page: page,
+                    limit: limit
+                }, 'GET', false);
+                
+                if (data.success && Array.isArray(data.movies)) {
+                    if (page === 1) {
+                        allMoviesCache = data.allMovies || data.movies;
+                        totalPages = data.totalPages || Math.ceil((data.total || data.movies.length) / limit);
+                        hasMoreMovies = data.hasMore || false;
+                    }
+                    
+                    return data;
+                } else {
+                    throw new Error(data.error || 'Invalid response');
+                }
+            } catch (error) {
+                console.error('Error fetching movies:', error);
+                showError('Failed to load movies: ' + error.message);
+                return { success: false, movies: [] };
+            }
+        }
+        
+        // Optimized initial load - batch all API calls
+        async function optimizedInitialLoad() {
+            try {
+                showGlobalLoading('Loading platform...');
+                
+                // Batch all initial API calls into one request
+                const batchResult = await batchAPICall([
+                    { action: 'getMoviesPaginated', page: 1, limit: ITEMS_PER_PAGE },
+                    { action: 'getRatings', limit: 100 },
+                    { action: 'getContinueWatching', userId: userId }
+                ]);
+                
+                if (batchResult.success) {
+                    // Process movies
+                    const moviesData = batchResult.results.find(r => r.action === 'getMoviesPaginated');
+                    if (moviesData && moviesData.success) {
+                        movies = moviesData.movies || [];
+                        allMoviesCache = moviesData.allMovies || movies;
+                        totalPages = moviesData.totalPages || 1;
+                        hasMoreMovies = moviesData.hasMore || false;
+                        
+                        if (movies.length > 0) {
+                            updateHero(movies[0]);
+                        }
+                    }
+                    
+                    // Process ratings
+                    const ratingsData = batchResult.results.find(r => r.action === 'getRatings');
+                    if (ratingsData && ratingsData.success) {
+                        const ratingsMap = {};
+                        const distributionsMap = {};
+                        
+                        (ratingsData.ratings || []).forEach(r => {
+                            if (!ratingsMap[r.movieId]) ratingsMap[r.movieId] = [];
+                            ratingsMap[r.movieId].push(parseInt(r.rating));
+                        });
+                        
+                        Object.keys(ratingsMap).forEach(movieId => {
+                            const movieRatings = ratingsMap[movieId];
+                            const distribution = [0, 0, 0, 0, 0];
+                            movieRatings.forEach(r => {
+                                if (r >= 1 && r <= 5) distribution[r - 1]++;
+                            });
+                            distributionsMap[movieId] = distribution;
+                        });
+                        
+                        ratings = ratingsMap;
+                        ratingDistributions = distributionsMap;
+                        localStorage.setItem('btffRatings', JSON.stringify(ratings));
+                    }
+                    
+                    // Process continue watching
+                    const continueData = batchResult.results.find(r => r.action === 'getContinueWatching');
+                    if (continueData && continueData.success) {
+                        continueWatching = (continueData.continueWatching || []).map(item => ({
+                            id: item.movieId,
+                            progress: parseInt(item.progress),
+                            timestamp: new Date(item.lastWatched).getTime()
+                        }));
+                        localStorage.setItem('btffContinueWatching', JSON.stringify(continueWatching));
+                    }
+                    
+                    extractGenres();
+                    populateYearFilter();
+                    renderAll();
+                    hideError();
+                    
+                    // Check for movie param in URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const movieParam = urlParams.get('movie');
+                    if (movieParam) {
+                        openDetailsModal(movieParam);
+                    }
+                } else {
+                    throw new Error(batchResult.error || 'Batch load failed');
+                }
+                
+                hideGlobalLoading();
+            } catch (error) {
+                hideGlobalLoading();
+                console.error('Error in optimized load:', error);
+                showError('Failed to connect: ' + error.message);
+            }
+        }
+
+        // ========== STATE ==========
         let movies = [];
         let myList = JSON.parse(localStorage.getItem('btffMyList')) || [];
         let continueWatching = JSON.parse(localStorage.getItem('btffContinueWatching')) || [];
@@ -2066,8 +2449,8 @@
                     commentDiv.className = 'comment-item';
                     commentDiv.style.cssText = 'padding: 10px; border-bottom: 1px solid #1f334a;';
                     commentDiv.innerHTML = `
-                        <strong>${comment.user}</strong> <span style="color: #88abdf; font-size: 0.8rem;">${new Date(comment.timestamp).toLocaleString()}</span>
-                        <p style="margin-top: 5px;">${comment.text}</p>
+                        <strong>${escapeHtml(comment.user)}</strong> <span style="color: #88abdf; font-size: 0.8rem;">${new Date(comment.timestamp).toLocaleString()}</span>
+                        <p style="margin-top: 5px;">${escapeHtml(comment.text)}</p>
                     `;
                     commentsList.appendChild(commentDiv);
                 });
@@ -2143,7 +2526,7 @@
                     div.className = 'notification-item';
                     div.style.cssText = 'padding: 10px; border-bottom: 1px solid #1f334a; cursor: pointer;';
                     div.innerHTML = `
-                        <strong>${n.message}</strong>
+                        <strong>${escapeHtml(n.message)}</strong>
                         <div style="color: #88abdf; font-size: 0.7rem;">${new Date(n.timestamp).toLocaleString()}</div>
                     `;
                     div.onclick = () => {
@@ -2325,49 +2708,6 @@
         }
 
         // API Functions
-        async function fetchMovies() {
-            try {
-                showGlobalLoading('Loading movies...');
-                
-                const data = await apiCall('getMovies', {}, 'GET', false);
-                
-                if (data.success && Array.isArray(data.movies)) {
-                    movies = data.movies;
-                    
-                    movies.sort((a, b) => {
-                        const idA = getNumericId(a.id);
-                        const idB = getNumericId(b.id);
-                        return idB - idA;
-                    });
-                    
-                    if (movies.length > 0) {
-                        updateHero(movies[0]);
-                    }
-                    
-                    await fetchAllRatings();
-                    extractGenres();
-                    populateYearFilter();
-                    renderAll();
-                    hideError();
-                    
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const movieParam = urlParams.get('movie');
-                    if (movieParam) {
-                        openDetailsModal(movieParam);
-                    }
-                    
-                    hideGlobalLoading();
-                } else {
-                    hideGlobalLoading();
-                    throw new Error(data.error || 'Invalid response');
-                }
-            } catch (error) {
-                hideGlobalLoading();
-                console.error('Error:', error);
-                showError('Failed to connect: ' + error.message);
-            }
-        }
-
         async function fetchAllRatings() {
             const data = await apiCall('getRatings', {}, 'GET', false);
             
@@ -2446,9 +2786,9 @@
             genreFilters.innerHTML = '<span class="genre-pill active" data-genre="all">All</span>';
             genresList.sort().forEach(genre => {
                 if (typeof genre === 'string') {
-                    genreFilters.innerHTML += `<span class="genre-pill" data-genre="${genre}">${genre}</span>`;
+                    genreFilters.innerHTML += `<span class="genre-pill" data-genre="${genre}">${escapeHtml(genre)}</span>`;
                 } else if (genre.name) {
-                    genreFilters.innerHTML += `<span class="genre-pill" data-genre="${genre.name}">${genre.name} (${genre.count || 0})</span>`;
+                    genreFilters.innerHTML += `<span class="genre-pill" data-genre="${genre.name}">${escapeHtml(genre.name)} (${genre.count || 0})</span>`;
                 }
             });
             
@@ -2724,7 +3064,7 @@
                     <span>${movie.year || '2024'}</span>
                     <span>${movie.duration || '0m'}</span>
                     <span>${movie.category}</span>
-                    ${movie.genre ? `<span>${movie.genre}</span>` : ''}
+                    ${movie.genre ? `<span>${escapeHtml(movie.genre)}</span>` : ''}
                 `;
             }
             
@@ -2844,6 +3184,19 @@
             renderAll();
         }
 
+        // Debounce function for search input
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
         function filterAndSortMovies(movieList) {
             let filtered = [...movieList];
             
@@ -2909,7 +3262,15 @@
             return filtered;
         }
 
-        // Card Creation
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Card Creation with lazy loading
         function createMovieCard(movie, forSimilar = false) {
             const youtubeId = movie.youtubeId ? movie.youtubeId.split('?')[0].split('&')[0] : '';
             if (!youtubeId) {
@@ -2921,7 +3282,7 @@
             card.className = `movie-card ${isInMyList(movie.id) ? 'in-my-list' : ''}`;
             if (getProgress(movie.id) > 0) card.classList.add('continue-watching');
             card.dataset.id = movie.id;
-
+            
             const thumb = `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`;
             const icon = isInMyList(movie.id) ? 'fa-check' : 'fa-plus';
             const avgRating = getAverageRating(movie.id);
@@ -2948,13 +3309,13 @@
             }
 
             card.innerHTML = `
-                <img class="card-poster" src="${thumb}" loading="lazy">
+                <img class="card-poster" data-src="${thumb}" loading="lazy">
                 <div class="card-info">
-                    <div class="card-title">${movie.title}</div>
+                    <div class="card-title">${escapeHtml(movie.title)}</div>
                     <div class="card-meta">
                         <span>${movie.year || '2024'}</span>
                         <span>${movie.duration || '0m'}</span>
-                        <span>${movie.genre || movie.category}</span>
+                        <span>${escapeHtml(movie.genre || movie.category)}</span>
                     </div>
                     <div class="card-rating">
                         <i class="fas fa-star"></i>
@@ -2962,7 +3323,7 @@
                         <span class="rating-count">(${ratingCount})</span>
                     </div>
                     ${ratingBarsHtml}
-                    <div class="card-description">${(movie.description || '').substring(0,60)}...</div>
+                    <div class="card-description">${escapeHtml((movie.description || '').substring(0, 60))}...</div>
                     <div class="card-footer">
                         <i class="fas fa-play"></i>
                         <i class="fas ${icon}"></i>
@@ -3026,12 +3387,25 @@
         }
 
         function renderAll() {
+            // Clear rows but keep skeletons
             clearRow(trendingRow);
             clearRow(popularRow);
             clearRow(recentRow);
-
-            const filteredMovies = filterAndSortMovies(movies);
-
+            
+            // Get current page movies from cache
+            let currentMovies = [];
+            if (allMoviesCache) {
+                const start = (currentPage - 1) * ITEMS_PER_PAGE;
+                const end = start + ITEMS_PER_PAGE;
+                currentMovies = allMoviesCache.slice(start, end);
+            } else {
+                currentMovies = movies;
+            }
+            
+            // Apply filters
+            const filteredMovies = filterAndSortMovies(currentMovies);
+            
+            // Render movies for current page
             filteredMovies.forEach(movie => {
                 if (movie.category === 'trending') {
                     if (trendingRow) trendingRow.appendChild(createMovieCard(movie));
@@ -3050,6 +3424,7 @@
                 }
             });
 
+            // Handle empty states
             if (trendingRow && trendingRow.children.length === 0) {
                 trendingRow.innerHTML = '<div class="empty-row">No trending movies</div>';
             }
@@ -3063,6 +3438,20 @@
             renderMyListRow();
             renderContinueWatchingRow();
             renderRecommendations();
+            
+            // Initialize lazy loading for newly added images
+            setTimeout(() => initLazyLoading(), 100);
+            
+            // Update load trigger visibility
+            const loadTrigger = document.getElementById('loadTrigger');
+            if (loadTrigger && hasMoreMovies) {
+                loadTrigger.style.display = 'block';
+                if (loadTriggerObserver) {
+                    loadTriggerObserver.observe(loadTrigger);
+                }
+            } else if (loadTrigger) {
+                loadTrigger.style.display = 'none';
+            }
 
             const totalVisible = (trendingRow?.children.length || 0) + (popularRow?.children.length || 0) + (recentRow?.children.length || 0);
             if (searchCount) {
@@ -3177,10 +3566,15 @@
             if (!chatBox) return;
             const msgDiv = document.createElement('div');
             msgDiv.className = 'chat-message';
-            msgDiv.innerHTML = `<strong>${user}:</strong> ${message}`;
+            msgDiv.innerHTML = `<strong>${escapeHtml(user)}:</strong> ${escapeHtml(message)}`;
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
+
+        // Optimized search with debouncing
+        const debouncedSearch = debounce(() => {
+            applyFilters();
+        }, 300);
 
         // Event Listeners
         if (mobileMenuBtn) {
@@ -3226,7 +3620,7 @@
         }
 
         if (searchInput) {
-            searchInput.addEventListener('input', applyFilters);
+            searchInput.addEventListener('input', debouncedSearch);
         }
 
         if (categoryFilter) {
@@ -3411,7 +3805,9 @@
         }
 
         if (retryBtn) {
-            retryBtn.addEventListener('click', fetchMovies);
+            retryBtn.addEventListener('click', () => {
+                optimizedInitialLoad();
+            });
         }
 
         if (detailsPlayBtn) {
@@ -3570,10 +3966,36 @@
             loadingIndicator.style.display = 'none';
         }
 
+        // Show skeletons while loading
+        showSkeletonRows();
+
+        // Use optimized initial load
         initSession().then(() => {
-            fetchMovies();
-            fetchContinueWatching();
+            optimizedInitialLoad();
+            initLazyLoading();
+            initInfiniteScroll();
             updateNotificationsBadge();
+        });
+        
+        // Re-initialize lazy loading when new content is added
+        const mutationObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.addedNodes.length) {
+                    initLazyLoading();
+                }
+            });
+        });
+        
+        mutationObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // Clean up observers on page unload
+        window.addEventListener('beforeunload', () => {
+            if (imageObserver) imageObserver.disconnect();
+            if (loadTriggerObserver) loadTriggerObserver.disconnect();
+            mutationObserver.disconnect();
         });
     })();
 </script>

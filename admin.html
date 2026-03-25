@@ -2133,23 +2133,37 @@
                     <div class="top-bar"><div class="page-title"><h1>Call Center Clients</h1><p>Manage client database</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
                     <div class="section-header"><h2>All Clients (${callCenterClients.length})</h2><button class="btn-primary" onclick="openAddClientModal()"><i class="fas fa-plus"></i> Add Client</button></div>
                     <div class="table-container">
-                         <thead>
-                             <th>Phone</th><th>Name</th><th>Country</th><th>State</th><th>City</th><th>Total Calls</th><th>Last Called</th><th>Status</th><th>Actions</th>
-                         </thead>
-                        <tbody>
-                            ${callCenterClients.map(c => `
-                                 <td>${c.phoneNumber}</td>
-                                 <td>${c.fullName || 'Unknown'}</td>
-                                 <td>${c.country || 'N/A'}</td>
-                                 <td>${c.state || 'N/A'}</td>
-                                 <td>${c.city || 'N/A'}</td>
-                                 <td>${c.totalCalls || 0}</td>
-                                 <td>${c.lastCalled ? new Date(c.lastCalled).toLocaleDateString() : 'Never'}</td>
-                                 <td><span class="status-badge ${c.callStatus === 'Pending' ? 'pending' : 'active'}">${c.callStatus || 'Pending'}</span></td>
-                                 <td><div class="action-btns"><button class="action-btn delete" onclick="deleteClient('${c.phoneNumber}')"><i class="fas fa-trash"></i></button></div></td>
-                            `).join('')}
-                            ${callCenterClients.length === 0 ? ' <td colspan="9" style="text-align:center">No clients found</td>' : ''}
-                        </tbody>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Phone Number</th>
+                                    <th>Full Name</th>
+                                    <th>Country</th>
+                                    <th>State</th>
+                                    <th>City</th>
+                                    <th>Total Calls</th>
+                                    <th>Last Called</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${callCenterClients.map(c => `
+                                    <tr>
+                                        <td>${c.phoneNumber}</td>
+                                        <td>${c.fullName || 'Unknown'}</td>
+                                        <td>${c.country || 'N/A'}</td>
+                                        <td>${c.state || 'N/A'}</td>
+                                        <td>${c.city || 'N/A'}</td>
+                                        <td>${c.totalCalls || 0}</td>
+                                        <td>${c.lastCalled ? new Date(c.lastCalled).toLocaleDateString() : 'Never'}</td>
+                                        <td><span class="status-badge ${c.callStatus === 'Pending' ? 'pending' : 'active'}">${c.callStatus || 'Pending'}</span></td>
+                                        <td><div class="action-btns"><button class="action-btn delete" onclick="deleteClient('${c.phoneNumber}')"><i class="fas fa-trash"></i></button></div></td>
+                                    </tr>
+                                `).join('')}
+                                ${callCenterClients.length === 0 ? ' <td colspan="9" style="text-align:center">No clients found</td>' : ''}
+                            </tbody>
+                        </table>
                     </div>
                 `;
             }
@@ -2161,21 +2175,27 @@
                     <div class="top-bar"><div class="page-title"><h1>Call Logs</h1><p>View all call history</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
                     <div class="stats-grid"><div class="stat-card"><div class="stat-icon"><i class="fas fa-phone"></i></div><div class="stat-value">${callCenterCalls.length}</div><div class="stat-label">Total Calls</div></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value">${callCenterCalls.filter(c => c.outcome === 'Connected').length}</div><div class="stat-label">Connected</div></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">${Math.round(callCenterCalls.reduce((sum, c) => sum + (c.duration || 0), 0) / 60)}min</div><div class="stat-label">Total Talk Time</div></div></div>
                     <div class="table-container">
-                         <thead>
-                             <th>Date & Time</th><th>Worker</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th>
-                         </thead>
-                        <tbody>
-                            ${recentCalls.map(c => `
-                                 <td>${new Date(c.callDate).toLocaleString()}</td>
-                                 <td>${c.workerEmail?.split('@')[0] || 'Unknown'}</td>
-                                 <td>${c.clientName || 'Unknown'}</td>
-                                 <td>${c.clientPhone}</td>
-                                 <td>${Math.floor(c.duration / 60)}:${(c.duration % 60).toString().padStart(2,'0')}</td>
-                                 <td><span class="status-badge ${c.outcome === 'Connected' ? 'active' : 'pending'}">${c.outcome}</span></td>
-                                 <td>${c.remarks?.substring(0, 50) || ''}${c.remarks?.length > 50 ? '...' : ''}</td>
-                            `).join('')}
-                            ${recentCalls.length === 0 ? ' <td colspan="7" style="text-align:center">No calls recorded</td>' : ''}
-                        </tbody>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th><th>Worker</th><th>Client</th><th>Phone</th><th>Duration</th><th>Outcome</th><th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${recentCalls.map(c => `
+                                    <tr>
+                                        <td>${new Date(c.callDate).toLocaleString()}</td>
+                                        <td>${c.workerEmail?.split('@')[0] || 'Unknown'}</td>
+                                        <td>${c.clientName || 'Unknown'}</td>
+                                        <td>${c.clientPhone}</td>
+                                        <td>${Math.floor(c.duration / 60)}:${(c.duration % 60).toString().padStart(2,'0')}</td>
+                                        <td><span class="status-badge ${c.outcome === 'Connected' ? 'active' : 'pending'}">${c.outcome}</span></td>
+                                        <td>${c.remarks?.substring(0, 50) || ''}${c.remarks?.length > 50 ? '...' : ''}</td>
+                                    </tr>
+                                `).join('')}
+                                ${recentCalls.length === 0 ? ' <td colspan="7" style="text-align:center">No calls recorded</td>' : ''}
+                            </tbody>
+                        </table>
                     </div>
                 `;
             }
@@ -2205,71 +2225,75 @@
                     
                     <div class="section-header"><h2>Pending Approvals</h2></div>
                     <div class="table-container">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Country</th>
-                                <th>Registered</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${pendingWorkers.map(w => `
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td>${w.fullName || 'N/A'}</td>
-                                    <td>${w.email}</td>
-                                    <td>${w.phoneNumber || 'N/A'}</td>
-                                    <td>${w.country || 'N/A'}</td>
-                                    <td>${w.registrationDate ? new Date(w.registrationDate).toLocaleDateString() : 'N/A'}</td>
-                                    <td><span class="status-badge pending">Pending</span></td>
-                                    <td>
-                                        <div class="action-btns">
-                                            <button class="action-btn success" onclick="approveWorker('${w.email}')" title="Approve"><i class="fas fa-check"></i></button>
-                                            <button class="action-btn delete" onclick="deleteWorker('${w.email}')" title="Delete"><i class="fas fa-trash"></i></button>
-                                        </div>
-                                    </td>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Country</th>
+                                    <th>Registered</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
-                            `).join('')}
-                            ${pendingWorkers.length === 0 ? '<tr><td colspan="7" style="text-align:center">No pending approvals</td></tr>' : ''}
-                        </tbody>
+                            </thead>
+                            <tbody>
+                                ${pendingWorkers.map(w => `
+                                    <tr>
+                                        <td>${w.fullName || 'N/A'}</td>
+                                        <td>${w.email}</td>
+                                        <td>${w.phoneNumber || 'N/A'}</td>
+                                        <td>${w.country || 'N/A'}</td>
+                                        <td>${w.registrationDate ? new Date(w.registrationDate).toLocaleDateString() : 'N/A'}</td>
+                                        <td><span class="status-badge pending">Pending</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn success" onclick="approveWorker('${w.email}')" title="Approve"><i class="fas fa-check"></i></button>
+                                                <button class="action-btn delete" onclick="deleteWorker('${w.email}')" title="Delete"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                                ${pendingWorkers.length === 0 ? '<tr><td colspan="7" style="text-align:center">No pending approvals</td></tr>' : ''}
+                            </tbody>
+                        </table>
                     </div>
                     
                     <div class="section-header"><h2>Active Workers</h2></div>
                     <div class="table-container">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Country</th>
-                                <th>Total Calls</th>
-                                <th>Last Active</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${activeWorkers.map(w => `
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td>${w.fullName || 'N/A'}</td>
-                                    <td>${w.email}</td>
-                                    <td>${w.phoneNumber || 'N/A'}</td>
-                                    <td>${w.country || 'N/A'}</td>
-                                    <td>${w.totalCalls || 0}</td>
-                                    <td>${w.lastActive ? new Date(w.lastActive).toLocaleDateString() : 'Never'}</td>
-                                    <td><span class="status-badge active">Active</span></td>
-                                    <td>
-                                        <div class="action-btns">
-                                            <button class="action-btn delete" onclick="deleteWorker('${w.email}')" title="Delete"><i class="fas fa-trash"></i></button>
-                                        </div>
-                                    </td>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Country</th>
+                                    <th>Total Calls</th>
+                                    <th>Last Active</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
-                            `).join('')}
-                            ${activeWorkers.length === 0 ? '<tr><td colspan="8" style="text-align:center">No active workers</td></tr>' : ''}
-                        </tbody>
+                            </thead>
+                            <tbody>
+                                ${activeWorkers.map(w => `
+                                    <tr>
+                                        <td>${w.fullName || 'N/A'}</td>
+                                        <td>${w.email}</td>
+                                        <td>${w.phoneNumber || 'N/A'}</td>
+                                        <td>${w.country || 'N/A'}</td>
+                                        <td>${w.totalCalls || 0}</td>
+                                        <td>${w.lastActive ? new Date(w.lastActive).toLocaleDateString() : 'Never'}</td>
+                                        <td><span class="status-badge active">Active</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn delete" onclick="deleteWorker('${w.email}')" title="Delete"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                                ${activeWorkers.length === 0 ? '<tr><td colspan="8" style="text-align:center">No active workers</td></tr>' : ''}
+                            </tbody>
+                        </table>
                     </div>
                 `;
             }
@@ -2302,11 +2326,13 @@
                     <div class="top-bar"><div class="page-title"><h1>Call Analytics</h1><p>Performance metrics and insights</p></div><div class="admin-profile"><div class="admin-info"><h4>${currentAdminUser?.role || 'Admin'}</h4><p>${currentAdminUser?.email || 'admin@btff.com'}</p></div><div class="admin-avatar">${currentAdminUser?.role?.charAt(0) || 'AD'}</div></div></div>
                     <div class="stats-grid"><div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-value">${callCenterCalls.length}</div><div class="stat-label">Total Calls</div></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-percent"></i></div><div class="stat-value">${callCenterCalls.length ? Math.round((outcomeCounts.Connected / callCenterCalls.length) * 100) : 0}%</div><div class="stat-label">Connect Rate</div></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">${Math.round(callCenterCalls.reduce((sum, c) => sum + (c.duration || 0), 0) / 60)}min</div><div class="stat-label">Total Talk Time</div></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-user-tie"></i></div><div class="stat-value">${Object.keys(workerStats).length}</div><div class="stat-label">Active Workers</div></div></div>
                     <div class="charts-row"><div class="chart-card"><div class="chart-header"><h3>Call Outcomes</h3></div><div class="chart-container"><canvas id="outcomeChart"></canvas></div></div><div class="chart-card"><div class="chart-header"><h3>Top Performers</h3></div><div class="table-container">
-                        <thead><tr><th>Worker</th><th>Calls</th><th>Talk Time</th></tr></thead>
-                        <tbody>
-                            ${topWorkers.map(w => `<tr><td>${w.name}</td><td>${w.calls}</td><td>${Math.floor(w.duration / 60)}min</td></tr>`).join('')}
-                            ${topWorkers.length === 0 ? '<tr><td colspan="3" style="text-align:center">No data available</td></tr>' : ''}
-                        </tbody>
+                        <table>
+                            <thead><tr><th>Worker</th><th>Calls</th><th>Talk Time</th></tr></thead>
+                            <tbody>
+                                ${topWorkers.map(w => `<tr><td>${w.name}</td><td>${w.calls}</td><td>${Math.floor(w.duration / 60)}min</td></tr>`).join('')}
+                                ${topWorkers.length === 0 ? '<tr><td colspan="3" style="text-align:center">No data available</td></tr>' : ''}
+                            </tbody>
+                        </table>
                     </div></div></div>
                 `;
             }

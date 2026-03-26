@@ -2773,18 +2773,61 @@
 
         function openVideoPlayer(movieId, episode = null) {
             const movie = movies.find(m => m.id == movieId);
-            if (!movie || !movie.youtubeId) {
-                showNotification('This movie has no video URL');
+            if (!movie) {
+                console.error('Movie not found:', movieId);
+                showNotification('Video not found');
                 return;
             }
+            
+            // Handle both regular movies and temp movies from Pastor Enoch
+            let videoId = movie.youtubeId;
+            if (!videoId && movie.id && movie.id.length < 20) {
+                // If it's a YouTube ID directly
+                videoId = movie.id;
+            }
+            
+            if (!videoId) {
+                console.error('Movie missing youtubeId:', movie);
+                showNotification('This video has no URL');
+                return;
+            }
+            
             currentMovie = movie;
-            const youtubeId = movie.youtubeId.split('?')[0].split('&')[0];
-            if (videoModalTitle) videoModalTitle.textContent = episode ? `${movie.title} - ${episode}` : movie.title;
-            if (videoIframe) videoIframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
-            if (videoModal) { videoModal.style.display = 'flex'; videoModal.classList.add('active'); }
+            
+            // Extract clean YouTube ID
+            const youtubeId = videoId.split('?')[0].split('&')[0];
+            
+            if (videoModalTitle) {
+                videoModalTitle.textContent = episode ? `${movie.title} - ${episode}` : movie.title;
+            }
+            
+            const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
+            
+            console.log('🎬 Playing video:', embedUrl);
+            
+            if (videoIframe) {
+                videoIframe.src = embedUrl;
+            }
+            
+            if (videoModal) {
+                videoModal.style.display = 'flex';
+                videoModal.classList.add('active');
+            }
+            
             document.body.style.overflow = 'hidden';
-            setTimeout(() => updateProgress(movieId, 25), 30000);
-            if (videoModalAddBtn) videoModalAddBtn.innerHTML = isInMyList(movieId) ? '<i class="fas fa-check"></i> In My List' : '<i class="fas fa-plus"></i> My List';
+            
+            // Only update progress for actual movies (not temp pastor videos)
+            if (movie.id !== videoId && movies.some(m => m.id === movie.id && m.youtubeId)) {
+                setTimeout(() => {
+                    updateProgress(movieId, 25);
+                }, 30000);
+            }
+            
+            if (videoModalAddBtn) {
+                videoModalAddBtn.innerHTML = isInMyList(movieId) ? 
+                    '<i class="fas fa-check"></i> In My List' : 
+                    '<i class="fas fa-plus"></i> My List';
+            }
         }
 
         function closeVideoPlayer() {
@@ -3209,20 +3252,44 @@
             document.body.style.overflow = 'auto';
         }
         
-        // Make playVideo globally accessible
+        // Make playVideo globally accessible - FIXED VERSION
         window.playVideo = function(videoId) {
+            console.log('🎬 Playing video with ID:', videoId);
             closeAiChatModal();
-            // Use the existing video player to play the YouTube video
-            const tempMovie = { 
-                id: videoId, 
-                title: "Pastor Enoch Teaching", 
-                youtubeId: videoId, 
-                description: "A spiritual teaching from Pastor Enoch" 
-            };
-            if (typeof openVideoPlayer === 'function') {
-                openVideoPlayer(tempMovie.id);
+            
+            // First, check if this video already exists in the movies array
+            let existingMovie = movies.find(m => m.youtubeId === videoId);
+            
+            if (existingMovie) {
+                // If it exists, use the existing movie
+                console.log('Found existing movie:', existingMovie.title);
+                openVideoPlayer(existingMovie.id);
             } else {
-                window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+                // Create a temporary movie object that will work with openVideoPlayer
+                const tempMovie = { 
+                    id: videoId,
+                    title: "Pastor Enoch Teaching", 
+                    youtubeId: videoId, 
+                    description: "A spiritual teaching from Pastor Enoch",
+                    category: "trending",
+                    year: new Date().getFullYear().toString(),
+                    duration: "10m",
+                    type: "movie"
+                };
+                
+                // Add to movies array temporarily so openVideoPlayer can find it
+                movies.push(tempMovie);
+                
+                // Now open the video player
+                openVideoPlayer(tempMovie.id);
+                
+                // Optional: Remove from movies array after a delay (or keep it for future use)
+                setTimeout(() => {
+                    const index = movies.findIndex(m => m.id === videoId);
+                    if (index !== -1) {
+                        movies.splice(index, 1);
+                    }
+                }, 60000); // Remove after 1 minute
             }
         };
         
